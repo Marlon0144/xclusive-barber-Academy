@@ -60,12 +60,12 @@ export async function signup(prevState: SignupState, formData: FormData): Promis
       }
     )
 
-    // Insertamos usando supabaseAdmin en lugar de supabase normal
     const { error: profileError } = await supabaseAdmin.from('profiles').insert({
       id: authData.user.id,
       full_name: fullName,
       email: email,
-      role: 'student',
+      // AHORA: Usamos el rol que viene definido en la invitación
+      role: invitation.role_to_assign, 
     })
 
     if (profileError) {

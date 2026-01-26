@@ -5,7 +5,7 @@ export default async function Home() {
   const supabase = await createClient();
 
   // 2. Hacemos una consulta simple: Traer todas las invitaciones
-  const { data: invitations } = await supabase.from("invitations").select();
+  const { data: users } = await supabase.from("profiles").select();
 
   return (
     <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center p-4">
@@ -27,7 +27,7 @@ export default async function Home() {
           </p>
           
           <pre className="bg-black text-xs text-left text-green-500 p-4 rounded overflow-auto font-mono">
-            {JSON.stringify(invitations, null, 2)}
+            {JSON.stringify(users, null, 2)}
           </pre>
         </div>
       </div>
