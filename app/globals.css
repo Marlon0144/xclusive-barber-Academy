@@ -1,4 +1,6 @@
 @import "tailwindcss";
+/* 👇 AGREGA ESTA LÍNEA AQUÍ PARA ACTIVAR EL PLUGIN EN V4 */
+@plugin "@tailwindcss/typography"; 
 
 :root {
   --background: #ffffff;
