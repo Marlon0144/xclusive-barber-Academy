@@ -1,6 +1,0 @@
--- Generar 5 códigos aleatorios automáticos -- 
-INSERT INTO invitations (code, max_uses)
-SELECT 
-  'BARBER-' || substr(md5(random()::text), 1, 6), -- Genera ej: BARBER-a1b2c3
-  1
-FROM generate_series(1, 5);

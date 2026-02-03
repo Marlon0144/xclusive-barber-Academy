@@ -81,7 +81,7 @@ export async function signup(prevState: SignupState, formData: FormData): Promis
   }
 
   revalidatePath('/', 'layout')
-  redirect('/dashboard/courses')
+  redirect('/dashboard')
   
   return { success: true, error: null } 
 }
