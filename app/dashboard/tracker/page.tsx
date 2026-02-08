@@ -29,17 +29,26 @@ export default function TrackerPage() {
   const supabase = createClient()
 
   const fetchHistory = useCallback(async () => {
-    const { data, error } = await supabase
-      .from('submissions')
-      .select('*')
-      .order('created_at', { ascending: false })
+      // 1. Primero obtenemos el usuario actual para saber "Quién soy"
+      const { data: { user } } = await supabase.auth.getUser()
+      
+      if (!user) return
 
-    if (error) {
-      console.error('Error fetching history:', error)
-    } else if (data) {
-      setSubmissions(data as Submission[])
-    }
-  }, [supabase])
+      const { data, error } = await supabase
+        .from('submissions')
+        .select('*')
+        // 2. FILTRO MAESTRO: Forzamos que solo traiga mis filas
+        // Esto anula el efecto visual de "ver todo" que tiene el Admin por RLS
+        .eq('student_id', user.id) 
+        .order('created_at', { ascending: false })
+
+      if (error) {
+        console.error('Error fetching history:', error)
+      } else if (data) {
+        // console.log("Mis entregas:", data)
+        setSubmissions(data as Submission[])
+      }
+    }, [supabase])
 
   useEffect(() => {
     fetchHistory()
