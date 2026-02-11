@@ -1,42 +1,37 @@
 import { createClient } from '@/utils/supabase/server'
+import { redirect, notFound } from 'next/navigation' // Importamos notFound por si el ID está mal
 import EditLessonForm from './EditLessonForm'
-import { notFound, redirect } from 'next/navigation'
 
-// CORRECCIÓN NEXT.JS 15:
-// Definimos params como una Promesa
+// Asegúrate de que el tipo de props sea correcto para Next.js 15
 interface PageProps {
   params: Promise<{ lessonId: string }>
 }
 
 export default async function EditLessonPage({ params }: PageProps) {
-  // 1. Desempaquetamos la promesa (¡Esto es lo que faltaba!)
+  // Await params (Requerido en Next.js 15)
   const { lessonId } = await params
-
-  const supabase = await createClient()
   
-  // 2. Verificar sesión
+  const supabase = await createClient()
+
+  // 1. Verificación de Auth
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
-  // 3. Traer la lección usando el ID ya resuelto
+  // 2. Fetch de la Lección
+  // ⚠️ AQUÍ ESTABA EL ERROR: Faltaba pedir 'video_url'
   const { data: lesson, error } = await supabase
     .from('lessons')
-    .select('id, title, content, module_id')
-    .eq('id', lessonId) // Ahora sí usamos la variable segura
+    .select('id, title, content, video_url') // <--- AGREGADO AQUI
+    .eq('id', lessonId)
     .single()
 
   if (error || !lesson) {
     console.error('Error fetching lesson:', error)
-    notFound()
+    return notFound() // Muestra página 404 si no existe
   }
 
   return (
-    <div className="p-8 max-w-4xl mx-auto">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold tracking-tight">Editar Lección</h1>
-        <p className="text-gray-500">Editando: {lesson.title}</p>
-      </div>
-
+    <div>
       <EditLessonForm lesson={lesson} />
     </div>
   )

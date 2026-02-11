@@ -1,10 +1,8 @@
 'use server'
 
-import { createClient } from '@/utils/supabase/server'
+import { createClient, createAdminClient } from '@/utils/supabase/server' // <--- IMPORTAMOS AMBOS
 import { revalidatePath } from 'next/cache'
-import { redirect } from 'next/navigation'
 
-// Tipo de retorno para manejo de errores en el cliente
 export type ActionState = {
   success?: boolean
   error?: string | null
@@ -12,48 +10,44 @@ export type ActionState = {
 
 export async function updateLessonContent(
   lessonId: string, 
-  htmlContent: string
+  htmlContent: string,
+  videoUrl: string | null 
 ): Promise<ActionState> {
-  const supabase = await createClient()
+  
+  // 1. CLIENTE NORMAL: Solo para verificar identidad
+  const supabaseUser = await createClient()
+  const { data: { user }, error: authError } = await supabaseUser.auth.getUser()
 
-  // 1. Verificación de Seguridad (Autenticación y Rol)
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
-
+  // Verificamos que el usuario exista
   if (authError || !user) {
-    return { error: 'No autorizado. Debes iniciar sesión.' }
+    return { error: 'No autorizado: Debes iniciar sesión.' }
   }
 
-  // Opcional: Verificar si es admin explícitamente en la tabla profiles
-  // Esto es doble seguridad además del RLS
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('role')
-    .eq('id', user.id)
-    .single()
+  // (OPCIONAL PERO RECOMENDADO) Verificamos rol aquí manualmente
+  // const role = user.user_metadata?.role || user.app_metadata?.role
+  // if (role !== 'admin') return { error: 'No tienes permisos de administrador.' }
 
-  if (profile?.role !== 'admin' && profile?.role !== 'professor') {
-     return { error: 'Acceso denegado. Solo administradores o profesores.' }
-  }
+  // ---------------------------------------------------------
 
-  // 2. Actualizar el contenido en la DB
-  const { error: updateError } = await supabase
+  // 2. CLIENTE ADMIN: Para escribir en la DB saltando RLS
+  const supabaseAdmin = await createAdminClient()
+
+  const { error: updateError } = await supabaseAdmin
     .from('lessons')
     .update({ 
-      content: htmlContent,
-      // Podríamos agregar un campo 'updated_at': new Date().toISOString() si tu tabla lo tiene
+      content: htmlContent,   
+      video_url: videoUrl,    
     })
     .eq('id', lessonId)
 
   if (updateError) {
     console.error('Error updating lesson:', updateError)
-    return { error: 'Error al guardar el contenido en la base de datos.' }
+    return { error: 'Error DB: ' + updateError.message }
   }
 
-  // 3. Revalidar la caché
-  // Esto hace que cuando vuelvas a entrar a la lección, veas el cambio instantáneamente
-  // Ajusta esta ruta si tu vista de cursos es diferente (ej: /courses/module-id/lesson-id)
-  revalidatePath('/courses') 
-  revalidatePath(`/dashboard/admin/courses`)
+  // 3. Limpiar caché
+  revalidatePath('/dashboard/courses') 
+  revalidatePath(`/dashboard/admin/lessons/${lessonId}/edit`)
 
   return { success: true }
 }

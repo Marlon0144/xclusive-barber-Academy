@@ -21,6 +21,18 @@ export default async function Header() {
           {user ? (
             // ESTADO: LOGUEADO
             <div className="flex items-center gap-4 bg-slate-900 border border-slate-800 py-1 px-3 rounded-full">
+              
+              {/* --- NUEVO: ENLACE AL DASHBOARD --- */}
+              <Link 
+                href="/dashboard" 
+                className="text-amber-500 hover:text-amber-400 font-bold px-2 transition-colors"
+              >
+                Dashboard
+              </Link>
+
+              {/* Separador visual */}
+              <div className="h-4 w-px bg-slate-700"></div>
+
               <div className="flex flex-col text-right">
                 <span className="text-xs text-slate-400">Conectado como:</span>
                 <span className="text-emerald-400 font-mono truncate max-w-[150px]">
