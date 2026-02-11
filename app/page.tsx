@@ -2,6 +2,7 @@ import { createClient } from "@/utils/supabase/server";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { Check, Star, Users, Briefcase } from "lucide-react";
+import julianImg from "./julian.png";
 
 export default async function Home() {
   const supabase = await createClient();
@@ -152,7 +153,7 @@ export default async function Home() {
           </div>
           <div className="w-full md:w-1/2 h-[500px] md:h-[600px] relative">
             <img
-              src="https://images.unsplash.com/photo-1635273052243-5b887160d5b4?q=80&w=1974&auto=format&fit=crop"
+              src={julianImg?.src ?? julianImg}
               alt="Julian Instructor"
               className="w-full h-full object-cover object-top mask-image-b-fade"
               style={{ maskImage: 'linear-gradient(to bottom, black 80%, transparent 100%)' }}
