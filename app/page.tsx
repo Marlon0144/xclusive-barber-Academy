@@ -11,10 +11,10 @@ export default async function Home() {
 
       {/* 1. HERO SECTION */}
       <section className="relative h-[90vh] flex items-center justify-center overflow-hidden">
-        {/* Background Image & Overlay */}
+        {/* Background Image & Overlay (Figma assets) */}
         <div className="absolute inset-0 z-0">
           <img
-            src="https://images.unsplash.com/photo-1585747860715-2ba37e788b70?q=80&w=2074&auto=format&fit=crop"
+            src="https://www.figma.com/api/mcp/asset/30929525-8af9-4ea8-a25e-ce1c5438a04d"
             alt="Barber Background"
             className="w-full h-full object-cover grayscale opacity-40"
           />
@@ -29,24 +29,24 @@ export default async function Home() {
             <h2 className="text-gold-500 tracking-[0.2em] text-sm uppercase font-bold mb-2">Xclusive Barber Academy</h2>
           </div>
 
-          <h1 className="text-5xl md:text-7xl font-bold font-serif text-white tracking-tight leading-tight">
-            FORMACIÓN <span className="text-transparent bg-clip-text bg-gradient-to-r from-gold-500 to-gold-600">PROFESIONAL</span><br />
-            EN BARBERÍA
+          <h1 className="text-4xl md:text-6xl lg:text-7xl font-extrabold font-serif text-white tracking-tight leading-tight">
+            FORMACIÓN <span className="text-transparent bg-clip-text bg-gradient-to-r from-gold-500 to-gold-600">PROFESIONAL</span>
+            <br />EN BARBERÍA
           </h1>
 
-          <p className="text-zinc-400 text-lg md:text-xl max-w-2xl mx-auto">
+          <p className="text-zinc-400 text-base md:text-lg max-w-2xl mx-auto">
             PARA LATINOS EN AUSTRALIA. Sistema de aprendizaje práctico y estructurado para construir una carrera real.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center pt-8">
             <Link href="/apply">
               <Button size="lg" className="w-full sm:w-auto text-base px-8 py-6">
-                Aplicar a la Academia
+                APLICAR A LA ACADEMIA
               </Button>
             </Link>
             <Link href="/models">
               <Button variant="outline" size="lg" className="w-full sm:w-auto text-base px-8 py-6">
-                Quiero ser Modelo
+                QUIERO SER MODELO
               </Button>
             </Link>
           </div>
@@ -79,7 +79,7 @@ export default async function Home() {
             </div>
             <div className="relative h-[400px] rounded-sm overflow-hidden border border-white/10 group">
               <img
-                src="https://images.unsplash.com/photo-1503951914875-452162b7f30a?q=80&w=2070&auto=format&fit=crop"
+                src="https://www.figma.com/api/mcp/asset/ad8ab21e-eae2-41dd-813c-69b187f4ee92"
                 alt="Barber working"
                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
               />
@@ -107,7 +107,7 @@ export default async function Home() {
             {[
               { title: "FORMACIÓN PRÁCTICA REAL", desc: "Aprende haciendo, con escenarios realistas y estándares del mercado australiano.", icon: "scissors" },
               { title: "MENTALIDAD PROFESIONAL", desc: "Disciplina, puntualidad, trato al cliente y presentación personal como parte del proceso.", icon: "brain" },
-              { title: "ENFOQUE EN CARRERA", desc: "No solo técnica, preparación para el mundo laboral y hogando mentalidad emprendedora.", icon: "briefcase" }
+              { title: "ENFOQUE EN CARRERA", desc: "No solo técnica, preparación para el mundo laboral y mentalidad emprendedora.", icon: "briefcase" }
             ].map((item, i) => (
               <div key={i} className="bg-black/50 backdrop-blur-sm border border-white/5 p-8 hover:border-gold-500/50 transition-colors group">
                 <h3 className="text-gold-500 font-bold text-xl mb-4 group-hover:translate-x-1 transition-transform">{item.title}</h3>
