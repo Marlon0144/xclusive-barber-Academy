@@ -22,7 +22,7 @@ export default async function DashboardPage() {
   }
 
   // Definimos permisos
-  const isInstructor = userRole === 'admin' || userRole === 'professor'
+  const isInstructor = userRole === 'admin' || userRole === 'instructor'
   const isAdmin = userRole === 'admin' // <--- NUEVA CONSTANTE
 
   return (

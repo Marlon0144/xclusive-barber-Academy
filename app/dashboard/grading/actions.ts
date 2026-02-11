@@ -3,7 +3,7 @@
 import { createClient } from '@/utils/supabase/server'
 import { revalidatePath } from 'next/cache'
 // Asegúrate de que esta ruta sea correcta, si no la tienes, comenta la línea de IA temporalmente para probar
-import { generateAIFeedback } from '@/utils/openai' 
+import { generateAIFeedback } from '@/utils/openai'
 
 interface Grades {
   fade: number
@@ -33,7 +33,7 @@ export async function submitGrade(submissionId: string, grades: Grades): Promise
       .eq('id', user.id)
       .single()
 
-    if (!profile || (profile.role !== 'admin' && profile.role !== 'professor')) {
+    if (!profile || (profile.role !== 'admin' && profile.role !== 'instructor')) {
       return { error: 'No tienes permisos de Instructor para realizar esta acción.' }
     }
 
@@ -50,7 +50,7 @@ export async function submitGrade(submissionId: string, grades: Grades): Promise
     let feedback = "Feedback manual pendiente."
     try {
       if (submission.cut_type) {
-         feedback = await generateAIFeedback(submission.cut_type, grades)
+        feedback = await generateAIFeedback(submission.cut_type, grades)
       }
     } catch (aiError) {
       console.error("Error generando IA:", aiError)
@@ -63,7 +63,7 @@ export async function submitGrade(submissionId: string, grades: Grades): Promise
       .from('submissions')
       .update({
         scores: grades, // Asegúrate que tu columna en Supabase sea tipo JSONB
-        status: 'reviewed', 
+        status: 'reviewed',
         feedback_ai: feedback,
         graded_at: new Date().toISOString(), // Opcional: útil para saber cuándo se calificó
         grader_id: user.id // Opcional: saber quién calificó

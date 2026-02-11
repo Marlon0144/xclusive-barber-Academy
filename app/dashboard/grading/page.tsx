@@ -7,7 +7,7 @@ export default async function GradingPage() {
 
   // 1. SEGURIDAD: Obtener usuario y rol
   const { data: { user } } = await supabase.auth.getUser()
-  
+
   if (!user) return redirect('/auth/login')
 
   // Consultamos la tabla profiles
@@ -18,7 +18,7 @@ export default async function GradingPage() {
     .single()
 
   // REGLA DE ORO: Si no es admin ni profesor, fuera de aquí
-  if (profile?.role !== 'admin' && profile?.role !== 'professor') {
+  if (profile?.role !== 'admin' && profile?.role !== 'instructor') {
     return (
       <div className="p-10 text-center text-red-500">
         <h1 className="text-3xl font-bold">403 - Acceso Prohibido</h1>
