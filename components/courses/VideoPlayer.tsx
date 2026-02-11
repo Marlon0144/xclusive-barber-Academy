@@ -14,7 +14,7 @@ export default function VideoPlayer({ url, lessonId }: VideoPlayerProps) {
   const [isCompleted, setIsCompleted] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState(false)
-  
+
   const supabase = createClient()
   const videoId = getYouTubeID(url) // Extraemos el ID limpio
 
@@ -37,9 +37,10 @@ export default function VideoPlayer({ url, lessonId }: VideoPlayerProps) {
   }, [lessonId, supabase])
 
   // Lógica cuando termina el video
-  const onPlayerEnd = async (event: YouTubeEvent) => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const onPlayerEnd = async (_event: YouTubeEvent) => {
     console.log("✅ Video terminado (Evento Nativo YouTube)")
-    
+
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
 
@@ -75,7 +76,7 @@ export default function VideoPlayer({ url, lessonId }: VideoPlayerProps) {
       <div className="absolute top-0 left-0 w-full h-full">
         {error ? (
           <div className="flex h-full items-center justify-center text-red-400 bg-gray-900">
-             ❌ Video no disponible
+            ❌ Video no disponible
           </div>
         ) : (
           <YouTube
@@ -87,7 +88,7 @@ export default function VideoPlayer({ url, lessonId }: VideoPlayerProps) {
             onEnd={onPlayerEnd} // <--- ESTO ES LO QUE NECESITAMOS
           />
         )}
-        
+
         {/* Spinner limpio */}
         {isLoading && !error && (
           <div className="absolute inset-0 flex items-center justify-center bg-gray-900 z-10">
@@ -98,9 +99,9 @@ export default function VideoPlayer({ url, lessonId }: VideoPlayerProps) {
         {/* Etiqueta de éxito */}
         {isCompleted && (
           <div className="absolute top-4 right-4 z-20 animate-in fade-in zoom-in duration-500">
-             <div className="bg-green-600/90 backdrop-blur-md text-white px-4 py-2 rounded-full shadow-lg flex items-center gap-2 font-bold text-sm border border-green-400/30">
-               <span>✓ Lección Completada</span>
-             </div>
+            <div className="bg-green-600/90 backdrop-blur-md text-white px-4 py-2 rounded-full shadow-lg flex items-center gap-2 font-bold text-sm border border-green-400/30">
+              <span>✓ Lección Completada</span>
+            </div>
           </div>
         )}
       </div>

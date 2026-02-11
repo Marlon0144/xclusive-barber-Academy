@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react'
 import { Edit2, Check, X } from 'lucide-react'
+import { cn } from "@/lib/utils"
 
 interface EditableTextProps {
   initialText: string
@@ -27,7 +28,7 @@ export default function EditableText({ initialText, onSave, className = '' }: Ed
       setIsEditing(false)
       return
     }
-    
+
     setIsSaving(true)
     await onSave(text)
     setIsSaving(false)
@@ -54,38 +55,38 @@ export default function EditableText({ initialText, onSave, className = '' }: Ed
           onChange={(e) => setText(e.target.value)}
           onKeyDown={handleKeyDown}
           disabled={isSaving}
-          className="bg-gray-800 text-white px-2 py-1 rounded border border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 min-w-[200px]"
+          className="bg-black/50 text-white px-3 py-1.5 rounded-sm border border-gold-500 focus:outline-none focus:ring-1 focus:ring-gold-500/50 min-w-[200px] text-sm font-serif placeholder:text-zinc-600"
         />
-        <button 
-          onClick={handleSave} 
+        <button
+          onClick={handleSave}
           disabled={isSaving}
-          className="p-1 text-green-400 hover:bg-green-400/10 rounded"
+          className="p-1.5 bg-green-900/50 text-green-400 hover:bg-green-500/20 rounded-sm border border-green-500/30 transition-colors"
         >
-          <Check size={16} />
+          <Check size={14} />
         </button>
-        <button 
-          onClick={handleCancel} 
+        <button
+          onClick={handleCancel}
           disabled={isSaving}
-          className="p-1 text-red-400 hover:bg-red-400/10 rounded"
+          className="p-1.5 bg-red-900/50 text-red-400 hover:bg-red-500/20 rounded-sm border border-red-500/30 transition-colors"
         >
-          <X size={16} />
+          <X size={14} />
         </button>
       </div>
     )
   }
 
   return (
-    <div className={`flex items-center gap-2 group/edit ${className}`}>
-      <span className="font-medium truncate">{initialText}</span>
+    <div className={cn("flex items-center gap-2 group/edit", className)}>
+      <span className="truncate">{initialText}</span>
       <button
         onClick={(e) => {
           e.stopPropagation() // Evita abrir el acordeón
           setIsEditing(true)
         }}
-        className="opacity-0 group-hover/edit:opacity-100 p-1 text-gray-500 hover:text-blue-400 transition-opacity"
+        className="opacity-0 group-hover/edit:opacity-100 p-1 text-zinc-500 hover:text-gold-500 transition-all duration-300"
         title="Renombrar"
       >
-        <Edit2 size={14} />
+        <Edit2 size={12} />
       </button>
     </div>
   )

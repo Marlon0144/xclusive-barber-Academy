@@ -1,13 +1,14 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google"; // O la fuente que tengas
+import { Cinzel, Montserrat } from "next/font/google";
 import "./globals.css";
-import Header from "@/components/Header"; // <--- 1. IMPORTAR
+import Header from "@/components/Header";
 
-const inter = Inter({ subsets: ["latin"] });
+const cinzel = Cinzel({ subsets: ["latin"], weight: ["400", "700"], variable: "--font-cinzel" });
+const montserrat = Montserrat({ subsets: ["latin"], weight: ["300", "400", "500", "600", "700"], variable: "--font-montserrat" });
 
 export const metadata: Metadata = {
-  title: "Xclusive Barber Academy",
-  description: "Plataforma de formación premium",
+  title: "Xclusive Barber Academy | Formación Profesional",
+  description: "Formación profesional en barbería para latinos en Australia.",
 };
 
 export default function RootLayout({
@@ -17,10 +18,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es">
-      <body className={inter.className}>
-        {/* 2. COLOCAR AQUÍ, ANTES DEL CHILDREN */}
+      <body className={`${cinzel.variable} ${montserrat.variable} antialiased bg-[#050505] text-[#EDEDED]`}>
         <Header />
-        
         <main>
           {children}
         </main>

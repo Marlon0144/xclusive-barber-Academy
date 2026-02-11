@@ -25,14 +25,14 @@ export default function RichTextEditor({ content, onChange }: RichTextEditorProp
   const uploadImage = useCallback(async (file: File) => {
     const fileExt = file.name.split('.').pop()
     const fileName = `${Math.random().toString(36).substring(2)}.${fileExt}`
-    
+
     // Subir
     const { error } = await supabase.storage.from('course_content').upload(fileName, file)
     if (error) {
       console.error('Error subiendo imagen:', error)
       return null
     }
-    
+
     // Obtener URL
     const { data } = supabase.storage.from('course_content').getPublicUrl(fileName)
     return data.publicUrl
@@ -40,23 +40,23 @@ export default function RichTextEditor({ content, onChange }: RichTextEditorProp
 
   // Hook para el botón de la barra de herramientas
   const handleAddImage = useCallback(() => {
-     // Creamos un input invisible temporalmente
-     const input = document.createElement('input')
-     input.type = 'file'
-     input.accept = 'image/*'
-     input.onchange = async (e) => {
-       const file = (e.target as HTMLInputElement).files?.[0]
-       if (file) {
-         const url = await uploadImage(file)
-         // Necesitamos acceder a 'editor' aquí, pero como es callback externo,
-         // usaremos una referencia o lógica interna.
-         // TRUCO: Disparamos un evento personalizado o simplemente confiamos en que
-         // el usuario arrastre, pero para el botón:
-         // (Ver abajo como lo conectamos en el render)
-       }
-     }
-     input.click()
-  }, [uploadImage]) 
+    // Creamos un input invisible temporalmente
+    const input = document.createElement('input')
+    input.type = 'file'
+    input.accept = 'image/*'
+    input.onchange = async (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0]
+      if (file) {
+        const url = await uploadImage(file)
+        // Necesitamos acceder a 'editor' aquí, pero como es callback externo,
+        // usaremos una referencia o lógica interna.
+        // TRUCO: Disparamos un evento personalizado o simplemente confiamos en que
+        // el usuario arrastre, pero para el botón:
+        // (Ver abajo como lo conectamos en el render)
+      }
+    }
+    input.click()
+  }, [uploadImage])
 
   // --- CONFIGURACIÓN DEL EDITOR ---
   const editor = useEditor({
@@ -77,14 +77,14 @@ export default function RichTextEditor({ content, onChange }: RichTextEditorProp
         class: 'prose prose-invert prose-lg max-w-none focus:outline-none min-h-[500px] text-gray-300 px-8 py-6',
       },
       // DRAG & DROP DE IMÁGENES (Esto SÍ funciona y es muy útil)
-      handleDrop: function(view, event, slice, moved) {
+      handleDrop: function (view, event, slice, moved) {
         if (!moved && event.dataTransfer && event.dataTransfer.files && event.dataTransfer.files[0]) {
           const file = event.dataTransfer.files[0];
           if ((file.type === "image/jpeg" || file.type === "image/png" || file.type === "image/webp")) {
-             uploadImage(file).then((url) => {
-               if (url && editor) editor.chain().focus().setImage({ src: url }).run()
-             });
-             return true; 
+            uploadImage(file).then((url) => {
+              if (url && editor) editor.chain().focus().setImage({ src: url }).run()
+            });
+            return true;
           }
         }
         return false;
@@ -116,13 +116,13 @@ export default function RichTextEditor({ content, onChange }: RichTextEditorProp
 
   return (
     <div className="w-full border border-gray-800 rounded-xl overflow-hidden bg-gray-950/50 shadow-inner relative group">
-      
+
       {/* 1. BARRA DE HERRAMIENTAS FIJA (Estable y Funcional) */}
       <EditorToolbar editor={editor} addImage={onImageClick} />
 
       {/* 2. ÁREA DE EDICIÓN */}
       <EditorContent editor={editor} />
-      
+
     </div>
   )
 }

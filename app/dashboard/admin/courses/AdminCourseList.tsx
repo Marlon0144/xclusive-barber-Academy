@@ -1,11 +1,13 @@
 'use client'
 
 import { useState } from 'react'
-import { Plus, Trash2, Edit, ChevronDown, ChevronRight, BookOpen, Video, GripVertical } from 'lucide-react'
+import { Plus, Trash2, Edit, ChevronDown, ChevronRight, BookOpen, Video, GripVertical, FolderOpen, Save } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 // Importamos las actions (asegúrate de que updateModuleTitle y updateLessonTitle estén en actions.ts)
 import { createModule, deleteModule, createLesson, deleteLesson, updateModuleTitle, updateLessonTitle } from './actions'
-import EditableText from './EditableText' // <--- Asegúrate de tener este componente creado
+import EditableText from './EditableText'
+import { Button } from "@/components/ui/button"
+import { cn } from "@/lib/utils"
 
 // Tipos locales para la UI
 type Lesson = {
@@ -36,7 +38,7 @@ export default function AdminCourseList({ initialModules }: { initialModules: Mo
     const title = window.prompt('Nombre del nuevo Módulo (Ej: Corte Clásico):')
     if (!title) return
     await createModule(title)
-    router.refresh() 
+    router.refresh()
   }
 
   const handleDeleteModule = async (id: string) => {
@@ -50,7 +52,7 @@ export default function AdminCourseList({ initialModules }: { initialModules: Mo
     if (!title) return
     await createLesson(moduleId, title)
     // Forzamos abrir el módulo para ver la nueva lección
-    setExpandedModules(prev => ({ ...prev, [moduleId]: true })) 
+    setExpandedModules(prev => ({ ...prev, [moduleId]: true }))
     router.refresh()
   }
 
@@ -72,127 +74,160 @@ export default function AdminCourseList({ initialModules }: { initialModules: Mo
   }
 
   return (
-    <div className="space-y-6">
-      
+    <div className="space-y-8">
+
       {/* BOTÓN SUPERIOR */}
       <div className="flex justify-end">
-        <button 
+        <Button
           onClick={handleCreateModule}
-          className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg font-bold hover:bg-blue-700 transition-all shadow-lg hover:shadow-blue-500/20"
+          className="bg-gold-500 hover:bg-gold-600 text-black font-bold tracking-widest"
         >
-          <Plus size={20} />
-          <span>Crear Módulo</span>
-        </button>
+          <Plus size={18} className="mr-2" />
+          CREAR MÓDULO
+        </Button>
       </div>
 
       {/* LISTA DE MÓDULOS */}
-      <div className="space-y-4">
-        {initialModules.map((module) => (
-          <div key={module.id} className="border border-gray-800 rounded-xl overflow-hidden bg-gray-900/40">
-            
+      <div className="space-y-6">
+        {initialModules.map((module, index) => (
+          <div key={module.id} className="group border border-white/5 rounded-sm overflow-hidden bg-surface transition-all hover:border-white/10">
+
             {/* CABECERA DEL MÓDULO */}
-            <div 
-                className="flex items-center justify-between p-4 bg-gray-900 hover:bg-gray-800 transition-colors group select-none cursor-pointer"
-                onClick={() => toggleModule(module.id)}
+            <div
+              className={cn(
+                "flex items-center justify-between p-5 cursor-pointer bg-gradient-to-r from-[#0A0A0A] to-transparent hover:from-[#111] transition-all border-l-4",
+                expandedModules[module.id] ? "border-gold-500 bg-white/5" : "border-transparent"
+              )}
+              onClick={() => toggleModule(module.id)}
             >
-              <div 
-                className="flex items-center gap-3 flex-1"
+              <div
+                className="flex items-center gap-4 flex-1"
               >
                 {/* Icono de carpeta abierta/cerrada */}
-                {expandedModules[module.id] 
-                  ? <ChevronDown size={20} className="text-blue-400" /> 
-                  : <ChevronRight size={20} className="text-gray-500" />
-                }
-                
-                {/* TÍTULO EDITABLE DEL MÓDULO */}
-                <EditableText 
-                  initialText={module.title}
-                  onSave={(newTitle) => handleRenameModule(module.id, newTitle)}
-                  className="font-semibold text-lg text-white"
-                />
-                
-                <span className="text-xs bg-gray-800 text-gray-400 px-2 py-0.5 rounded-full border border-gray-700 ml-2">
-                  {module.lessons?.length || 0} lecciones
-                </span>
+                <div className={cn("p-2 rounded-full bg-black/50 border border-white/5 text-zinc-500 transition-colors", expandedModules[module.id] && "text-gold-500 border-gold-500/30")}>
+                  {expandedModules[module.id]
+                    ? <FolderOpen size={20} />
+                    : <ChevronRight size={20} />
+                  }
+                </div>
+
+                {/* INFO DEL MÓDULO */}
+                <div className="flex-1">
+                  <div className="flex items-center gap-3">
+                    <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest border border-white/10 px-2 rounded-sm bg-black/20">
+                      Módulo 0{index + 1}
+                    </span>
+                    <span className="text-xs bg-black/50 text-zinc-500 px-2 py-0.5 rounded-full border border-white/5">
+                      {module.lessons?.length || 0} lecciones
+                    </span>
+                  </div>
+
+                  {/* TÍTULO EDITABLE */}
+                  <EditableText
+                    initialText={module.title}
+                    onSave={(newTitle) => handleRenameModule(module.id, newTitle)}
+                    className="font-serif text-xl text-white mt-1 hover:text-gold-500 transition-colors"
+                  />
+                </div>
               </div>
-              
-              <button 
+
+              <Button
+                variant="ghost"
+                size="icon"
                 onClick={(e) => {
-                    e.stopPropagation() // Evitar toggle al borrar
-                    handleDeleteModule(module.id)
+                  e.stopPropagation() // Evitar toggle al borrar
+                  handleDeleteModule(module.id)
                 }}
-                className="p-2 text-gray-600 hover:text-red-500 hover:bg-red-500/10 rounded-lg opacity-0 group-hover:opacity-100 transition-all"
+                className="text-zinc-600 hover:text-red-500 hover:bg-red-500/10 opacity-0 group-hover:opacity-100 transition-all"
                 title="Eliminar Módulo"
               >
                 <Trash2 size={18} />
-              </button>
+              </Button>
             </div>
 
             {/* CONTENIDO DEL MÓDULO (LECCIONES) */}
             {expandedModules[module.id] && (
-              <div className="bg-black/20 border-t border-gray-800">
+              <div className="bg-black/40 border-t border-white/5 p-2">
                 {module.lessons?.length > 0 ? (
-                  <div className="divide-y divide-gray-800/50">
-                    {module.lessons.map((lesson) => (
-                      <div key={lesson.id} className="flex items-center justify-between p-3 pl-10 hover:bg-white/5 group transition-colors">
-                        
-                        <div className="flex items-center gap-3 flex-1">
-                          <GripVertical size={16} className="text-gray-600 cursor-move hover:text-gray-400" />
-                          <Video size={16} className="text-blue-500/70" />
-                          
-                          {/* TÍTULO EDITABLE DE LA LECCIÓN */}
-                          <EditableText 
-                            initialText={lesson.title}
-                            onSave={(newTitle) => handleRenameLesson(lesson.id, newTitle)}
-                            className="text-gray-300 font-medium"
-                          />
+                  <div className="space-y-1">
+                    {module.lessons.map((lesson, lIndex) => (
+                      <div key={lesson.id} className="flex items-center justify-between p-3 pl-4 rounded-sm hover:bg-white/5 group/lesson transition-colors border border-transparent hover:border-white/5 ml-8 relative">
+                        {/* Connecting Line */}
+                        <div className="absolute -left-6 top-1/2 w-4 h-[1px] bg-zinc-800"></div>
+                        <div className="absolute -left-6 top-0 bottom-1/2 w-[1px] bg-zinc-800"></div>
+
+                        <div className="flex items-center gap-4 flex-1">
+                          <GripVertical size={16} className="text-zinc-700 cursor-move hover:text-zinc-500" />
+
+                          <div className={cn("text-zinc-600 group-hover/lesson:text-blue-400 transition-colors")}>
+                            <Video size={16} />
+                          </div>
+
+                          <div className="flex flex-col">
+                            <span className="text-[9px] text-zinc-600 uppercase tracking-widest font-bold">Lección 0{lIndex + 1}</span>
+                            {/* TÍTULO EDITABLE */}
+                            <EditableText
+                              initialText={lesson.title}
+                              onSave={(newTitle) => handleRenameLesson(lesson.id, newTitle)}
+                              className="text-zinc-300 font-medium text-sm hover:text-white transition-colors"
+                            />
+                          </div>
                         </div>
 
-                        <div className="flex items-center gap-2 opacity-60 group-hover:opacity-100 transition-opacity">
-                          {/* BOTÓN EDITAR: Redirige al editor */}
-                          <button 
+                        <div className="flex items-center gap-2 opacity-0 group-hover/lesson:opacity-100 transition-opacity">
+                          {/* BOTÓN EDITAR */}
+                          <Button
+                            size="sm"
+                            variant="default"
                             onClick={() => router.push(`/dashboard/admin/lessons/${lesson.id}/edit`)}
-                            className="flex items-center gap-1 px-3 py-1.5 bg-blue-600/10 text-blue-400 hover:bg-blue-600 hover:text-white rounded text-xs font-bold transition-all border border-blue-600/20"
+                            className="h-7 text-[10px] uppercase font-bold tracking-wider bg-blue-900/30 text-blue-400 border border-blue-500/30 hover:bg-blue-600 hover:text-white hover:border-blue-600"
                           >
-                            <Edit size={14} />
-                            Contenido
-                          </button>
-                          
-                          <button 
+                            <Edit size={12} className="mr-1" />
+                            Editar
+                          </Button>
+
+                          <Button
+                            variant="ghost"
+                            size="icon"
                             onClick={() => handleDeleteLesson(lesson.id)}
-                            className="p-1.5 text-gray-500 hover:text-red-400 hover:bg-red-400/10 rounded transition-colors"
+                            className="h-7 w-7 text-zinc-600 hover:text-red-400 hover:bg-red-400/10"
                             title="Borrar Lección"
                           >
-                            <Trash2 size={16} />
-                          </button>
+                            <Trash2 size={14} />
+                          </Button>
                         </div>
                       </div>
                     ))}
                   </div>
                 ) : (
-                  <div className="p-4 text-center text-sm text-gray-500 italic">
-                    Este módulo está vacío.
+                  <div className="py-8 text-center flex flex-col items-center">
+                    <p className="text-zinc-600 text-sm italic mb-4">Este módulo está vacío.</p>
                   </div>
                 )}
 
-                {/* BOTÓN AGREGAR LECCIÓN (AL FINAL DE LA LISTA) */}
-                <button 
+                {/* BOTÓN AGREGAR LECCIÓN */}
+                <Button
+                  variant="ghost"
                   onClick={() => handleCreateLesson(module.id)}
-                  className="w-full py-3 text-sm text-gray-500 hover:text-blue-400 hover:bg-blue-500/5 transition-colors flex items-center justify-center gap-2 border-t border-gray-800 border-dashed"
+                  className="w-full mt-2 py-6 text-xs uppercase tracking-widest font-bold text-zinc-500 hover:text-blue-400 hover:bg-blue-500/5 transition-colors border border-dashed border-zinc-800 hover:border-blue-500/30"
                 >
-                  <Plus size={16} />
-                  <span>Agregar nueva lección a {module.title}</span>
-                </button>
+                  <Plus size={14} className="mr-2" />
+                  Agregar lección al módulo
+                </Button>
               </div>
             )}
           </div>
         ))}
 
         {initialModules.length === 0 && (
-          <div className="text-center py-16 border border-dashed border-gray-800 rounded-xl bg-gray-900/20">
-            <BookOpen size={48} className="mx-auto mb-4 text-gray-700" />
-            <h3 className="text-xl font-bold text-gray-300">Curso vacío</h3>
-            <p className="text-gray-500 mt-2">Crea tu primer módulo para comenzar la estructura.</p>
+          <div className="text-center py-24 border border-dashed border-zinc-800 rounded-sm bg-surface/30 flex flex-col items-center">
+            <div className="bg-black/50 w-20 h-20 rounded-full flex items-center justify-center mb-6 text-zinc-700 border border-white/5">
+              <BookOpen size={32} />
+            </div>
+            <h3 className="text-xl font-serif text-white mb-2">Curso vacío</h3>
+            <p className="text-zinc-500 text-sm max-w-xs">
+              Aún no has creado ningún módulo. Comienza tu plan de estudios ahora.
+            </p>
           </div>
         )}
       </div>

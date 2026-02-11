@@ -1,74 +1,79 @@
 import { createClient } from '@/utils/supabase/server'
 import Link from 'next/link'
-// AGREGADO: Importamos el icono Settings para el admin
-import { BookOpen, Target, GraduationCap, ArrowRight, Settings } from 'lucide-react'
+import { BookOpen, Target, GraduationCap, ArrowRight, Settings, Star } from 'lucide-react'
 
 export default async function DashboardPage() {
   const supabase = await createClient()
 
   // 1. Obtener usuario y rol para renderizado condicional
   const { data: { user } } = await supabase.auth.getUser()
-  
+
   let userRole = 'student' // Default
-  
+
   if (user) {
     const { data: profile } = await supabase
       .from('profiles')
       .select('role')
       .eq('id', user.id)
       .single()
-    
+
     if (profile) userRole = profile.role
   }
 
   // Definimos permisos
   const isInstructor = userRole === 'admin' || userRole === 'instructor'
-  const isAdmin = userRole === 'admin' // <--- NUEVA CONSTANTE
+  const isAdmin = userRole === 'admin'
 
   return (
-    <div className="p-8 max-w-6xl mx-auto">
-      
+    <div className="min-h-screen p-8 max-w-7xl mx-auto space-y-12">
+
       {/* HEADER DE BIENVENIDA */}
-      <header className="mb-10">
-        <h1 className="text-3xl font-bold text-white mb-2">
-          Hola, <span className="text-blue-500">{user?.email?.split('@')[0]}</span> 👋
-        </h1>
-        <p className="text-zinc-400">
-          Bienvenido a Xclusive Barber Academy. ¿Qué quieres hacer hoy?
-        </p>
+      <header className="relative py-8 border-b border-white/10">
+        <div className="absolute top-0 right-0 opacity-20 hidden md:block">
+          <Star className="w-24 h-24 text-gold-500" />
+        </div>
+        <div className="relative z-10">
+          <h2 className="text-gold-500 text-sm tracking-[0.2em] uppercase font-bold mb-2">Panel de Control</h2>
+          <h1 className="text-4xl md:text-5xl font-serif text-white mb-4">
+            Hola, <span className="text-transparent bg-clip-text bg-gradient-to-r from-gold-500 to-gold-600 font-bold">{user?.email?.split('@')[0]}</span>
+          </h1>
+          <p className="text-zinc-400 max-w-xl text-lg">
+            Bienvenido a tu espacio en Xclusive Barber Academy. Aquí comienza tu camino hacia la maestría.
+          </p>
+        </div>
       </header>
 
       {/* GRID DE NAVEGACIÓN */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        
-        {/* OPCIÓN 1: MIS CURSOS (Todos pueden ver esto) */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+
+        {/* OPCIÓN 1: MIS CURSOS (Todos) */}
         <Link href="/dashboard/courses" className="group">
-          <div className="h-full bg-zinc-900 border border-zinc-800 hover:border-blue-600 p-6 rounded-xl transition-all hover:shadow-lg hover:shadow-blue-900/20 flex flex-col">
-            <div className="bg-blue-900/20 w-12 h-12 rounded-lg flex items-center justify-center mb-4 text-blue-400 group-hover:scale-110 transition-transform">
+          <div className="h-full bg-surface border border-white/5 hover:border-gold-500 p-8 rounded-sm transition-all duration-300 hover:shadow-[0_0_20px_rgba(212,175,55,0.1)] flex flex-col group-hover:-translate-y-1">
+            <div className="bg-black/50 w-14 h-14 rounded-full flex items-center justify-center mb-6 text-gold-500 border border-gold-500/20 group-hover:bg-gold-500 group-hover:text-black transition-colors">
               <BookOpen size={24} />
             </div>
-            <h3 className="text-xl font-bold text-white mb-2">Aprender</h3>
-            <p className="text-zinc-400 text-sm flex-1">
-              Accede a la biblioteca de videos, tutoriales y lecciones teóricas.
+            <h3 className="text-2xl font-serif text-white mb-3 group-hover:text-gold-500 transition-colors">Aprender</h3>
+            <p className="text-zinc-400 text-sm leading-relaxed flex-1">
+              Catálogo de cursos. Accede a lecciones teóricas, tutoriales en video y material de estudio.
             </p>
-            <div className="mt-4 flex items-center text-blue-400 text-sm font-bold gap-1">
-              Ir al Catálogo <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform"/>
+            <div className="mt-8 flex items-center text-gold-500 text-xs font-bold uppercase tracking-widest gap-2">
+              Ver Cursos <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
             </div>
           </div>
         </Link>
 
-        {/* OPCIÓN 2: MASTERY TRACKER (Todos pueden ver esto) */}
+        {/* OPCIÓN 2: MASTERY TRACKER (Todos) */}
         <Link href="/dashboard/tracker" className="group">
-          <div className="h-full bg-zinc-900 border border-zinc-800 hover:border-green-600 p-6 rounded-xl transition-all hover:shadow-lg hover:shadow-green-900/20 flex flex-col">
-            <div className="bg-green-900/20 w-12 h-12 rounded-lg flex items-center justify-center mb-4 text-green-400 group-hover:scale-110 transition-transform">
+          <div className="h-full bg-surface border border-white/5 hover:border-gold-500 p-8 rounded-sm transition-all duration-300 hover:shadow-[0_0_20px_rgba(212,175,55,0.1)] flex flex-col group-hover:-translate-y-1">
+            <div className="bg-black/50 w-14 h-14 rounded-full flex items-center justify-center mb-6 text-gold-500 border border-gold-500/20 group-hover:bg-gold-500 group-hover:text-black transition-colors">
               <Target size={24} />
             </div>
-            <h3 className="text-xl font-bold text-white mb-2">Practicar</h3>
-            <p className="text-zinc-400 text-sm flex-1">
-              Sube fotos de tus cortes, recibe feedback de la IA y mide tu progreso.
+            <h3 className="text-2xl font-serif text-white mb-3 group-hover:text-gold-500 transition-colors">Practicar</h3>
+            <p className="text-zinc-400 text-sm leading-relaxed flex-1">
+              Sube tus cortes, recibe feedback potenciado por IA y valida tu progreso técnico.
             </p>
-            <div className="mt-4 flex items-center text-green-400 text-sm font-bold gap-1">
-              Subir Práctica <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform"/>
+            <div className="mt-8 flex items-center text-gold-500 text-xs font-bold uppercase tracking-widest gap-2">
+              Subir Práctica <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
             </div>
           </div>
         </Link>
@@ -76,21 +81,21 @@ export default async function DashboardPage() {
         {/* OPCIÓN 3: GRADING (SOLO INSTRUCTORES) */}
         {isInstructor && (
           <Link href="/dashboard/grading" className="group">
-            <div className="h-full bg-zinc-900 border border-yellow-800/50 hover:border-yellow-500 p-6 rounded-xl transition-all hover:shadow-lg hover:shadow-yellow-900/20 flex flex-col relative overflow-hidden">
+            <div className="h-full bg-[#0A1F0A]/40 border border-white/5 hover:border-green-500/50 p-8 rounded-sm transition-all duration-300 flex flex-col relative overflow-hidden group-hover:-translate-y-1">
               {/* Etiqueta de Staff */}
-              <div className="absolute top-3 right-3 bg-yellow-500/10 text-yellow-500 text-[10px] font-bold px-2 py-1 rounded border border-yellow-500/20">
-                STAFF ONLY
+              <div className="absolute top-0 right-0 bg-white/5 text-zinc-400 text-[10px] font-bold px-3 py-1 border-b border-l border-white/10 tracking-widest uppercase">
+                Staff Only
               </div>
-              
-              <div className="bg-yellow-900/20 w-12 h-12 rounded-lg flex items-center justify-center mb-4 text-yellow-400 group-hover:scale-110 transition-transform">
+
+              <div className="bg-black/50 w-14 h-14 rounded-full flex items-center justify-center mb-6 text-zinc-300 border border-white/10 group-hover:bg-green-900 group-hover:text-green-400 transition-colors">
                 <GraduationCap size={24} />
               </div>
-              <h3 className="text-xl font-bold text-white mb-2">Evaluar</h3>
-              <p className="text-zinc-400 text-sm flex-1">
-                Panel de instructores para revisar prácticas pendientes y asignar notas.
+              <h3 className="text-2xl font-serif text-white mb-3 group-hover:text-green-400 transition-colors">Evaluar</h3>
+              <p className="text-zinc-500 group-hover:text-zinc-300 text-sm leading-relaxed flex-1 transition-colors">
+                Panel de instructor. Revisa los trabajos de los estudiantes y califica su desempeño.
               </p>
-              <div className="mt-4 flex items-center text-yellow-400 text-sm font-bold gap-1">
-                Entrar al Panel <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform"/>
+              <div className="mt-8 flex items-center text-zinc-500 group-hover:text-green-400 text-xs font-bold uppercase tracking-widest gap-2 transition-colors">
+                Panel de Notas <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
               </div>
             </div>
           </Link>
@@ -99,19 +104,19 @@ export default async function DashboardPage() {
         {/* --- NUEVA OPCIÓN 4: GESTIÓN DE CURSOS (SOLO ADMIN) --- */}
         {isAdmin && (
           <Link href="/dashboard/admin/courses" className="group">
-            <div className="h-full bg-zinc-900 border border-purple-800/50 hover:border-purple-500 p-6 rounded-xl transition-all hover:shadow-lg hover:shadow-purple-900/20 flex flex-col relative overflow-hidden">
-               <div className="absolute top-3 right-3 bg-purple-500/10 text-purple-500 text-[10px] font-bold px-2 py-1 rounded border border-purple-500/20">
-                ADMIN
+            <div className="h-full bg-[#1A1010]/40 border border-white/5 hover:border-red-500/50 p-8 rounded-sm transition-all duration-300 flex flex-col relative overflow-hidden group-hover:-translate-y-1">
+              <div className="absolute top-0 right-0 bg-red-900/20 text-red-500 text-[10px] font-bold px-3 py-1 border-b border-l border-red-500/20 tracking-widest uppercase">
+                Admin
               </div>
-              <div className="bg-purple-900/20 w-12 h-12 rounded-lg flex items-center justify-center mb-4 text-purple-400 group-hover:scale-110 transition-transform">
+              <div className="bg-black/50 w-14 h-14 rounded-full flex items-center justify-center mb-6 text-zinc-300 border border-white/10 group-hover:bg-red-900 group-hover:text-red-400 transition-colors">
                 <Settings size={24} />
               </div>
-              <h3 className="text-xl font-bold text-white mb-2">Gestionar Cursos</h3>
-              <p className="text-zinc-400 text-sm flex-1">
-                Crea módulos, lecciones y edita el contenido de la academia.
+              <h3 className="text-2xl font-serif text-white mb-3 group-hover:text-red-400 transition-colors">Cursos</h3>
+              <p className="text-zinc-500 group-hover:text-zinc-300 text-sm leading-relaxed flex-1 transition-colors">
+                Editor de contenido. Gestiona módulos, lecciones y estructura académica.
               </p>
-              <div className="mt-4 flex items-center text-purple-400 text-sm font-bold gap-1">
-                Ir al Editor <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform"/>
+              <div className="mt-8 flex items-center text-zinc-500 group-hover:text-red-400 text-xs font-bold uppercase tracking-widest gap-2 transition-colors">
+                Gestionar Contenido <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
               </div>
             </div>
           </Link>
