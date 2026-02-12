@@ -53,7 +53,7 @@ export default async function Header() {
                   Entrar
                 </Button>
               </Link>
-              <Link href="/signup">
+              <Link href="/apply">
                 <Button className="font-bold tracking-wide">
                   INSCRIBIRSE
                 </Button>
