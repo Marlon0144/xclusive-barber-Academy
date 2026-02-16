@@ -1,9 +1,15 @@
+'use client'
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
-import { Star } from "lucide-react";
+import { Star, AlertCircle } from "lucide-react";
+import { useFormState } from "react-dom";
+import { applyAccess } from "./actions";
 
 export default function ApplyPage() {
+    const [state, formAction] = useFormState(applyAccess, { success: false, error: null })
+
     return (
         <div className="min-h-screen flex flex-col items-center justify-center p-4 relative overflow-hidden">
             {/* Background with overlay */}
@@ -50,33 +56,69 @@ export default function ApplyPage() {
                         </p>
                     </div>
 
-                    <form className="space-y-4">
-                        <div className="space-y-2">
-                            <label className="text-xs text-zinc-500 uppercase tracking-wider ml-1">Nombre</label>
-                            <Input placeholder="Tu nombre completo" className="text-center" />
-                        </div>
+                {/* Error Message */}
+                {state.error && (
+                    <div className="bg-red-900/20 border border-red-500/50 p-4 rounded-sm flex gap-3">
+                        <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
+                        <p className="text-red-300 text-sm">{state.error}</p>
+                    </div>
+                )}
 
-                        <div className="space-y-2">
-                            <label className="text-xs text-zinc-500 uppercase tracking-wider ml-1">Correo Electrónico</label>
-                            <Input type="email" placeholder="ejemplo@email.com" className="text-center" />
-                        </div>
+                <form action={formAction} className="space-y-4">
+                    <div className="space-y-2">
+                        <label className="text-xs text-zinc-500 uppercase tracking-wider ml-1">Nombre</label>
+                        <Input 
+                            name="fullName" 
+                            placeholder="Tu nombre completo" 
+                            className="text-center"
+                            required
+                        />
+                    </div>
 
-                        <div className="space-y-2">
-                            <label className="text-xs text-zinc-500 uppercase tracking-wider ml-1">Código de Acceso</label>
-                            <Input type="text" placeholder="XXXX-XXXX" className="text-center" />
-                        </div>
+                    <div className="space-y-2">
+                        <label className="text-xs text-zinc-500 uppercase tracking-wider ml-1">Correo Electrónico</label>
+                        <Input 
+                            name="email" 
+                            type="email" 
+                            placeholder="ejemplo@email.com" 
+                            className="text-center"
+                            required
+                        />
+                    </div>
 
-                        <div className="space-y-2">
-                            <label className="text-xs text-zinc-500 uppercase tracking-wider ml-1">Crear Contraseña</label>
-                            <Input type="password" placeholder="******" className="text-center" />
-                        </div>
+                    <div className="space-y-2">
+                        <label className="text-xs text-zinc-500 uppercase tracking-wider ml-1">Código de Acceso</label>
+                        <Input 
+                            name="inviteCode" 
+                            type="text" 
+                            placeholder="XXXX-XXXX" 
+                            className="text-center uppercase"
+                            required
+                        />
+                    </div>
 
-                        <div className="pt-4">
-                            <Button className="w-full text-lg py-6 font-bold tracking-widest bg-[#ededed] text-black hover:bg-white border-none">
-                                ACTIVAR CUENTA
-                            </Button>
-                        </div>
-                    </form>
+                    <div className="space-y-2">
+                        <label className="text-xs text-zinc-500 uppercase tracking-wider ml-1">Crear Contraseña</label>
+                        <Input 
+                            name="password" 
+                            type="password" 
+                            placeholder="Mínimo 6 caracteres" 
+                            className="text-center"
+                            minLength={6}
+                            required
+                        />
+                    </div>
+
+                    <div className="pt-4">
+                        <Button 
+                            type="submit"
+                            disabled={state.success}
+                            className="w-full text-lg py-6 font-bold tracking-widest bg-[#ededed] text-black hover:bg-white border-none disabled:opacity-50"
+                        >
+                            {state.success ? '✓ CUENTA ACTIVADA' : 'ACTIVAR CUENTA'}
+                        </Button>
+                    </div>
+                </form>
 
                     <div className="text-center pt-4">
                         <p className="text-xs text-zinc-600">

@@ -1,3 +1,4 @@
+import React from 'react'
 import Link from 'next/link'
 import { createClient } from '@/utils/supabase/server'
 import { CheckCircle2, PlayCircle, ChevronLeft } from 'lucide-react'
@@ -6,10 +7,10 @@ interface CourseSidebarProps {
   moduleId: string
 }
 
-export default async function CourseSidebar({ moduleId }: CourseSidebarProps) {
+// cached fetch to avoid duplicated calls within the same render/or when
+// the sidebar is used more than once.
+const fetchLessonsWithProgress = React.cache(async (moduleId: string) => {
   const supabase = await createClient()
-
-  // Traemos las lecciones Y el progreso del usuario actual
   const { data: lessons } = await supabase
     .from('lessons')
     .select(`
@@ -21,6 +22,13 @@ export default async function CourseSidebar({ moduleId }: CourseSidebarProps) {
     `)
     .eq('module_id', moduleId)
     .order('position', { ascending: true })
+
+  return lessons
+})
+
+export default async function CourseSidebar({ moduleId }: CourseSidebarProps) {
+  // start the promise early (async-defer-await) and use cache
+  const lessons = await fetchLessonsWithProgress(moduleId)
 
   if (!lessons) return <div className="p-4">Cargando...</div>
 

@@ -1,9 +1,22 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import YouTube, { YouTubeEvent } from 'react-youtube' // Librería nativa
+import dynamic from 'next/dynamic'
 import { createClient } from '@/utils/supabase/client'
 import { getYouTubeID } from '@/utils/get-youtube-id' // La función que creamos en el paso 2
+
+// load the heavy YouTube iframe player only on the client once
+const YouTube = dynamic<{
+  videoId: string
+  opts: any
+  className?: string
+  onReady?: () => void
+  onError?: () => void
+  onEnd?: (event: any) => void
+}>(
+  () => import('react-youtube'),
+  { ssr: false }
+)
 
 interface VideoPlayerProps {
   url: string | null
@@ -15,13 +28,17 @@ export default function VideoPlayer({ url, lessonId }: VideoPlayerProps) {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState(false)
 
-  const supabase = createClient()
-  const videoId = getYouTubeID(url) // Extraemos el ID limpio
+
+// use singleton client so it stays stable across renders
+const supabase = createClient()
+const videoId = getYouTubeID(url) // Extraemos el ID limpio
 
   // Verificar progreso inicial
   useEffect(() => {
     const checkProgress = async () => {
-      const { data: { user } } = await supabase.auth.getUser()
+      const {
+        data: { user },
+      } = await supabase.auth.getUser()
       if (!user) return
 
       const { data } = await supabase
@@ -34,7 +51,7 @@ export default function VideoPlayer({ url, lessonId }: VideoPlayerProps) {
       if (data?.is_completed) setIsCompleted(true)
     }
     checkProgress()
-  }, [lessonId, supabase])
+  }, [lessonId]) // supabase is a stable singleton
 
   // Lógica cuando termina el video
   // eslint-disable-next-line @typescript-eslint/no-unused-vars

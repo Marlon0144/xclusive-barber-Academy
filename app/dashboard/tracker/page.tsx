@@ -29,10 +29,13 @@ export default function TrackerPage() {
   // 2. ESTADO PARA CONTROLAR EL MODAL
   const [selectedSubmission, setSelectedSubmission] = useState<Submission | null>(null)
 
+  // singleton client – stable reference
   const supabase = createClient()
 
   const fetchHistory = useCallback(async () => {
-    const { data: { user } } = await supabase.auth.getUser()
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
     if (!user) return
 
     const { data, error } = await supabase
@@ -46,7 +49,7 @@ export default function TrackerPage() {
     } else if (data) {
       setSubmissions(data as Submission[])
     }
-  }, [supabase])
+  }, []) // supabase never changes
 
   useEffect(() => {
     fetchHistory()

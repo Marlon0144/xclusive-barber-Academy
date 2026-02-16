@@ -1,3 +1,4 @@
+import React from 'react'
 import { createClient } from '@/utils/supabase/server'
 import { notFound, redirect } from 'next/navigation'
 import VideoPlayer from '@/components/courses/VideoPlayer'
@@ -19,22 +20,36 @@ export default async function LessonPage({ params }: LessonPageProps) {
   // Esperamos a que Next.js nos entregue los datos de la URL
   const { lessonId, courseId } = await params
 
-  // 1. Iniciamos Supabase
+  // helpers
+const getCurrentUser = React.cache(async () => {
   const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  return user
+})
 
-  // 2. Auth Check
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) {
-    redirect('/login')
-  }
-
-  // 3. Consultamos la Base de Datos
-  // Simplificamos la consulta para evitar errores de relación por ahora
+const getLessonById = React.cache(async (id: string) => {
+  const supabase = await createClient()
   const { data: lesson, error } = await supabase
     .from('lessons')
     .select('*')
-    .eq('id', lessonId)
+    .eq('id', id)
     .single()
+  return { lesson, error }
+})
+
+// start both queries in parallel
+const [user, lessonResult] = await Promise.all([
+  getCurrentUser(),
+  getLessonById(lessonId),
+])
+
+if (!user) {
+  redirect('/login')
+}
+
+const { lesson, error } = lessonResult
 
   // 4. Manejo de Errores con logs detallados
   if (error) {

@@ -5,8 +5,7 @@ import { Check, Star, Users, Briefcase } from "lucide-react";
 import julianImg from "./julian.png";
 
 export default async function Home() {
-  const supabase = await createClient();
-
+  // no server data needed on landing page
   return (
     <div className="flex flex-col min-h-screen text-foreground">
 

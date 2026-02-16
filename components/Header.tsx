@@ -2,10 +2,23 @@ import Link from 'next/link'
 import { createClient } from '@/utils/supabase/server'
 import { signout } from '@/app/auth/actions'
 import { Button } from "@/components/ui/button"
+import React from 'react'
+
+// cache the current user so multiple components can read it without
+// re-running the request during the same render/flight.
+const getCurrentUser = React.cache(async () => {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  return user
+})
 
 export default async function Header() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  // by starting both operations early we satisfy async-defer-await
+  const userPromise = getCurrentUser()
+
+  const user = await userPromise
 
   return (
     <header className="w-full border-b border-white/10 bg-black/80 backdrop-blur-md p-4 sticky top-0 z-50">

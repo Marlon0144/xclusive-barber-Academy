@@ -1,22 +1,36 @@
+import React from 'react'
 import { createClient } from '@/utils/supabase/server'
 import Link from 'next/link'
 import { BookOpen, Target, GraduationCap, ArrowRight, Settings, Star } from 'lucide-react'
 
-export default async function DashboardPage() {
-  const supabase = await createClient()
 
+// helper cached getters
+const getUser = React.cache(async () => {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  return user
+})
+
+const getProfile = React.cache(async (userId: string) => {
+  const supabase = await createClient()
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', userId)
+    .single()
+  return profile
+})
+
+export default async function DashboardPage() {
   // 1. Obtener usuario y rol para renderizado condicional
-  const { data: { user } } = await supabase.auth.getUser()
+  const user = await getUser()
 
   let userRole = 'student' // Default
 
   if (user) {
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('role')
-      .eq('id', user.id)
-      .single()
-
+    const profile = await getProfile(user.id)
     if (profile) userRole = profile.role
   }
 

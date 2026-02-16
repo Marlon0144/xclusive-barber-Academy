@@ -12,6 +12,24 @@ export default async function CoursesIndexPage() {
     .select('*')
     .order('order_index', { ascending: true }) // Changed to order_index as per schema
 
+  // prepare first lesson map using parallel requests to avoid waterfall/N+1
+  const firstLessonMap: Record<string, string | null> = {}
+  if (modules && modules.length) {
+    const promises = modules.map((m) =>
+      supabase
+        .from('lessons')
+        .select('id')
+        .eq('module_id', m.id)
+        .order('order_index', { ascending: true })
+        .limit(1)
+        .single()
+    )
+    const results = await Promise.all(promises)
+    results.forEach((r, idx) => {
+      firstLessonMap[modules[idx].id] = r.data?.id ?? null
+    })
+  }
+
   return (
     <div className="min-h-screen p-8 max-w-7xl mx-auto space-y-12">
 
@@ -78,8 +96,23 @@ export default async function CoursesIndexPage() {
                   {module.description || "Aprende las técnicas avanzadas y fundamentos esenciales en este módulo completo de barbería."}
                 </p>
 
-                {/* Este componente busca la primera lección para que el botón funcione */}
-                <GetFirstLessonButton moduleId={module.id} />
+                {/* build the button based on pre‑fetched first lesson */}
+                {firstLessonMap[module.id] ? (
+                  <Link href={`/dashboard/courses/${module.id}/${firstLessonMap[module.id]}`} className="w-full">
+                    <Button className="w-full font-bold tracking-widest group-hover:bg-gold-500 group-hover:text-black transition-all">
+                      <PlayCircle className="mr-2 h-4 w-4" />
+                      ENTRAR AL MÓDULO
+                    </Button>
+                  </Link>
+                ) : (
+                  <Button
+                    variant="outline"
+                    className="w-full opacity-50 cursor-not-allowed border-zinc-800 text-zinc-500 hover:bg-transparent hover:text-zinc-500"
+                    disabled
+                  >
+                    Próximamente
+                  </Button>
+                )}
               </div>
             </div>
           ))}
@@ -89,37 +122,3 @@ export default async function CoursesIndexPage() {
   )
 }
 
-// Componente auxiliar para encontrar dónde empieza el módulo
-async function GetFirstLessonButton({ moduleId }: { moduleId: string }) {
-  const supabase = await createClient()
-
-  // Buscamos la primera lección basada en order_index o position
-  const { data: firstLesson } = await supabase
-    .from('lessons')
-    .select('id')
-    .eq('module_id', moduleId)
-    .order('order_index', { ascending: true }) // Consistent ordering
-    .limit(1)
-    .single()
-
-  if (!firstLesson) {
-    return (
-      <Button
-        variant="outline"
-        className="w-full opacity-50 cursor-not-allowed border-zinc-800 text-zinc-500 hover:bg-transparent hover:text-zinc-500"
-        disabled
-      >
-        Próximamente
-      </Button>
-    )
-  }
-
-  return (
-    <Link href={`/dashboard/courses/${moduleId}/${firstLesson.id}`} className="w-full">
-      <Button className="w-full font-bold tracking-widest group-hover:bg-gold-500 group-hover:text-black transition-all">
-        <PlayCircle className="mr-2 h-4 w-4" />
-        ENTRAR AL MÓDULO
-      </Button>
-    </Link>
-  )
-}
