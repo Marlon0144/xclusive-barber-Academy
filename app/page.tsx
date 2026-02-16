@@ -1,7 +1,6 @@
-import { createClient } from "@/utils/supabase/server";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { Check, Star, Users, Briefcase } from "lucide-react";
+import { Check, Star, Users } from "lucide-react";
 import julianImg from "./julian.png";
 
 export default async function Home() {

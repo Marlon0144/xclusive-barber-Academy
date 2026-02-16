@@ -6,20 +6,8 @@ import { createClient } from '@/utils/supabase/client'
 import { Loader2, Upload, Clock, CheckCircle, Eye, Star, Camera, Scissors } from 'lucide-react'
 import FeedbackModal from './FeedbackModal'
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
-
-// Definimos la forma de nuestros datos
-interface Submission {
-  id: string
-  image_url: string
-  cut_type: string
-  description: string
-  status: 'pending' | 'reviewed'
-  created_at: string
-  scores: any
-  feedback_ai: string | null
-}
+import { Submission } from '@/types/submissions'
 
 export default function TrackerPage() {
   const [loading, setLoading] = useState(false)
@@ -49,7 +37,7 @@ export default function TrackerPage() {
     } else if (data) {
       setSubmissions(data as Submission[])
     }
-  }, []) // supabase never changes
+  }, [supabase]) // supabase is a stable singleton so deps are satisfied
 
   useEffect(() => {
     fetchHistory()

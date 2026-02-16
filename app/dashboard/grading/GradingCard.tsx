@@ -2,11 +2,11 @@
 
 import { useState } from 'react'
 import { submitGrade } from './actions'
-import { Loader2, CheckCircle, Save, Star } from 'lucide-react'
+import { Loader2, Save, Star } from 'lucide-react'
 import { Button } from "@/components/ui/button"
-import { cn } from "@/lib/utils"
+import { Submission } from '@/types/submissions'
 
-export default function GradingCard({ submission }: { submission: any }) {
+export default function GradingCard({ submission }: { submission: Submission }) {
   const [loading, setLoading] = useState(false)
   const [scores, setScores] = useState({
     fade: 5,
@@ -19,7 +19,7 @@ export default function GradingCard({ submission }: { submission: any }) {
     setLoading(true)
     try {
       await submitGrade(submission.id, scores)
-    } catch (error) {
+    } catch {
       alert('Error al calificar')
       setLoading(false)
     }

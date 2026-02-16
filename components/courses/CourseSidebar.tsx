@@ -3,6 +3,18 @@ import Link from 'next/link'
 import { createClient } from '@/utils/supabase/server'
 import { CheckCircle2, PlayCircle, ChevronLeft } from 'lucide-react'
 
+interface LessonProgress {
+  is_completed: boolean
+}
+
+interface Lesson {
+  id: string
+  title: string
+  position: number
+  module_id: string
+  lesson_progress: LessonProgress[] | null
+}
+
 interface CourseSidebarProps {
   moduleId: string
 }
@@ -23,7 +35,7 @@ const fetchLessonsWithProgress = React.cache(async (moduleId: string) => {
     .eq('module_id', moduleId)
     .order('position', { ascending: true })
 
-  return lessons
+  return lessons as Lesson[] | null
 })
 
 export default async function CourseSidebar({ moduleId }: CourseSidebarProps) {
@@ -34,8 +46,7 @@ export default async function CourseSidebar({ moduleId }: CourseSidebarProps) {
 
   // Cálculos para la barra de progreso
   const totalLessons = lessons.length
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const completedLessons = lessons.filter((l: any) => l.lesson_progress?.[0]?.is_completed).length
+  const completedLessons = lessons.filter((l: Lesson) => l.lesson_progress?.[0]?.is_completed).length
   const progressPercentage = totalLessons > 0 ? (completedLessons / totalLessons) * 100 : 0
 
   return (
@@ -72,8 +83,7 @@ export default async function CourseSidebar({ moduleId }: CourseSidebarProps) {
 
       {/* --- LISTA DE LECCIONES --- */}
       <nav className="flex-1 overflow-y-auto p-4 space-y-2">
-        {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-        {lessons.map((lesson: any) => {
+        {lessons.map((lesson: Lesson) => {
           const isCompleted = lesson.lesson_progress?.[0]?.is_completed
 
           return (

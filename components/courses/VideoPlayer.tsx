@@ -6,17 +6,9 @@ import { createClient } from '@/utils/supabase/client'
 import { getYouTubeID } from '@/utils/get-youtube-id' // La función que creamos en el paso 2
 
 // load the heavy YouTube iframe player only on the client once
-const YouTube = dynamic<{
-  videoId: string
-  opts: any
-  className?: string
-  onReady?: () => void
-  onError?: () => void
-  onEnd?: (event: any) => void
-}>(
-  () => import('react-youtube'),
-  { ssr: false }
-)
+const YouTube = dynamic(() => import('react-youtube'), {
+  ssr: false,
+})
 
 interface VideoPlayerProps {
   url: string | null
@@ -51,11 +43,10 @@ const videoId = getYouTubeID(url) // Extraemos el ID limpio
       if (data?.is_completed) setIsCompleted(true)
     }
     checkProgress()
-  }, [lessonId]) // supabase is a stable singleton
+  }, [lessonId, supabase]) // supabase is a stable singleton
 
   // Lógica cuando termina el video
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const onPlayerEnd = async (_event: YouTubeEvent) => {
+  const onPlayerEnd = async () => {
     console.log("✅ Video terminado (Evento Nativo YouTube)")
 
     const { data: { user } } = await supabase.auth.getUser()

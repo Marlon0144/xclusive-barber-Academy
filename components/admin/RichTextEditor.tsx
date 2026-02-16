@@ -38,25 +38,11 @@ export default function RichTextEditor({ content, onChange }: RichTextEditorProp
     return data.publicUrl
   }, [supabase])
 
-  // Hook para el botón de la barra de herramientas
-  const handleAddImage = useCallback(() => {
-    // Creamos un input invisible temporalmente
-    const input = document.createElement('input')
-    input.type = 'file'
-    input.accept = 'image/*'
-    input.onchange = async (e) => {
-      const file = (e.target as HTMLInputElement).files?.[0]
-      if (file) {
-        const url = await uploadImage(file)
-        // Necesitamos acceder a 'editor' aquí, pero como es callback externo,
-        // usaremos una referencia o lógica interna.
-        // TRUCO: Disparamos un evento personalizado o simplemente confiamos en que
-        // el usuario arrastre, pero para el botón:
-        // (Ver abajo como lo conectamos en el render)
-      }
-    }
-    input.click()
-  }, [uploadImage])
+  // Hook para el botón de la barra de herramientas - Currently unused but kept for future implementations
+  // const handleAddImage = useCallback(() => {
+  //   // See uploadImage for implementation
+  // }, [uploadImage])
+
 
   // --- CONFIGURACIÓN DEL EDITOR ---
   const editor = useEditor({

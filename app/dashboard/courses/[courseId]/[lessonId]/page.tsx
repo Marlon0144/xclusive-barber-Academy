@@ -1,13 +1,12 @@
-import React from 'react'
-import { createClient } from '@/utils/supabase/server'
 import { notFound, redirect } from 'next/navigation'
 import VideoPlayer from '@/components/courses/VideoPlayer'
 import LessonContent from '@/components/courses/LessonContent'
 import { Star, MonitorPlay, ChevronLeft } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from "@/components/ui/button"
+import { getUser, getLessonById } from '@/utils/cache-helpers'
 
-// CAMBIO 1: Definimos params como una Promesa en el tipo
+// Definimos params como una Promesa en el tipo
 interface LessonPageProps {
   params: Promise<{
     courseId: string
@@ -16,32 +15,13 @@ interface LessonPageProps {
 }
 
 export default async function LessonPage({ params }: LessonPageProps) {
-  // CAMBIO 2: "Desempaquetamos" la promesa antes de usarla
+  // "Desempaquetamos" la promesa antes de usarla
   // Esperamos a que Next.js nos entregue los datos de la URL
-  const { lessonId, courseId } = await params
-
-  // helpers
-const getCurrentUser = React.cache(async () => {
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-  return user
-})
-
-const getLessonById = React.cache(async (id: string) => {
-  const supabase = await createClient()
-  const { data: lesson, error } = await supabase
-    .from('lessons')
-    .select('*')
-    .eq('id', id)
-    .single()
-  return { lesson, error }
-})
+  const { lessonId } = await params
 
 // start both queries in parallel
 const [user, lessonResult] = await Promise.all([
-  getCurrentUser(),
+  getUser(),
   getLessonById(lessonId),
 ])
 

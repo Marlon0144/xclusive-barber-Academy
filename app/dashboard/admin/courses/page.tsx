@@ -1,7 +1,7 @@
 import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
 import AdminCourseList from './AdminCourseList'
-import { Settings, Layers, Star } from 'lucide-react'
+import { Settings, Star } from 'lucide-react'
 
 export default async function AdminCoursesPage() {
   const supabase = await createClient()
