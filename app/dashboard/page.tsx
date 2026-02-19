@@ -1,121 +1,94 @@
-import React from 'react'
-import Link from 'next/link'
-import { BookOpen, Target, GraduationCap, ArrowRight, Settings, Star } from 'lucide-react'
+import { BookOpen, Target, TrendingUp, Landmark, GraduationCap, Settings } from 'lucide-react'
 import { getUser, getProfile } from '@/utils/cache-helpers'
+import { DashboardHeader } from '@/components/dashboard/DashboardHeader'
+import { DashboardCard } from '@/components/dashboard/DashboardCard'
 
 export default async function DashboardPage() {
-  // 1. Obtener usuario y rol para renderizado condicional
   const user = await getUser()
 
-  let userRole = 'student' // Default
+  let userRole = 'student'
 
   if (user) {
     const profile = await getProfile(user.id)
     if (profile) userRole = profile.role
   }
 
-  // Definimos permisos
   const isInstructor = userRole === 'admin' || userRole === 'instructor'
   const isAdmin = userRole === 'admin'
 
   return (
-    <div className="min-h-screen p-8 max-w-7xl mx-auto space-y-12">
+    <div className="min-h-screen bg-[#161616] text-white">
+      
+      {/* HEADER Section - Full Width */}
+      <DashboardHeader userName={user?.email?.split('@')[0]} />
 
-      {/* HEADER DE BIENVENIDA */}
-      <header className="relative py-8 border-b border-white/10">
-        <div className="absolute top-0 right-0 opacity-20 hidden md:block">
-          <Star className="w-24 h-24 text-gold-500" />
+      <div className="max-w-7xl mx-auto p-6 md:p-12 space-y-10">
+        
+        {/* DASHBOARD GRID */}
+        {/* Mobile: 1 col, Tablet: 2 cols, Desktop: 3 cols */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+          {/* 1. PROGRAMA DE FORMACIÓN */}
+          <DashboardCard
+            title="Programa de Formación"
+            description="Accede a lecciones teóricas, tutoriales en video y material de estudio exclusivo."
+            icon={BookOpen}
+            href="/dashboard/courses"
+            actionText="Ingresar"
+          />
+
+          {/* 2. SEGUIMIENTO Y EVALUACIÓN */}
+          <DashboardCard
+            title="Seguimiento y Evaluación"
+            description="Sube tus cortes, recibe feedback detallado y monitorea tu evolución técnica."
+            icon={Target}
+            href="/dashboard/tracker"
+            actionText="Ver Progreso"
+          />
+
+          {/* 3. PROGRESO PROFESIONAL (Placeholder) */}
+          <DashboardCard
+            title="Progreso Profesional"
+            description="Analíticas de tu carrera, objetivos alcanzados y proyección a futuro."
+            icon={TrendingUp}
+            disabled={true}
+            actionText="Próximamente"
+          />
+
+           {/* 4. LA ACADEMIA (Placeholder) */}
+           <DashboardCard
+            title="La Academia"
+            description="Comunidad, eventos y noticias exclusivas del mundo Xclusive Barber."
+            icon={Landmark}
+            disabled={true}
+            actionText="Próximamente"
+          />
+
+          {/* INSTRUCTOR ONLY: EVALUAR */}
+          {isInstructor && (
+            <DashboardCard
+                title="Evaluar Estudiantes"
+                description="Revisar entregas, calificar cortes y proporcionar retroalimentación técnica."
+                icon={GraduationCap}
+                href="/dashboard/grading"
+                actionText="Panel de Calificación"
+                isInstructor={true}
+            />
+          )}
+
+          {/* ADMIN ONLY: GESTIÓN DE CURSOS */}
+          {isAdmin && (
+            <DashboardCard
+                title="Gestión de Cursos"
+                description="Administrar catálogo, editar lecciones y configurar módulos de aprendizaje."
+                icon={Settings}
+                href="/dashboard/admin/courses"
+                actionText="Administrar"
+                isAdmin={true}
+            />
+          )}
+
         </div>
-        <div className="relative z-10">
-          <h2 className="text-gold-500 text-sm tracking-[0.2em] uppercase font-bold mb-2">Panel de Control</h2>
-          <h1 className="text-4xl md:text-5xl font-serif text-white mb-4">
-            Hola, <span className="text-transparent bg-clip-text bg-gradient-to-r from-gold-500 to-gold-600 font-bold">{user?.email?.split('@')[0]}</span>
-          </h1>
-          <p className="text-zinc-400 max-w-xl text-lg">
-            Bienvenido a tu espacio en Xclusive Barber Academy. Aquí comienza tu camino hacia la maestría.
-          </p>
-        </div>
-      </header>
-
-      {/* GRID DE NAVEGACIÓN */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-
-        {/* OPCIÓN 1: MIS CURSOS (Todos) */}
-        <Link href="/dashboard/courses" className="group">
-          <div className="h-full bg-surface border border-white/5 hover:border-gold-500 p-8 rounded-sm transition-all duration-300 hover:shadow-[0_0_20px_rgba(212,175,55,0.1)] flex flex-col group-hover:-translate-y-1">
-            <div className="bg-black/50 w-14 h-14 rounded-full flex items-center justify-center mb-6 text-gold-500 border border-gold-500/20 group-hover:bg-gold-500 group-hover:text-black transition-colors">
-              <BookOpen size={24} />
-            </div>
-            <h3 className="text-2xl font-serif text-white mb-3 group-hover:text-gold-500 transition-colors">Aprender</h3>
-            <p className="text-zinc-400 text-sm leading-relaxed flex-1">
-              Catálogo de cursos. Accede a lecciones teóricas, tutoriales en video y material de estudio.
-            </p>
-            <div className="mt-8 flex items-center text-gold-500 text-xs font-bold uppercase tracking-widest gap-2">
-              Ver Cursos <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
-            </div>
-          </div>
-        </Link>
-
-        {/* OPCIÓN 2: MASTERY TRACKER (Todos) */}
-        <Link href="/dashboard/tracker" className="group">
-          <div className="h-full bg-surface border border-white/5 hover:border-gold-500 p-8 rounded-sm transition-all duration-300 hover:shadow-[0_0_20px_rgba(212,175,55,0.1)] flex flex-col group-hover:-translate-y-1">
-            <div className="bg-black/50 w-14 h-14 rounded-full flex items-center justify-center mb-6 text-gold-500 border border-gold-500/20 group-hover:bg-gold-500 group-hover:text-black transition-colors">
-              <Target size={24} />
-            </div>
-            <h3 className="text-2xl font-serif text-white mb-3 group-hover:text-gold-500 transition-colors">Practicar</h3>
-            <p className="text-zinc-400 text-sm leading-relaxed flex-1">
-              Sube tus cortes, recibe feedback potenciado por IA y valida tu progreso técnico.
-            </p>
-            <div className="mt-8 flex items-center text-gold-500 text-xs font-bold uppercase tracking-widest gap-2">
-              Subir Práctica <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
-            </div>
-          </div>
-        </Link>
-
-        {/* OPCIÓN 3: GRADING (SOLO INSTRUCTORES) */}
-        {isInstructor && (
-          <Link href="/dashboard/grading" className="group">
-            <div className="h-full bg-[#0A1F0A]/40 border border-white/5 hover:border-green-500/50 p-8 rounded-sm transition-all duration-300 flex flex-col relative overflow-hidden group-hover:-translate-y-1">
-              {/* Etiqueta de Staff */}
-              <div className="absolute top-0 right-0 bg-white/5 text-zinc-400 text-[10px] font-bold px-3 py-1 border-b border-l border-white/10 tracking-widest uppercase">
-                Staff Only
-              </div>
-
-              <div className="bg-black/50 w-14 h-14 rounded-full flex items-center justify-center mb-6 text-zinc-300 border border-white/10 group-hover:bg-green-900 group-hover:text-green-400 transition-colors">
-                <GraduationCap size={24} />
-              </div>
-              <h3 className="text-2xl font-serif text-white mb-3 group-hover:text-green-400 transition-colors">Evaluar</h3>
-              <p className="text-zinc-500 group-hover:text-zinc-300 text-sm leading-relaxed flex-1 transition-colors">
-                Panel de instructor. Revisa los trabajos de los estudiantes y califica su desempeño.
-              </p>
-              <div className="mt-8 flex items-center text-zinc-500 group-hover:text-green-400 text-xs font-bold uppercase tracking-widest gap-2 transition-colors">
-                Panel de Notas <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
-              </div>
-            </div>
-          </Link>
-        )}
-
-        {/* --- NUEVA OPCIÓN 4: GESTIÓN DE CURSOS (SOLO ADMIN) --- */}
-        {isAdmin && (
-          <Link href="/dashboard/admin/courses" className="group">
-            <div className="h-full bg-[#1A1010]/40 border border-white/5 hover:border-red-500/50 p-8 rounded-sm transition-all duration-300 flex flex-col relative overflow-hidden group-hover:-translate-y-1">
-              <div className="absolute top-0 right-0 bg-red-900/20 text-red-500 text-[10px] font-bold px-3 py-1 border-b border-l border-red-500/20 tracking-widest uppercase">
-                Admin
-              </div>
-              <div className="bg-black/50 w-14 h-14 rounded-full flex items-center justify-center mb-6 text-zinc-300 border border-white/10 group-hover:bg-red-900 group-hover:text-red-400 transition-colors">
-                <Settings size={24} />
-              </div>
-              <h3 className="text-2xl font-serif text-white mb-3 group-hover:text-red-400 transition-colors">Cursos</h3>
-              <p className="text-zinc-500 group-hover:text-zinc-300 text-sm leading-relaxed flex-1 transition-colors">
-                Editor de contenido. Gestiona módulos, lecciones y estructura académica.
-              </p>
-              <div className="mt-8 flex items-center text-zinc-500 group-hover:text-red-400 text-xs font-bold uppercase tracking-widest gap-2 transition-colors">
-                Gestionar Contenido <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
-              </div>
-            </div>
-          </Link>
-        )}
-
       </div>
     </div>
   )

@@ -1,15 +1,11 @@
 'use client'
 
-// 1. IMPORTAMOS SOLO LO QUE FUNCIONA (Core Editor)
 import { useEditor, EditorContent } from '@tiptap/react'
-import EditorToolbar from './EditorToolbar' // Nuestra barra fija confiable
-
-// 2. EXTENSIONES (Lógica)
+import EditorToolbar from './EditorToolbar'
 import StarterKit from '@tiptap/starter-kit'
 import ImageExtension from '@tiptap/extension-image'
 import LinkExtension from '@tiptap/extension-link'
 import YoutubeExtension from '@tiptap/extension-youtube'
-
 import { useCallback } from 'react'
 import { createClient } from '@/utils/supabase/client'
 

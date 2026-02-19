@@ -21,7 +21,30 @@
   /* Neutrals */
   --background: #050505;
   --foreground: #D3CBBA;
+  --foreground-strong: #EDEDED;
   --surface: #0F0F0F;
+  --surface-elevated: #121212;
+
+  /* Neutral utility tones */
+  --neutral-950: #0A0A0A;
+  --neutral-900: #1A1A1A;
+
+  /* Light CTA surface */
+  --cta-light: #D3D3D3;
+
+  /* Landing Hero semantic colors */
+  --hero-bg: #0A0A0A;
+  --hero-title: #E5E5E5;
+  --hero-highlight: #F2EFE9;
+  --hero-banner: #1A2E1A;
+
+  /* Header semantic colors */
+  --header-base: #0d0f12;
+  --header-foreground: #d9d9d9;
+  --header-muted: #b9bec7;
+  --header-accent-line: #d3b85a;
+  /* Header gradient: Dark edges, Green center */
+  --header-gradient-bg: linear-gradient(90deg, #050505 0%, #0A1F0A 35%, #0A1F0A 65%, #050505 100%);
 
   /* Typography tokens */
   --font-cinzel: 'Cinzel', serif;
@@ -31,10 +54,24 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-foreground-strong: var(--foreground-strong);
   --color-gold-500: var(--gold-500);
   --color-gold-600: var(--gold-600);
   --color-green-950: var(--green-950);
   --color-surface: var(--surface);
+  --color-surface-elevated: var(--surface-elevated);
+  --color-neutral-950: var(--neutral-950);
+  --color-neutral-900: var(--neutral-900);
+  --color-cta-light: var(--cta-light);
+  --color-hero-bg: var(--hero-bg);
+  --color-hero-title: var(--hero-title);
+  --color-hero-highlight: var(--hero-highlight);
+  --color-hero-banner: var(--hero-banner);
+  --color-header-base: var(--header-base);
+  --color-header-foreground: var(--header-foreground);
+  --image-header-gradient: var(--header-gradient-bg);
+  --color-header-muted: var(--header-muted);
+  --color-header-accent-line: var(--header-accent-line);
   
   --font-serif: var(--font-cinzel);
   --font-sans: var(--font-montserrat);
@@ -76,7 +113,55 @@ h1, h2, h3, h4, h5, h6 {
 .text-gold-500 { color: var(--gold-500); }
 .border-gold-500 { border-color: var(--gold-500); }
 
+.header-premium-bg {
+  background-image:
+    linear-gradient(90deg, rgba(23, 25, 30, 0.95) 0%, rgba(16, 57, 38, 0.92) 26%, rgba(28, 61, 41, 0.9) 50%, rgba(16, 57, 38, 0.92) 74%, rgba(23, 25, 30, 0.95) 100%),
+    linear-gradient(180deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0) 100%);
+}
+
 /* Small responsive helpers for text scaling to match Figma */
 @media (min-width: 768px) {
   .hero-title { font-size: 4.25rem; line-height: 1.02; }
 }
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideInFromBottom {
+  from { transform: translateY(2rem); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes slideInFromTop {
+  from { transform: translateY(-1rem); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.animate-in {
+  animation-duration: 0.5s;
+  animation-fill-mode: both;
+  animation-timing-function: ease-out;
+}
+
+.fade-in {
+  animation-name: fadeIn;
+}
+
+.slide-in-from-bottom-4 {
+  animation-name: slideInFromBottom;
+}
+
+.slide-in-from-bottom-8 {
+  animation-name: slideInFromBottom;
+}
+
+.slide-in-from-top-2 {
+  animation-name: slideInFromTop;
+}
+
+.delay-200 { animation-delay: 200ms; }
+.delay-500 { animation-delay: 500ms; }
+.duration-700 { animation-duration: 700ms; }
+.duration-1000 { animation-duration: 1000ms; }

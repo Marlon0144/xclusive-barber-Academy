@@ -1,8 +1,9 @@
 import { login } from './actions'
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+import { AuthCard, AuthCardContent, AuthCardHeader } from "@/components/ui/auth-card"
+import { AuthInput } from "@/components/ui/auth-input"
+import { AuthButton } from "@/components/ui/auth-button"
 import Link from "next/link"
-import { Star } from "lucide-react"
+import Image from "next/image"
 
 export default async function LoginPage({
   searchParams,
@@ -13,94 +14,168 @@ export default async function LoginPage({
   const errorMessage = params.error
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-4 relative overflow-hidden">
-      {/* Background with overlay */}
-      <div className="absolute inset-0 z-0">
-        <div className="absolute inset-0 bg-[#0A1F0A]/95 z-10"></div>
-        <img
-          src="https://images.unsplash.com/photo-1621605815971-fbc98d665033?q=80&w=2070&auto=format&fit=crop"
-          alt="Barber Background"
-          className="w-full h-full object-cover grayscale opacity-20"
-        />
-      </div>
+    <div className="min-h-screen w-full bg-[#161616] flex flex-col items-center justify-center relative overflow-hidden p-4">
+      {/* Background gradients/overlay if needed */}
 
-      <div className="relative z-20 w-full max-w-md space-y-8">
+      {/* Main Container - AuthCard */}
+      <AuthCard className="w-full max-w-[350px] bg-[#1d1d1d] border-none shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)] p-0 overflow-visible mt-20 mb-10 min-h-[600px]">
+        
+        {/* Header Section */}
+        <div className="relative pt-0 flex flex-col items-center text-center w-full">
+          
+          {/* Back Arrow - Absolute positioned */}
+          <Link href="/" className="absolute top-6 left-6 z-20 opacity-80 hover:opacity-100 transition-opacity">
+             <Image 
+               src="/assets/login/icon-arrow-back.png" 
+               alt="Back" 
+               width={24} 
+               height={12} 
+               className="w-auto h-3"
+             />
+          </Link>
 
-        {/* Header */}
-        <div className="text-center space-y-4">
-          <div className="flex justify-center">
-            <div className="text-gold-500 border border-gold-500 p-3 rounded-full bg-black/50 backdrop-blur-md">
-              <Star className="w-8 h-8 fill-current" />
-            </div>
+          {/* Logo - Centered at top, overflowing if needed or just padding top */}
+          <div className="mt-8 mb-6 relative w-24 h-24 flex items-center justify-center">
+            <Image
+              src="/assets/login/logo-footer.png"
+              alt="Xclusive Barber Academy"
+              fill
+              className="object-contain"
+              priority
+            />
           </div>
-          <h1 className="text-2xl font-serif text-gold-500 tracking-widest uppercase">
-            Xclusive<br />Barber<br />Academy
-          </h1>
-          <div className="pt-4">
-            <h2 className="text-3xl font-bold text-white font-serif">INICIAR SESIÓN</h2>
-            <h3 className="text-xl text-gold-500 font-serif">PLATAFORMA ACADÉMICA</h3>
+
+          {/* Title - Dark Green Strip */}
+          <div className="bg-[#1e3a27]/60 w-full py-5 mb-4 shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)] backdrop-blur-sm">
+            <h1 className="text-[#d3cbba] font-cinzel font-bold text-2xl leading-none tracking-widest">
+              ACCEDE A LA
+              <br />
+              <span className="text-[#d3cbba]">ACADEMIA</span>
+            </h1>
+          </div>
+
+          <p className="text-[#d3cbba] text-[10px] font-light tracking-wide mb-6 opacity-80">
+            Acceso exclusivo para estudiantes activos.
+          </p>
+
+          <div className="px-8 text-center space-y-4 w-full">
+             <div className="text-[#d3cbba] text-[12px] leading-relaxed">
+               <p className="font-bold mb-2">¡Bienvenido a Xclusive Barber Academy!</p>
+               <p className="font-light opacity-90">Ingresa para acceder a tus clases, contenidos exclusivos y seguimiento académico.</p>
+             </div>
+             
+             {/* Separator Image */}
+            <div className="w-full h-[1px] relative opacity-40">
+               <Image src="/assets/login/divider.png" alt="divider" fill className="object-cover" />
+            </div>
           </div>
         </div>
 
-        {/* Error Message */}
-        {errorMessage && (
-          <div className="p-3 bg-red-900/50 border border-red-500 rounded-sm text-red-200 text-xs text-center uppercase tracking-wide">
-            {errorMessage}
-          </div>
-        )}
-
-        {/* Form Container */}
-        <div className="bg-black/40 backdrop-blur-md p-8 border-t border-b border-white/10 space-y-6">
-          <form className="space-y-6">
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <label className="text-xs text-zinc-500 uppercase tracking-wider ml-1">Email</label>
-                <Input
+        <AuthCardContent className="px-8 pb-10 pt-6 space-y-6 w-full">
+          <form className="flex flex-col gap-6">
+            
+            <div className="space-y-6">
+              {/* Email Input */}
+              <div className="space-y-1">
+                <AuthInput
                   name="email"
                   type="email"
-                  placeholder="tu@email.com"
+                  placeholder="CORREO ELECTRÓNICO"
                   required
-                  className="text-center"
+                  className="text-center placeholder:text-[10px] placeholder:text-[#d3cbba]/40 placeholder:font-light placeholder:tracking-widest"
                 />
               </div>
 
-              <div className="space-y-2">
-                <label className="text-xs text-zinc-500 uppercase tracking-wider ml-1">Contraseña</label>
-                <Input
+               {/* Password Input */}
+              <div className="space-y-1">
+                <AuthInput
                   name="password"
                   type="password"
-                  placeholder="••••••••"
+                  placeholder="CONTRASEÑA"
                   required
-                  className="text-center"
+                  className="text-center placeholder:text-[10px] placeholder:text-[#d3cbba]/40 placeholder:font-light placeholder:tracking-widest"
                 />
               </div>
             </div>
 
-            <div className="pt-2">
-              <Button
-                formAction={login}
-                className="w-full text-lg py-6 font-bold tracking-widest bg-gold-500 text-black hover:bg-gold-600 border-none shadow-gold"
-              >
-                ENTRAR
-              </Button>
+            {/* Forgot Password */}
+            <div className="text-center -mt-2">
+               <Link href="/auth/forgot-password" className="text-[9px] text-[#d3cbba] hover:text-white transition-colors tracking-wide font-light opacity-80">
+                 ¿OLVIDASTE TU CONTRASEÑA?
+               </Link>
             </div>
+
+            {/* Submit Button */}
+            <div className="pt-2">
+              <AuthButton
+                formAction={login}
+                className="w-full bg-gradient-to-r from-[#D4AF37] to-[#C5A028] text-[#1e3a27] hover:brightness-110 font-bold tracking-[0.2em] text-[13px] py-6 shadow-[0px_4px_15px_rgba(212,175,55,0.15)] border-none rounded-sm"
+              >
+                ACCEDER A MI FORMACIÓN
+              </AuthButton>
+            </div>
+
+            {/* Error Message */}
+            {errorMessage && (
+              <div className="p-3 bg-red-900/50 border border-red-500 rounded-sm text-red-200 text-xs text-center uppercase tracking-wide">
+                {errorMessage}
+              </div>
+            )}
           </form>
 
-          <div className="text-center pt-2">
-            <p className="text-xs text-zinc-600">
-              ¿No tienes acceso? <Link href="/apply" className="text-gold-500 hover:underline">Solicita tu ingreso aquí</Link>
-            </p>
-            <Link href="/auth/forgot-password" className="block mt-4 text-[10px] text-zinc-700 hover:text-zinc-500 uppercase tracking-widest">
-              ¿Olvidaste tu contraseña?
-            </Link>
+          {/* Links Footer inside Card */}
+          <div className="text-center space-y-3 pt-4 border-t border-[#d3cbba]/10">
+            <div className="text-[9px] text-[#d3cbba]">
+              <span className="font-light">¿ES TU PRIMER INGRESO? </span>
+              <Link href="/apply" className="font-bold hover:text-white transition-colors ml-1">ACTIVAR CUENTA</Link>
+            </div>
+            
+            <div className="text-[9px] text-[#d3cbba]">
+              <p className="opacity-80 mb-1">¿TIENES PROBLEMAS PARA INGRESAR?</p>
+              <Link href="/contact" className="font-bold hover:text-white transition-colors">CONTÁCTANOS</Link>
+            </div>
           </div>
-        </div>
+        </AuthCardContent>
 
-        {/* Footer info */}
-        <div className="flex justify-between text-[10px] text-zinc-500 uppercase tracking-widest">
-          <span>@xclusivebarberau</span>
-          <span>Estudiantes</span>
-        </div>
+      </AuthCard>
+
+      {/* Footer Outside Card */}
+      <div className="mt-8 mb-4 w-full max-w-[350px] flex flex-col items-center justify-center space-y-4">
+          
+          <div className="flex items-center justify-center gap-6 opacity-70">
+             {/* Logo Footer */}
+             <div className="w-8 h-8 relative">
+               <Image src="/assets/login/logo-footer.png" alt="Footer Logo" fill className="object-contain" />
+             </div>
+             
+             {/* Social Handles */}
+             <div className="flex flex-col text-[9px] text-[#d3cbba] font-medium leading-tight text-right">
+                <span>@xclusivebarberau</span>
+             </div>
+
+             {/* Icons */}
+             <div className="flex gap-3">
+               <Link href="#" className="w-5 h-5 relative hover:opacity-80 transition-opacity">
+                  <Image src="/assets/login/icon-instagram.png" alt="Instagram" fill className="object-contain" />
+               </Link>
+               <Link href="#" className="w-4 h-4 relative hover:opacity-80 transition-opacity">
+                  <Image src="/assets/login/icon-whatsapp.png" alt="WhatsApp" fill className="object-contain" />
+               </Link>
+             </div>
+             
+             <div className="flex flex-col text-[9px] text-[#d3cbba] font-medium leading-tight">
+                <span>+61 413 891 977</span>
+             </div>
+          </div>
+          
+          {/* Separator */}
+          <div className="w-full h-[1px] relative opacity-50">
+             <Image src="/assets/login/divider.png" alt="divider" fill className="object-cover" />
+          </div>
+
+          <p className="text-[8px] text-[#d3cbba] text-center font-medium opacity-80 uppercase tracking-wider">
+            Formación profesional para construir una carrera real
+          </p>
 
       </div>
     </div>

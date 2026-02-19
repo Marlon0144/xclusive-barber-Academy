@@ -1,142 +1,118 @@
-'use client'
-
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import Link from "next/link";
-import { Star, AlertCircle } from "lucide-react";
-import { useFormState } from "react-dom";
-import { applyAccess } from "./actions";
+import Image from 'next/image'
+import Link from 'next/link'
+import ApplyForm from './ApplyForm'
+import { AuthCard, AuthCardContent } from '@/components/ui/auth-card'
 
 export default function ApplyPage() {
-    const [state, formAction] = useFormState(applyAccess, { success: false, error: null })
+  return (
+    <div className="min-h-screen w-full bg-[#161616] flex flex-col items-center justify-center relative overflow-hidden p-4">
+      {/* Background gradients/overlay if needed */}
 
-    return (
-        <div className="min-h-screen flex flex-col items-center justify-center p-4 relative overflow-hidden">
-            {/* Background with overlay */}
-            <div className="absolute inset-0 z-0">
-                <div className="absolute inset-0 bg-[#0A1F0A]/90 z-10"></div>
-                <img
-                    src="https://images.unsplash.com/photo-1599351431202-6e0005a7837f?q=80&w=1788&auto=format&fit=crop"
-                    alt="Barber Background"
-                    className="w-full h-full object-cover grayscale opacity-20"
-                />
+      {/* Main Container - AuthCard */}
+      <AuthCard className="w-full max-w-[350px] bg-[#1d1d1d] border-none shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)] p-0 overflow-visible mt-20 mb-10 min-h-[700px]">
+        
+        {/* Header Section */}
+        <div className="relative pt-0 flex flex-col items-center text-center w-full">
+          
+          {/* Back Arrow */}
+          <Link href="/" className="absolute top-6 left-6 z-20 opacity-80 hover:opacity-100 transition-opacity">
+             <Image 
+               src="/assets/apply/icon-back.png" 
+               alt="Back" 
+               width={24} 
+               height={12} 
+               className="w-auto h-3"
+             />
+          </Link>
+
+          {/* Logo */}
+          <div className="mt-8 mb-6 relative w-24 h-24 flex items-center justify-center">
+            <Image
+              src="/assets/apply/logo-footer.png"
+              alt="Xclusive Barber Academy"
+              fill
+              className="object-contain"
+              priority
+            />
+          </div>
+
+          {/* Title - Green Box */}
+          <div className="bg-[#1e3a27]/60 w-full py-5 mb-4 shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)] backdrop-blur-sm">
+            <h1 className="text-[#d3cbba] font-cinzel font-bold text-2xl leading-none tracking-widest">
+              ACTIVA TU ACCESO
+            </h1>
+          </div>
+
+          <p className="text-[#d3cbba] text-[6px] font-light tracking-wide mb-6 opacity-80 uppercase">
+            Este paso solo se realiza una vez.
+          </p>
+
+          <div className="px-8 text-center space-y-4 w-full">
+             <div className="text-[#d3cbba] text-[12px] leading-relaxed">
+               <p className="font-bold mb-2">¡Ya haces parte de Xclusive Barber Academy!</p>
+               <p className="font-light opacity-90 text-[10px]">Completa tus datos para acceder por primera vez a la plataforma académica.</p>
+             </div>
+             
+             {/* Separator Image */}
+            <div className="w-full h-[1px] relative opacity-40">
+               <Image src="/assets/apply/divider.png" alt="divider" fill className="object-cover" />
             </div>
-
-            <div className="relative z-20 w-full max-w-md space-y-8">
-
-                {/* Header del Formulario */}
-                <div className="text-center space-y-4">
-                    <div className="flex justify-center">
-                        <div className="text-gold-500 border border-gold-500 p-3 rounded-full bg-black/50 backdrop-blur-md">
-                            <Star className="w-8 h-8 fill-current" />
-                        </div>
-                    </div>
-                    <h1 className="text-2xl font-serif text-gold-500 tracking-widest uppercase">
-                        Xclusive<br />Barber<br />Academy
-                    </h1>
-
-                    <div className="pt-4">
-                        <h2 className="text-3xl font-bold text-white font-serif">ACTIVA TU ACCESO</h2>
-                        <h3 className="text-xl text-gold-500 font-serif">A LA ACADEMIA</h3>
-                    </div>
-
-                    <p className="text-xs text-zinc-500 uppercase tracking-widest mt-2">
-                        Este paso solo se realiza una vez
-                    </p>
-                </div>
-
-                {/* Formulario */}
-                <div className="bg-black/40 backdrop-blur-md p-8 border-t border-b border-white/10 space-y-6">
-                    <div className="text-center mb-6">
-                        <p className="text-zinc-300 text-sm">
-                            ¡Ya haces parte de Xclusive Barber Academy!
-                        </p>
-                        <p className="text-zinc-500 text-xs mt-2">
-                            Completa tus datos para acceder por primera vez a la plataforma académica.
-                        </p>
-                    </div>
-
-                {/* Error Message */}
-                {state.error && (
-                    <div className="bg-red-900/20 border border-red-500/50 p-4 rounded-sm flex gap-3">
-                        <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
-                        <p className="text-red-300 text-sm">{state.error}</p>
-                    </div>
-                )}
-
-                <form action={formAction} className="space-y-4">
-                    <div className="space-y-2">
-                        <label className="text-xs text-zinc-500 uppercase tracking-wider ml-1">Nombre</label>
-                        <Input 
-                            name="fullName" 
-                            placeholder="Tu nombre completo" 
-                            className="text-center"
-                            required
-                        />
-                    </div>
-
-                    <div className="space-y-2">
-                        <label className="text-xs text-zinc-500 uppercase tracking-wider ml-1">Correo Electrónico</label>
-                        <Input 
-                            name="email" 
-                            type="email" 
-                            placeholder="ejemplo@email.com" 
-                            className="text-center"
-                            required
-                        />
-                    </div>
-
-                    <div className="space-y-2">
-                        <label className="text-xs text-zinc-500 uppercase tracking-wider ml-1">Código de Acceso</label>
-                        <Input 
-                            name="inviteCode" 
-                            type="text" 
-                            placeholder="XXXX-XXXX" 
-                            className="text-center uppercase"
-                            required
-                        />
-                    </div>
-
-                    <div className="space-y-2">
-                        <label className="text-xs text-zinc-500 uppercase tracking-wider ml-1">Crear Contraseña</label>
-                        <Input 
-                            name="password" 
-                            type="password" 
-                            placeholder="Mínimo 6 caracteres" 
-                            className="text-center"
-                            minLength={6}
-                            required
-                        />
-                    </div>
-
-                    <div className="pt-4">
-                        <Button 
-                            type="submit"
-                            disabled={state.success}
-                            className="w-full text-lg py-6 font-bold tracking-widest bg-[#ededed] text-black hover:bg-white border-none disabled:opacity-50"
-                        >
-                            {state.success ? '✓ CUENTA ACTIVADA' : 'ACTIVAR CUENTA'}
-                        </Button>
-                    </div>
-                </form>
-
-                    <div className="text-center pt-4">
-                        <p className="text-xs text-zinc-600">
-                            ¿Ya activaste tu acceso? <Link href="/login" className="text-gold-500 hover:underline">Continuar tu formación</Link>
-                        </p>
-                    </div>
-                </div>
-
-                {/* Footer info */}
-                <div className="flex justify-between text-[10px] text-zinc-500 uppercase tracking-widest">
-                    <span>@xclusivebarberau</span>
-                    <span>+61 413 891 977</span>
-                </div>
-                <div className="text-center text-[10px] text-zinc-600 uppercase tracking-widest">
-                    Formación profesional para construir una carrera real
-                </div>
-
-            </div>
+          </div>
         </div>
-    );
+
+        <AuthCardContent className="px-8 pb-10 pt-4 w-full">
+          <ApplyForm />
+
+          {/* Links Footer inside Card */}
+          <div className="text-center space-y-3 pt-6 border-t border-[#d3cbba]/10 mt-6">
+            <div className="text-[7px] text-[#d3cbba] uppercase tracking-wide">
+              <span className="font-light">¿Ya activaste tu acceso? </span>
+              <Link href="/login" className="font-bold hover:text-white transition-colors ml-1">Continuar tu formación</Link>
+            </div>
+          </div>
+        </AuthCardContent>
+
+      </AuthCard>
+      
+      {/* Footer Outside Card */}
+      <div className="mt-4 mb-8 w-full max-w-[350px] flex flex-col items-center justify-center space-y-4">
+          
+          <div className="flex items-center justify-center gap-6 opacity-70">
+             {/* Logo Footer */}
+             <div className="w-8 h-8 relative">
+               <Image src="/assets/apply/logo-footer.png" alt="Footer Logo" fill className="object-contain" />
+             </div>
+             
+             {/* Social Handles */}
+             <div className="flex flex-col text-[9px] text-[#d3cbba] font-medium leading-tight text-right">
+                <span>@xclusivebarberau</span>
+             </div>
+
+             {/* Icons */}
+             <div className="flex gap-3">
+               <Link href="#" className="w-5 h-5 relative hover:opacity-80 transition-opacity">
+                  <Image src="/assets/apply/icon-instagram.png" alt="Instagram" fill className="object-contain" />
+               </Link>
+               <Link href="#" className="w-4 h-4 relative hover:opacity-80 transition-opacity">
+                  <Image src="/assets/apply/icon-whatsapp.png" alt="WhatsApp" fill className="object-contain" />
+               </Link>
+             </div>
+             
+             <div className="flex flex-col text-[9px] text-[#d3cbba] font-medium leading-tight">
+                <span>+61 413 891 977</span>
+             </div>
+          </div>
+          
+          {/* Separator */}
+          <div className="w-full h-[1px] relative opacity-50">
+             <Image src="/assets/apply/divider.png" alt="divider" fill className="object-cover" />
+          </div>
+
+          <p className="text-[8px] text-[#d3cbba] text-center font-medium opacity-80 uppercase tracking-wider">
+            Formación profesional para construir una carrera real
+          </p>
+
+      </div>
+    </div>
+  )
 }
