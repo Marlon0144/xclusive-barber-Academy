@@ -9,8 +9,11 @@ export interface AuthInputProps
 
 const AuthInput = React.forwardRef<HTMLInputElement, AuthInputProps>(
   ({ className, type, label, error, id, required, ...props }, ref) => {
-    // Generate a random ID if none provided, for accessibility
-    const inputId = id || React.useId()
+    // 1. Siempre llamamos al hook en el nivel superior para no romper las reglas de React
+    const generatedId = React.useId()
+    
+    // 2. Asignamos el ID: usamos el proporcionado o el generado
+    const inputId = id || generatedId
 
     return (
       <div className="space-y-4 group relative">
