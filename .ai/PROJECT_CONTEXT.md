@@ -58,7 +58,10 @@
 │    │    │
 │    │    ├── /courses ...
 │    │    ├── /grading ...
-│    │    └── /tracker ...
+│    │    └── /tracker
+│    │         ├── page.tsx         # Evidence Form & History (Updated Design)
+│    │         ├── actions.ts       # Upload & DB submission
+│    │         └── SubmissionCard.tsx # Tarjeta de historial angular (New)
 │
 ├── /components                     # Componentes COMPARTIDOS
 │    ├── Header.tsx                 # Navegación principal (Actualizado con diseño Gold/Dark)
@@ -126,6 +129,12 @@
 
 4.  **Header:**
     *   Actualizado para usar el nuevo logo (texto + svg) y componentes de UI.
+
+5.  **Tracker / Evidence (`/dashboard/tracker`):**
+    *   **Rediseño Completo - v2.0:** Estilo "Militar/Industrial" (#8C8C84 / #1A2E1A).
+    *   **Header:** Banner minimalista con flecha de retorno y título del curso.
+    *   **Formulario:** Brackets en esquinas, inputs estilizados y botón dorado.
+    *   **Historial:** Implementado con componente `SubmissionCard` angular (`clip-path`) y status badges.
 
 ### ✅ Optimizaciones de Rendimiento - Sprint 5b (2026-02-16)
 

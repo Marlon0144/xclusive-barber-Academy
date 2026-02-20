@@ -2,58 +2,63 @@ import Image from "next/image";
 
 export default function HeroSection() {
   return (
-    <section className="relative w-full min-h-[110vh] flex flex-col pt-32 overflow-hidden bg-[#161616]">
+    <section className="relative w-full min-h-screen flex flex-col pt-32 pb-20 overflow-hidden bg-[#050505]">
       
-      {/* 1. BACKGROUND IMAGE (Blurred per Figma) */}
+      {/* 1. BACKGROUND IMAGE & GRADIENT */}
       <div className="absolute inset-0 z-0">
         <Image
           src="/assets/landing/hero-bg.png"
           alt="Barber Background"
           fill
-          className="object-cover opacity-30 blur-[2.5px]"
+          className="object-cover opacity-20" // Reducimos opacidad para igualar el Figma
           priority
         />
-        {/* Helper gradient for text readability if needed */}
-        <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-[#161616] to-transparent"></div>
+        {/* Este gradiente hace que el fondo se funda a negro sólido hacia abajo */}
+        <div className="absolute inset-x-0 bottom-0 h-3/4 bg-gradient-to-t from-[#050505] via-[#050505]/90 to-transparent"></div>
       </div>
 
-      {/* 2. HERO CONTENT */}
-      <div className="relative z-20 w-full flex flex-col items-center text-center mt-8 md:mt-16 px-4">
+      {/* 2. MAIN CONTENT WRAPPER */}
+      <div className="relative z-20 w-full max-w-7xl mx-auto flex flex-col flex-1 px-4 md:px-8 mt-4 md:mt-10">
         
-        {/* Subtitle */}
-        <p className="font-sans font-light tracking-[0.2em] text-[#d3cbba] text-sm md:text-xl lg:text-2xl mb-4 md:mb-8 text-center uppercase">
-          EDUCACIÓN PROFESIONAL EN BARBERÍA PARA LATINOS
-        </p>
+        {/* BLOQUE SUPERIOR: Títulos Centrados */}
+        <div className="flex flex-col items-center text-center w-full">
+          
+          <p className="font-sans font-light tracking-[0.25em] text-[#d3cbba]/80 text-xs md:text-sm lg:text-base mb-6 uppercase">
+            Educación profesional en barbería para latinos
+          </p>
 
-        {/* Main Title Stack */}
-        <div className="flex flex-col items-center leading-none text-[#d3cbba] text-center max-w-7xl mx-auto">
-          <h1 className="font-sans font-black text-4xl sm:text-5xl md:text-7xl lg:text-[64px] tracking-tight uppercase mb-0">
-            FORMACIÓN ORIENTADA A LOS ESTÁNDARES REALES DEL
+          <h1 className="font-sans font-black text-4xl sm:text-5xl md:text-6xl lg:text-[72px] leading-[1.2] tracking-tight text-[#E8E4D9] uppercase max-w-4xl">
+            Formación orientada a los<br />estándares reales del
           </h1>
-          <h1 className="font-sans font-black text-5xl sm:text-7xl md:text-8xl lg:text-[96px] tracking-tight uppercase mt-2 md:mt-4">
-            MERCADO AUSTRALIANO
-          </h1>
+          
+          {/* Bloque "MERCADO AUSTRALIANO" con su línea asimétrica */}
+          <div className="relative mt-4 md:mt-6 inline-block">
+            <h2 className="font-sans font-black text-5xl sm:text-6xl md:text-7xl lg:text-[90px] tracking-tight text-[#d3cbba] uppercase">
+              Mercado Australiano
+            </h2>
+            {/* Línea dorada CSS pura, alineada a la derecha */}
+            <div className="absolute -bottom-2 md:-bottom-4 right-0 w-[55%] h-[2px] md:h-[3px] bg-[#D4AF37]"></div>
+          </div>
+
         </div>
 
-        {/* Gold Separator Line */}
-        <div className="relative w-[300px] md:w-[812px] h-[5px] mt-12 md:mt-16 shadow-lg">
-           <Image 
-             src="/assets/landing/gold-separator.png" 
-             alt="Separator" 
-             fill 
-             className="object-cover"
-           />
+        {/* BLOQUE INFERIOR: Párrafo alineado a la derecha */}
+        <div className="flex-1 w-full flex flex-col justify-end mt-24 md:mt-32 relative z-30">
+            <div className="w-full md:w-[420px] ml-auto text-right md:text-right mb-10 md:mb-0">
+              <p className="font-sans font-light text-[#d3cbba]/90 text-sm md:text-base leading-relaxed">
+                Sistema de aprendizaje práctico y estructurado para construir una carrera real, con estándares profesionales y mentalidad de negocio.
+              </p>
+            </div>
         </div>
-
       </div>
 
-      {/* 3. ARM TATTOO IMAGE (Absolute positioned left) */}
-      <div className="absolute left-[-20px] md:left-[-62px] top-[50%] md:top-[600px] w-[300px] md:w-[617px] h-[500px] md:h-[924px] z-10 opacity-90 pointer-events-none">
+      {/* 3. ARM TATTOO IMAGE */}
+      <div className="absolute left-[-20px] bottom-0 w-[300px] md:w-[500px] lg:w-[650px] h-[400px] md:h-[600px] lg:h-[750px] z-30 pointer-events-none">
         <Image
           src="/assets/landing/hero-tattoo-arm.png"
           alt="Tattoo Arm Detail"
           fill
-          className="object-contain md:object-cover"
+          className="object-contain object-bottom md:object-left-bottom"
         />
       </div>
 

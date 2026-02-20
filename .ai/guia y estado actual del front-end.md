@@ -51,14 +51,42 @@ Reutilizados exitosamente en ambas vistas:
 - `AuthInput.tsx`: Input minimalista de borde inferior, label flotante en focus, color dorado.
 - `AuthButton.tsx`: Bot�n con gradiente dorado y sombra neon.
 
-### C. Ensamblaje actual
+### C. Dashboard - Lista de Cursos (Implementado)
+
+Se ha implementado la vista de listado de módulos `/dashboard/courses` siguiendo el diseño "Programa de Formación".
+
+- **Diseño:** 1:1 con Figma (Node 137:464).
+- **Características:**
+    - Fondo oscuro con efecto blur y "ruido" de textura.
+    - Lista vertical de módulos con assets de fondo dinámicos y formas vectoriales (`.svg`).
+    - Animaciones de entrada escalonadas (`framer-motion` o CSS nativo `animate-in`).
+    - **Header integrado:** No se duplica el header global, solo se monta el título de la página debajo.
+    - **Responsividad:** Adaptable a móbile (`w-full`, `max-w` fluidos) y desktop.
+- **Componentes:** `CourseListView.tsx` (Client) + `page.tsx` (Server).
+- **Assets:** `public/assets/dashboard/courses/`.
+
+### D. Tracker / Evidencia (Implementado - v2)
+
+Se ha completado el rediseño total de la vista `/dashboard/tracker` siguiendo referencias visuales "pixel-perfect".
+
+- **Diseño:** Estilo militar/industrial premium.
+- **Características:**
+    - **Header:** Banner con título de curso, flecha de retorno y subrayado dorado (#D4AF37).
+    - **Formulario:** Tarjeta color Taupe (#8C8C84) con brackets en esquinas, headers de inputs en verde oscuro (#1A2E1A) y botón dorado.
+    - **Historial:** Nuevo componente `SubmissionCard` con diseño angular (`clip-path`), badges de estado y tipografía técnica.
+    - **Fondo:** Limpio, con gradientes ambientales sutiles (sin ruido excesivo).
+- **Componentes:** `SubmissionCard.tsx` (Card de historial), `page.tsx` (Lógica de formulario y lista).
+
+### E. Ensamblaje actual
 
 - `app/page.tsx`  Landing Page.
-- `app/apply/page.tsx`  Formulario de Activaci�n.
+- `app/apply/page.tsx`  Formulario de Activación.
 - `app/login/page.tsx`  Formulario de Login.
+- `app/dashboard/courses/page.tsx`  Lista de Cursos.
+- `app/dashboard/tracker/page.tsx`  Tracker de Evidencia.
 - `components/HeaderWrapper.tsx`  Controla visibilidad del Header (oculto en auth).
 
-### D. Assets
+### F. Assets
 
 El flujo de assets est� estandarizado en `public/assets`.
 **Regla de oro:** No usar URLs externas de Figma. Descargar, renombrar a *kebab-case*, guardar en `public/assets/<vista>/` e importar con `next/image`.
@@ -90,6 +118,16 @@ Base de dise�o vigente (Actualizada):
 
 3. **Control de Navegaci�n**
     - Las nuevas vistas privadas (Dashboard) deben tener su propio Layout/Sidebar.
+4. **Manejo de Header Global (CRÍTICO)**
+    - YA EXISTE un componente `Header.tsx` global inyectado en `layout.tsx`.
+    - **NO DUPLICAR:** Las nuevas páginas no deben renderizar su propio Header de navegación.
+    - Si la vista requiere un título o banner, este debe ser parte del *contenido* de la página, debajo del Header global.
+
+5. **Responsividad Obligatoria**
+    - Todo componente debe ser **Mobile-First** (`w-full`, `p-4`).
+    - Usar breakpoints (`md:`, `lg:`) para expandir el layout.
+    - Evitar anchos fijos en pixeles (`w-[367px]` ❌ -> `w-full max-w-sm` ✅).
+    - Imágenes y vectores deben escalar proporcionalmente (`object-contain`).
 
 ## 5. Pr�ximos Pasos (Ready for Dev)
 
