@@ -28,7 +28,7 @@ export default async function Header() {
           <Link href="/" className="group flex items-center gap-4">
             <div className="relative h-16 w-16 md:h-20 md:w-20">
               <Image
-                src="/assets/logo-academy.png"
+                src="/assets/header/logo-academia.png"
                 alt="Xclusive Barber Academy Logo"
                 fill
                 priority
@@ -67,13 +67,13 @@ export default async function Header() {
             <nav className="flex items-center gap-4 md:gap-8">
               <Link
                 href="/models"
-                className="hidden text-xs font-medium uppercase tracking-wide text-header-muted transition-colors hover:text-header-foreground md:inline-block md:text-sm"
+                className="hidden text-xs font-light uppercase tracking-wide text-foreground transition-colors hover:text-white md:inline-block md:text-sm"
               >
                 Ser modelo
               </Link>
               <Link
                 href="/login"
-                className="text-xs font-medium uppercase tracking-wide text-header-muted transition-colors hover:text-header-foreground md:text-sm"
+                className="text-xs font-light uppercase tracking-wide text-foreground transition-colors hover:text-white md:text-sm"
               >
                 Acceder
               </Link>

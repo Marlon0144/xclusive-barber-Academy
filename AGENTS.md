@@ -59,6 +59,8 @@ Este proyecto tiene instaladas skills en:
 
 ### Skills Activas:
 
+- `vercel-react-best-practices`
+- `implement-design`
 - `frontend-design`
 - `find-skills`
 

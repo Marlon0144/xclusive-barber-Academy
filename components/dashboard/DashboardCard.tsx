@@ -1,95 +1,75 @@
 import React from 'react';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
-import { type LucideIcon } from 'lucide-react';
 
 interface DashboardCardProps {
     title: string;
     description: string;
-    icon: LucideIcon;
     href?: string;
-    actionText?: string;
     disabled?: boolean;
     isInstructor?: boolean;
     isAdmin?: boolean;
+    /** First card in Figma is taller: h-[88px] vs h-[80px] */
+    tall?: boolean;
+    /** "La Academia" style: even lower opacity (opacity-45 in Figma) */
+    dimmed?: boolean;
     className?: string;
 }
 
 export function DashboardCard({
     title,
     description,
-    icon: Icon,
     href,
-    actionText = "Ver más",
     disabled = false,
     isInstructor = false,
     isAdmin = false,
-    className
+    tall = false,
+    dimmed = false,
+    className,
 }: DashboardCardProps) {
-    const cardContent = (
-        <>
-            <div>
-                <div className="flex justify-between items-start mb-4">
-                     <div className={cn(
-                        "p-3 rounded-lg w-fit transition-colors duration-300",
-                        "bg-[#1e3a27]/10 text-[#1e3a27]",
-                        !disabled && "group-hover:bg-[#1e3a27] group-hover:text-[#d3cbba]"
-                    )}>
-                        <Icon size={28} strokeWidth={1.5} />
-                    </div>
-                    
-                    {(isInstructor || isAdmin) && (
-                        <span className="px-2 py-1 bg-[#1e3a27] text-[#d3cbba] text-[10px] font-bold uppercase tracking-widest rounded">
-                            {isInstructor ? "Instructor" : "Admin"}
-                        </span>
-                    )}
-                </div>
-               
-                <h3 className="font-sans font-bold text-lg md:text-xl uppercase tracking-wide text-[#1e3a27] mb-2">
-                    {title}
-                </h3>
-                <p className="font-sans text-sm font-light text-[#1e3a27]/80 leading-relaxed">
-                    {description}
-                </p>
-            </div>
-            
-            {!disabled && (
-                <div className="mt-6 flex items-center text-[#1e3a27] text-xs font-bold uppercase tracking-widest gap-2 opacity-60 group-hover:opacity-100 transition-opacity">
-                    <span>{actionText}</span>
-                    <span className="group-hover:translate-x-1 transition-transform">→</span>
-                </div>
+
+    const inner = (
+        <div
+            className={cn(
+                // Layout — Figma node 2065:14
+                'relative flex flex-col items-center justify-center w-full px-4',
+                tall ? 'h-[88px]' : 'h-[80px]',
+                // Appearance
+                dimmed ? 'bg-[#d3cbba] opacity-45' : 'bg-[#d3cbba] opacity-60',
+                'shadow-[0px_4px_4px_rgba(0,0,0,0.25)]',
+                // Interaction
+                disabled
+                    ? 'cursor-not-allowed'
+                    : 'cursor-pointer transition-opacity duration-200 hover:opacity-80',
+                className,
             )}
-            
-            {disabled && (
-                <div className="mt-6 flex items-center text-[#1e3a27] text-xs font-bold uppercase tracking-widest gap-2 opacity-60">
-                   <span>{actionText}</span>
-                </div>
+        >
+            {/* Role badge */}
+            {(isAdmin || isInstructor) && (
+                <span className="absolute top-2 right-2 px-2 py-0.5 bg-[#1e3a27] text-[#d3cbba] text-[8px] font-bold uppercase tracking-widest rounded">
+                    {isAdmin ? 'Admin' : 'Instructor'}
+                </span>
             )}
-        </>
+
+            {/* Title — Poppins ExtraBold 17px */}
+            <h3 className="font-sans font-extrabold text-[17px] text-[#1e3a27] text-center uppercase leading-tight">
+                {title}
+            </h3>
+
+            {/* Description — Poppins Light 7px */}
+            <p className="font-sans font-light text-[7px] text-[#1e3a27] text-center leading-[1.3] mt-1 max-w-[260px]">
+                {description}
+            </p>
+        </div>
     );
 
-    const containerClasses = cn(
-        "group relative flex flex-col justify-between h-full p-6 rounded-xl",
-        "bg-[#d3cbba] backdrop-blur-sm transition-all duration-300 ease-in-out",
-        "shadow-md",
-        disabled 
-            ? "opacity-75 cursor-not-allowed hover:bg-[#d3cbba] hover:shadow-md" 
-            : "hover:bg-[#c5bdac] hover:shadow-lg hover:-translate-y-1 cursor-pointer",
-        (isInstructor || isAdmin) && "border-[#1e3a27]/20 border-2",
-        className
-    );
-
-    if (disabled || !href) {
+    if (href && !disabled) {
         return (
-            <div className={containerClasses}>
-                {cardContent}
-            </div>
+            <Link href={href} className="block w-full">
+                {inner}
+            </Link>
         );
     }
 
-    return (
-        <Link href={href} className={containerClasses}>
-            {cardContent}
-        </Link>
-    );
+    return inner;
 }

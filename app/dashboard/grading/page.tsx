@@ -2,6 +2,7 @@ import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
 import GradingCard from './GradingCard'
 import { GraduationCap, Inbox, Star } from 'lucide-react'
+import DashboardPageHeader from '@/components/headers/DashboardPageHeader'
 
 export default async function GradingPage() {
   const supabase = await createClient()
@@ -40,7 +41,9 @@ export default async function GradingPage() {
     .order('created_at', { ascending: true }) // Calificar las más antiguas primero
 
   return (
-    <div className="min-h-screen p-8 max-w-6xl mx-auto space-y-12">
+    <>
+      <DashboardPageHeader title="Evaluación" />
+      <div className="min-h-screen p-8 max-w-6xl mx-auto space-y-12">
 
       {/* HEADER */}
       <header className="relative border-b border-white/10 pb-8">
@@ -88,6 +91,7 @@ export default async function GradingPage() {
           </div>
         )}
       </div>
-    </div>
+      </div>
+    </>
   )
 }

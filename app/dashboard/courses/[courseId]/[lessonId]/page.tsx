@@ -6,6 +6,7 @@ import { getUser, getLessonById } from '@/utils/cache-helpers'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import VideoPlayer from '@/components/courses/VideoPlayer'
 import { cn } from '@/lib/utils'
+import DashboardPageHeader from '@/components/headers/DashboardPageHeader'
 
 interface LessonPageProps {
   params: Promise<{
@@ -65,20 +66,13 @@ export default async function LessonPage({ params }: LessonPageProps) {
   return (
     <div className="min-h-screen bg-[#161616] text-[#D3CBBA] font-sans relative overflow-x-hidden pb-20">
       
+      {/* NAV HEADER - Dark variant (sticky) */}
+      <DashboardPageHeader title="Lecciones" />
+
       {/* BACKGROUND ELEMENTS */}
       <div className="absolute top-0 left-0 w-full h-full pointer-events-none z-0">
         <div className="absolute top-[-10%] right-[-10%] w-[50vw] h-[50vw] bg-gold-500/5 blur-[120px] rounded-full opacity-30" />
         <div className="absolute bottom-[-10%] left-[-10%] w-[40vw] h-[40vw] bg-green-950/20 blur-[100px] rounded-full opacity-30" />
-      </div>
-
-      {/* DASHBOARD LINK (Top Right) */}
-      <div className="absolute top-8 right-8 z-20">
-        <Link href="/dashboard" className="group flex flex-col items-center gap-1">
-          <div className="bg-[#D9D9D9]/40 h-[14px] w-[74px] rounded-full backdrop-blur-sm group-hover:bg-[#D9D9D9]/60 transition-colors" />
-          <span className="text-[#161616] bg-[#D3CBBA] px-2 py-0.5 rounded text-[8px] tracking-widest font-light uppercase">
-            Dashboard
-          </span>
-        </Link>
       </div>
 
       {/* HEADER / HERO SECTION */}

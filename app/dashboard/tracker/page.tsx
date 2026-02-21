@@ -10,6 +10,7 @@ import { cn } from '@/lib/utils'
 import { Submission } from '@/types/submissions'
 import Image from 'next/image'
 import { SubmissionCard } from './SubmissionCard'
+import DashboardPageHeader from '@/components/headers/DashboardPageHeader'
 
 export default function TrackerPage() {
   const [loading, setLoading] = useState(false)
@@ -84,6 +85,9 @@ export default function TrackerPage() {
   return (
     <div className='relative min-h-screen bg-[#161616] text-[#D3CBBA] font-sans pb-20 overflow-x-hidden selection:bg-gold-500/30'>
       
+      {/* NAV HEADER - Dark variant (sticky) */}
+      <DashboardPageHeader title="Evolución Profesional" />
+
       {/* Background Effects */}
       <div className='fixed inset-0 pointer-events-none z-0'>
         {/* Subtle texture overlay - consistent with other pages if they have it, or just clean */}

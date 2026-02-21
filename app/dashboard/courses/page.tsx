@@ -1,6 +1,6 @@
-
 import { createClient } from '@/utils/supabase/server'
 import CourseListView from '@/components/dashboard/courses/CourseListView'
+import DashboardPageHeader from '@/components/headers/DashboardPageHeader'
 
 export default async function CoursesIndexPage() {
   const supabase = await createClient()
@@ -31,10 +31,13 @@ export default async function CoursesIndexPage() {
   }
 
   return (
-    <CourseListView 
-      modules={modules || []} 
-      firstLessonMap={firstLessonMap} 
-    />
+    <>
+      <DashboardPageHeader title="Módulos" />
+      <CourseListView 
+        modules={modules || []} 
+        firstLessonMap={firstLessonMap} 
+      />
+    </>
   )
 }
 

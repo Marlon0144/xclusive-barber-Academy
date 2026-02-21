@@ -10,10 +10,16 @@ export default function HeaderWrapper({
 }) {
   const pathname = usePathname()
   
-  // List of paths where the header should be hidden
+  // Paths where the global (landing) header should be hidden.
+  // Auth pages and ALL dashboard routes (dashboard uses its own headers).
   const hiddenPaths = ['/apply', '/login', '/signup']
-  
-  if (hiddenPaths.includes(pathname) || pathname?.startsWith('/apply/')) {
+
+  const isHidden =
+    hiddenPaths.includes(pathname) ||
+    pathname?.startsWith('/apply/') ||
+    pathname?.startsWith('/dashboard')
+
+  if (isHidden) {
     return null
   }
 
