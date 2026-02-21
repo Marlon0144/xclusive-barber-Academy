@@ -77,19 +77,28 @@ export default function CourseListView({ modules, firstLessonMap }: CourseListPr
             Estructura oficial del proceso académico alineado a estándares profesionales del mercado australiano.
           </p>
 
-          {/* "MÓDULOS" Label - Top Right (Responsive: hidden on mobile tight layouts if needed, or adjusted) */}
-          <div className="hidden md:flex absolute top-10 right-0 flex-col items-end opacity-60">
-            <span className="font-sans font-bold text-xs text-[#d3cbba] text-right">
-              MÓDULOS
-            </span>
-             <div className="relative w-[77px] h-[1px] mt-1">
-                <Image src="/assets/dashboard/courses/separator.png" alt="sep" fill className="object-cover" />
-             </div>
-          </div>
+          {/* "MÓDULOS" Label - removed: already shown in DashboardPageHeader */}
       </header>
 
+      {/* --- COURSE NAME BANNER — Figma node 2070:13 --- */}
+      <div className="relative w-full max-w-[333px] h-[65px] mx-auto mt-8 shadow-[0px_4px_4px_rgba(0,0,0,0.25)] bg-[rgba(30,58,39,0.51)] flex flex-col items-center justify-center z-10">
+        {/* "NOMBRE DEL CURSO" gold asset */}
+        <div className="relative w-[231px] h-[15px]">
+          <Image
+            src="/assets/dashboard/courses/nombre-curso.png"
+            alt="Nombre del curso"
+            fill
+            className="object-contain"
+          />
+        </div>
+        {/* Subtitle */}
+        <p className="font-sans font-extralight text-[11px] text-[#d3cbba] text-center tracking-[0.09em] mt-1.5 whitespace-pre-wrap">
+          FORMACIÓN PROFESIONAL EN BARBERÍA
+        </p>
+      </div>
+
       {/* --- MODULES LIST --- */}
-      <div className="relative mt-12 md:mt-16 pb-32 flex flex-col gap-12 md:gap-16 items-center w-full max-w-lg mx-auto z-10 px-4">
+      <div className="relative mt-16 md:mt-20 pb-32 flex flex-col gap-12 md:gap-16 items-center w-full max-w-lg mx-auto z-10 px-4">
         {modules.length === 0 ? (
            <p className="text-center text-zinc-500 font-sans text-sm mt-20">No hay módulos disponibles aún.</p>
         ) : (
@@ -137,14 +146,12 @@ export default function CourseListView({ modules, firstLessonMap }: CourseListPr
                     </p>
                  </div>
 
-                 {/* Right Side Status */}
-                 <div className="absolute right-4 md:right-6 top-1/2 -translate-y-1/2 z-20 flex flex-col items-end pointer-events-none">
-                    <div className="flex flex-col items-end">
-                      <span className="font-sans font-semibold text-[8px] md:text-[9px] text-[#d3cbba]">ESTADO:</span>
-                      <span className="font-sans font-extralight text-[8px] md:text-[9px] text-[#d3cbba]">
-                        {index === 0 ? "En progreso" : "Bloqueado"}
-                      </span>
-                    </div>
+                 {/* Status — just above the card */}
+                 <div className="absolute left-0 top-[-20px] z-20 flex items-center gap-1 pointer-events-none">
+                    <span className="font-sans font-semibold text-[8px] md:text-[9px] text-[#d3cbba]">ESTADO:</span>
+                    <span className="font-sans font-extralight text-[8px] md:text-[9px] text-[#d3cbba]">
+                      {index === 0 ? "En progreso" : "Bloqueado"}
+                    </span>
                  </div>
 
                  {/* Decorative Image (Right Side, floating outside/behind) */}
