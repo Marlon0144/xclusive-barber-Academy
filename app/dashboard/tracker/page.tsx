@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { uploadSubmission } from './actions'
 import { createClient } from '@/utils/supabase/client'
 import { Loader2, Upload, Clock, CheckCircle, Eye, Star, Camera, ChevronDown, X } from 'lucide-react'
@@ -19,6 +19,9 @@ export default function TrackerPage() {
 
   // 2. ESTADO PARA CONTROLAR EL MODAL
   const [selectedSubmission, setSelectedSubmission] = useState<Submission | null>(null)
+
+  // Referencia directa al form – evita querySelector que puede agarrar otro form (ej. logout)
+  const formRef = useRef<HTMLFormElement>(null)
 
   // singleton client – stable reference
   const supabase = createClient()
@@ -58,7 +61,7 @@ export default function TrackerPage() {
     e.preventDefault()
     setPreview(null)
     setFileName(null)
-    const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement
+    const fileInput = formRef.current?.querySelector('input[type="file"]') as HTMLInputElement
     if (fileInput) fileInput.value = ''
   }
 
@@ -68,8 +71,7 @@ export default function TrackerPage() {
       await uploadSubmission(formData)
       setPreview(null)
       setFileName(null)
-      const form = document.querySelector('form') as HTMLFormElement
-      form?.reset()
+      formRef.current?.reset()
       await fetchHistory()
     } catch (error) {
       console.error(error)
@@ -180,7 +182,7 @@ export default function TrackerPage() {
                 </p>
              </div>
 
-             <form action={handleSubmit} className='flex flex-col items-center space-y-6 px-4'>
+             <form ref={formRef} action={handleSubmit} className='flex flex-col items-center space-y-6 px-4'>
             
               {/* Image Upload Area with Brackets */}
               <div className='w-full relative py-2'>
@@ -296,10 +298,8 @@ export default function TrackerPage() {
              {/* Bottom Gold Button (Full Width of Card) */}
              <div className="absolute bottom-0 left-0 right-0">
                 <Button 
-                  onClick={() => {
-                    const form = document.querySelector('form');
-                    form?.requestSubmit();
-                  }}
+                  type="button"
+                  onClick={() => formRef.current?.requestSubmit()}
                   disabled={loading}
                   className='w-full h-[54px] bg-gradient-to-r from-[#C5A028] via-[#E8C547] to-[#C5A028] hover:via-[#F0D570] text-[#111] font-black tracking-[1px] text-[13px] shadow-[0_-5px_15px_rgba(0,0,0,0.2)] rounded-none uppercase transition-all duration-300 border-t border-[#FFF8E6]/20'
                 >

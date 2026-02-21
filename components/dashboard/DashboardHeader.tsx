@@ -13,13 +13,14 @@ export function DashboardHeader({ className, userName }: DashboardHeaderProps) {
             {/* Background Image */}
             <div className="absolute inset-0 w-full h-full">
                 <Image
-                src="/assets/dashboard/header-bg.png"
-                alt="Dashboard background"
-                fill
-                className="object-cover opacity-90"
-                priority
+                    src="/assets/dashboard/header-bg.png"
+                    alt="Dashboard background"
+                    fill
+                    className="object-cover opacity-100"
+                    priority
                 />
-                <div className="absolute inset-0 bg-gradient-to-r from-[#161616] via-[#161616]/90 to-[#161616]/40" />
+                {/* Overlay mejorado: contraste sin oscurecer */}
+                <div className="absolute inset-0 bg-gradient-to-r from-[#161616] via-[#161616]/80 to-transparent" />
             </div>
 
             {/* Content Container */}

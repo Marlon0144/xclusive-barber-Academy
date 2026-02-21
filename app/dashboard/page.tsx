@@ -30,7 +30,7 @@ export default async function DashboardPage() {
 
           {/* 1. PROGRAMA DE FORMACIÓN */}
           <DashboardCard
-            title="Programa de Formación"
+            title="Programa de Formación" 
             description="Accede a lecciones teóricas, tutoriales en video y material de estudio exclusivo."
             icon={BookOpen}
             href="/dashboard/courses"
