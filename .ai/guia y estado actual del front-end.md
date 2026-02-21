@@ -86,9 +86,22 @@ Se ha completado el rediseño total de la vista `/dashboard/tracker` siguiendo r
 - `app/dashboard/tracker/page.tsx`  Tracker de Evidencia.
 - `components/HeaderWrapper.tsx`  Controla visibilidad del Header (oculto en auth).
 
-### F. Assets
+### F. Player de Cursos (Implementado - v1)
 
-El flujo de assets est� estandarizado en `public/assets`.
+Se ha implementado la vista de reproducción de lección `/dashboard/courses/[courseId]/[lessonId]` siguiendo el diseño "Lección Individual" de Figma.
+
+- **Diseño:** Full-screen centrado (sin sidebar lateral).
+- **Características:**
+    - **Header:** Branding "Xclusive", título "FUNDAMENTOS TÉCNICOS" y decoración dorada.
+    - **Navegación:** Tabs horizontales (L1, L2, L3...) para navegar entre lecciones del módulo.
+    - **Video:** Player central con marco decorativo y esquinas estilizadas.
+    - **Contenido:** Layout a dos columnas en desktop (Detalles + Referencias).
+    - **Footer:** Navegación "Anterior / Siguiente" con flechas e indicadores de título.
+- **Componentes:** `page.tsx` (Lógica y UI unificada por ahora para mantener contexto).
+- **Assets:** `public/assets/dashboard/lessons/`.
+- **Cambios Estructurales:** Se ocultó el sidebar en `layout.tsx` para esta ruta específica.
+
+### G. Ensamblaje actual
 **Regla de oro:** No usar URLs externas de Figma. Descargar, renombrar a *kebab-case*, guardar en `public/assets/<vista>/` e importar con `next/image`.
 
 ## 3. Sistema visual y tokens
