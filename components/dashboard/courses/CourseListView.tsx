@@ -58,7 +58,7 @@ export default function CourseListView({ modules, firstLessonMap }: CourseListPr
       {/* --- HEADER SECTION --- */}
       <header className="relative pt-12 md:pt-20 flex flex-col items-center z-10 w-full max-w-4xl mx-auto px-4">
           {/* Main Title */}
-          <h1 className="font-cinzel font-bold text-2xl md:text-3xl text-[#d3cbba] text-center tracking-wide leading-none">
+          <h1 className="font-sans font-extrabold text-2xl md:text-3xl text-[#d3cbba] text-center tracking-wide leading-none">
             PROGRAMA DE FORMACIÓN
           </h1>
           
@@ -136,7 +136,7 @@ export default function CourseListView({ modules, firstLessonMap }: CourseListPr
                     </p>
                     
                     {/* Module Title */}
-                    <h3 className="font-cinzel font-bold text-lg md:text-xl text-[#1e3a27] leading-none mt-1 w-[85%] uppercase">
+                    <h3 className="font-sans font-extrabold text-lg md:text-xl text-[#1e3a27] leading-none mt-1 w-[85%] uppercase">
                       {module.title}
                     </h3>
                     
@@ -177,7 +177,7 @@ export default function CourseListView({ modules, firstLessonMap }: CourseListPr
          <Link href="/dashboard" className="relative group cursor-pointer w-full max-w-[300px]">
              <div className="absolute inset-0 bg-[#1e3a27]/50 blur-sm group-hover:bg-[#1e3a27]/70 transition-colors rounded-sm" />
              <div className="relative bg-[rgba(30,58,39,0.51)] w-full h-[40px] flex items-center justify-center border border-white/5 shadow-lg backdrop-blur-sm group-hover:scale-[1.02] transition-transform">
-                <span className="font-cinzel font-bold text-[13px] text-[#d3cbba] tracking-[0.78px]">
+                <span className="font-sans font-extrabold text-[13px] text-[#d3cbba] tracking-[0.78px]">
                   PONER EN PRÁCTICA MI FORMACIÓN
                 </span>
              </div>

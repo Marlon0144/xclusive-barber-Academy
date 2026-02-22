@@ -1,6 +1,8 @@
-# Gu�a y Estado Actual del Front-end
+# Guía y Estado Actual del Front-end
 
 Documento vivo del estado de front-end para mantener continuidad entre iteraciones y agentes.
+
+**Última actualización:** 22-Feb-2026
 
 ## 1. Arquitectura oficial (vigente)
 
@@ -10,7 +12,7 @@ Documento vivo del estado de front-end para mantener continuidad entre iteracion
 - **Patr�n de datos:** Server Components para carga inicial + Supabase para auth/data.
 - **UI base:** componentes propios en `components/ui`.
 
-## 2. Estado Actualizado (18-Feb-2026) - Hito 1, 2 & 3 Completados (Landing + Auth)
+## 2. Estado Actualizado (22-Feb-2026) — Sprint 6b + Typography Audit
 
 ### A. Landing Page Rediseñanda 1:1 Figma (Implementado - v3)
 
@@ -101,19 +103,51 @@ Se ha implementado la vista de reproducción de lección `/dashboard/courses/[co
 - **Assets:** `public/assets/dashboard/lessons/`.
 - **Cambios Estructurales:** Se ocultó el sidebar en `layout.tsx` para esta ruta específica.
 
+### G. Sistema de Footer del Dashboard (Implementado — 22-Feb-2026)
+
+Se ha extraído el footer compartido del área de dashboard en un componente reutilizable.
+
+- **Componente:** `components/dashboard/DashboardFooter.tsx`
+- **Props:**
+    - `tagline?: string` — Tagline opcional (default: "Plataforma oficial de desarrollo académico.")
+- **Contenido fijo:** Instagram `@xclusivebarberau` · Logo centrado · Teléfono `+61 413 891 977` · Divisor gradiente
+- **Asset:** `/assets/header_dash/logo-academia.png` (compartido con DashboardHeader)
+- **Vistas que lo usan:**
+    - `app/dashboard/page.tsx`
+    - `app/dashboard/progreso_profesional/page.tsx`
+    - `app/dashboard/tracker/page.tsx`
+    - `app/dashboard/courses/page.tsx`
+    - `app/dashboard/grading/page.tsx`
+
+**Regla:** Toda nueva vista del área `/dashboard` debe incluir `<DashboardFooter />` al final.
+
+### H. Auditoría Tipográfica — Figma como fuente de verdad (22-Feb-2026)
+
+- **Cambio:** Migración de `Cinzel` + `Montserrat` → **`Poppins`** en todo el proyecto.
+- **Fuente:** Figma Node `213:108` — `Poppins ExtraBold` (headings) + `Poppins Regular` (body).
+- **Implementación:**
+    - `app/layout.tsx`: `next/font/google` carga Poppins pesos 300–900, variable `--font-poppins`.
+    - `app/globals.css`: `--font-sans` y `--font-serif` apuntan a `var(--font-poppins)`. `h1–h6` base `font-weight: 800`.
+    - Todas las clases `font-cinzel` explícitas reemplazadas por `font-sans font-extrabold`.
+
 ### G. Ensamblaje actual
 **Regla de oro:** No usar URLs externas de Figma. Descargar, renombrar a *kebab-case*, guardar en `public/assets/<vista>/` e importar con `next/image`.
 
 ## 3. Sistema visual y tokens
 
-Base de dise�o vigente (Actualizada):
+Base de diseño vigente (Actualizada 22-Feb-2026):
+
+- **Tipografía (ACTUALIZADA):**
+  - **Fuente única:** `Poppins` (Figma fuente de verdad — Node `213:108`)
+  - Headings: `font-sans font-extrabold` (Poppins 800)
+  - Body: `font-sans font-normal` / `font-light` (Poppins 400/300)
+  - Variable CSS: `--font-poppins` → mapeada a `--font-sans` y `--font-serif`
 
 - **Paleta Auth Dark:**
   - Background: `#050505` (Deep Black)
   - Card Bg: `#1d1d1d` (Surface Elevated)
   - Gold Accent: `#D4AF37`
   - Input Placeholder: `text-[#d3cbba]/50`
-  - Typography: `font-cinzel` (T�tulos), `font-sans` (Cuerpo/Inputs).
 
 ## 4. Pr�cticas obligatorias para siguientes vistas (Dashboard, Admin, etc.)
 
@@ -125,9 +159,14 @@ Base de dise�o vigente (Actualizada):
     *   **Paso 4 (Detalle):** Aplicar tokens de dise�o y ajustes finos (pixel-perfect).
 
 2. **Consistencia Visual**
-    - Mantener la est�tica "Dark Premium".
+    - Mantener la estética "Dark Premium".
     - Usar los componentes `Auth*` si se requieren formularios similares.
-    - Respetar espaciados y tipograf�as (`Cinzel` vs `Montserrat`).
+    - Tipografía: `font-sans font-extrabold` (headings), `font-sans font-normal/light` (body) — Poppins.
+
+3. **Footer de Dashboard (CRÍTICO)**
+    - TODA vista dentro de `/dashboard` debe terminar con `<DashboardFooter />`.
+    - Importar desde `@/components/dashboard/DashboardFooter`.
+    - Usar la prop `tagline` para personalizar el texto de cada sección si es necesario.
 
 3. **Control de Navegaci�n**
     - Las nuevas vistas privadas (Dashboard) deben tener su propio Layout/Sidebar.

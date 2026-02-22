@@ -93,3 +93,23 @@ export async function updateLessonTitle(lessonId: string, newTitle: string): Pro
   revalidatePath('/dashboard/admin/courses')
   return { success: true }
 }
+
+/**
+ * Asigna o desasigna la competencia de un módulo.
+ * Al cambiar la competencia, el progreso del estudiante se recalcula
+ * automáticamente en el siguiente request (a través de getStudentProgress).
+ */
+export async function updateModuleCompetency(
+  moduleId: string,
+  competency: string | null,
+): Promise<ActionState> {
+  const { error } = await supabaseAdmin
+    .from('modules')
+    .update({ competency })
+    .eq('id', moduleId)
+
+  if (error) return { error: error.message }
+
+  revalidatePath('/dashboard/admin/courses')
+  return { success: true }
+}

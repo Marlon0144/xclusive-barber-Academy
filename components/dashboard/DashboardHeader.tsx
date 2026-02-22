@@ -4,6 +4,8 @@ import Image from 'next/image';
 // Hero section — pixel-faithful to Figma node 136:377
 // h-[278px] fixed, background blurred at opacity-66, all text centered
 export function DashboardHeader() {
+    const  mobileBg = '/assets/dashboard/header-bg-mobile.png';
+    const desktopBg = '/assets/dashboard/header-bg.png';
     return (
         <div className="relative w-full h-[278px] bg-[#161616] overflow-hidden">
 
@@ -11,12 +13,24 @@ export function DashboardHeader() {
                 Figma: rotate-90 container, blur-[2px], opacity-66
                 We keep the same visual weight: full-cover, blurred, low opacity
             ──────────────────────────────────────────────────────────────── */}
-            <div className="absolute inset-0">
+            {/* Mobile background — shown below md breakpoint */}
+            <div className="absolute inset-0 block md:hidden">
                 <Image
-                    src="/assets/dashboard/header-bg.png"
+                    src={mobileBg}
                     alt=""
                     fill
-                    className="object-cover opacity-[0.66] blur-[2px]"
+                    className="object-cover"
+                    priority
+                />
+            </div>
+
+            {/* Desktop background — shown from md breakpoint and up */}
+            <div className="absolute inset-0 hidden md:block">
+                <Image
+                    src={desktopBg}
+                    alt=""
+                    fill
+                    className="object-cover"
                     priority
                 />
             </div>
@@ -43,7 +57,7 @@ export function DashboardHeader() {
                 </h1>
 
                 {/* Gold divider — CSS gradient to match Figma Rectangle7 (h-px, w-[223px]) */}
-                <div className="w-[223px] h-px bg-gradient-to-r from-transparent via-[#d3cbba] to-transparent mt-[14px] mb-[12px] opacity-90" />
+                <div className="w-[223px] h-px bg-gradient-to-r from-transparent via-[#468F5D] to-transparent mt-[14px] mb-[12px] opacity-90" />
 
                 {/* Description — Poppins Regular 9px, max-w to match Figma 223px */}
                 <p className="font-sans font-normal text-[9px] text-[#d3cbba] text-center leading-[1.3] max-w-[223px]">
