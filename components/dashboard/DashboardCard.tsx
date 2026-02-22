@@ -23,7 +23,6 @@ export function DashboardCard({
     disabled = false,
     isInstructor = false,
     isAdmin = false,
-    tall = true,
     dimmed = false,
     className,
 }: DashboardCardProps) {

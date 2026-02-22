@@ -27,13 +27,6 @@ function competencyStatus(pct: number): string {
   return 'Sin Iniciar'
 }
 
-function statusColor(pct: number): string {
-  if (pct === 100) return '#D4AF37'
-  if (pct >= 50) return '#7aab7a'
-  if (pct > 0) return '#a0a0a0'
-  return '#555'
-}
-
 function modulesForNextLevel(
   minPct: number,
   totalModules: number,

@@ -16,37 +16,64 @@ const getCurrentUser = React.cache(async () => {
 })
 
 export default async function Header() {
-  // by starting both operations early we satisfy async-defer-await
-  const userPromise = getCurrentUser()
-
-  const user = await userPromise
+  const user = await getCurrentUser()
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-white/5 bg-[image:var(--image-header-gradient)] shadow-2xl">
-      <div className="w-full">
-        <div className="mx-auto flex h-20 w-full max-w-[1500px] items-center justify-between px-4 md:px-8">
-          <Link href="/" className="group flex items-center gap-4">
-            <div className="relative h-16 w-16 md:h-20 md:w-20">
+    /**
+     * Two-layer background (Figma source — Node 2098:16):
+     *   Layer 1 (outer): rgba(28,49,35,0.38) — semi-transparent dark green.
+     *                    On a near-black page background this renders as
+     *                    a very dark, almost black-green — giving the header
+     *                    a slight darker "frame" at the very top and bottom edges.
+     *   Layer 2 (inner): #1c3123 — fully-opaque dark forest green band.
+     *                    Inset 9 px from top/bottom so the outer frame shows
+     *                    through at the edges, creating the subtle two-tone depth.
+     */
+    <header className="sticky top-0 z-50 w-full overflow-hidden">
+      {/* ── Layer 1: outer semi-transparent frame ── */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 bg-[rgba(28,49,35,0.38)] backdrop-blur-[2px]"
+      />
+      {/* ── Layer 2: inner solid dark-green band (9 px gap top/bottom) ── */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-x-0 top-[9px] h-[51px] bg-[#1c3123]"
+      />
+
+      {/* ── Content ── */}
+      <div className="relative z-10 w-full">
+        <div className="mx-auto flex h-[69px] w-full max-w-[1500px] items-center justify-between px-4 md:px-8">
+
+          {/* Brand / Logo */}
+          <Link href="/" className="group flex items-center gap-3">
+            {/* Mark icon */}
+            <div className="relative h-[55px] w-[55px] shrink-0 md:h-[67px] md:w-[67px]">
               <Image
                 src="/assets/header/logo-academia.png"
                 alt="Xclusive Barber Academy Logo"
                 fill
                 priority
                 className="object-contain"
-                sizes="(max-width: 768px) 64px, 80px"
+                sizes="(max-width: 768px) 55px, 67px"
               />
             </div>
-            <div className="flex flex-col justify-center leading-none">
-              <span className="font-serif text-lg font-bold tracking-wider text-gold-500 md:text-2xl">
-                XCLUSIVE
-              </span>
-              <span className="font-sans text-[0.6rem] font-medium tracking-[0.2em] text-foreground-strong md:text-[0.7rem]">
-                BARBER ACADEMY
-              </span>
+            {/* Wordmark — "XCLUSIVE / BARBER ACADEMY" decorative text asset */}
+            <div className="relative h-[38px] w-[72px] shrink-0 md:h-[50px] md:w-[90px]">
+              <Image
+                src="/assets/header/texto-decorativo.png"
+                alt="Xclusive Barber Academy"
+                fill
+                priority
+                className="object-contain object-left"
+                sizes="(max-width: 768px) 72px, 84px"
+              />
             </div>
           </Link>
 
+          {/* Navigation */}
           {user ? (
+            /* ── Authenticated state ── */
             <div className="flex items-center gap-2 md:gap-3">
               <Link
                 href="/dashboard"
@@ -57,35 +84,54 @@ export default async function Header() {
               <form action={signout}>
                 <Button
                   variant="ghost"
-                  className="h-auto px-3 py-2 text-xs font-semibold uppercase tracking-wider text-header-foreground hover:bg-white/5 hover:text-white md:text-sm"
+                  className="h-auto px-3 py-2 text-xs font-semibold uppercase tracking-wider text-[#d3cbba] hover:bg-white/5 hover:text-white md:text-sm"
                 >
                   Salir
                 </Button>
               </form>
             </div>
           ) : (
+            /* ── Unauthenticated state — matches Figma nav order ── */
             <nav className="flex items-center gap-4 md:gap-8">
+              {/* SER MODELO — hidden on mobile, matches Figma layout */}
               <Link
                 href="/models"
-                className="hidden text-xs font-light uppercase tracking-wide text-foreground transition-colors hover:text-white md:inline-block md:text-sm"
+                className="hidden text-[0.7rem] font-light uppercase tracking-widest text-[#d3cbba] transition-colors hover:text-white md:inline-block md:text-xs"
               >
                 Ser modelo
               </Link>
+
+              {/* ACCEDER — Poppins Light */}
               <Link
                 href="/login"
-                className="text-xs font-light uppercase tracking-wide text-foreground transition-colors hover:text-white md:text-sm"
+                className="text-[0.7rem] font-light uppercase tracking-widest text-[#d3cbba] transition-colors hover:text-white md:text-xs"
               >
                 Acceder
               </Link>
+
+              {/* APLICAR — Poppins Bold + golden divider accent (Figma: Rectangle 29) */}
               <Link
                 href="/apply"
-                className="group relative pb-1 text-base font-bold uppercase tracking-wider text-foreground-strong md:text-lg"
+                className="group relative flex flex-col items-center gap-0.5"
               >
-                Aplicar
-                <span className="absolute -bottom-1 left-0 h-[2px] w-full scale-x-100 bg-gold-500 transition-transform duration-300 md:h-[3px]" />
+                <span className="text-[0.75rem] font-extrabold uppercase tracking-widest text-[#d3cbba] transition-colors group-hover:text-white md:text-sm">
+                  Aplicar
+                </span>
+                {/* Golden line divider — asset from public/assets/header/divider.png */}
+                <span className="relative block h-[3px] w-full overflow-hidden">
+                  <Image
+                    src="/assets/header/divider.png"
+                    alt=""
+                    fill
+                    className="object-cover"
+                    sizes="70px"
+                    aria-hidden="true"
+                  />
+                </span>
               </Link>
             </nav>
           )}
+
         </div>
       </div>
     </header>
