@@ -4,7 +4,8 @@ import { useState } from 'react'
 import { Plus, Trash2, Edit, ChevronRight, BookOpen, Video, GripVertical, FolderOpen } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 // Importamos las actions (asegúrate de que updateModuleTitle y updateLessonTitle estén en actions.ts)
-import { createModule, deleteModule, createLesson, deleteLesson, updateModuleTitle, updateLessonTitle } from './actions'
+import { createModule, deleteModule, createLesson, deleteLesson, updateModuleTitle, updateLessonTitle, updateModuleCompetency } from './actions'
+import { COMPETENCY_LABELS, type CompetencyKey } from '@/types/progress'
 import EditableText from './EditableText'
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
@@ -20,6 +21,7 @@ type Module = {
   id: string
   title: string
   order_index: number
+  competency: string | null
   lessons: Lesson[]
 }
 
@@ -70,6 +72,12 @@ export default function AdminCourseList({ initialModules }: { initialModules: Mo
 
   const handleRenameLesson = async (lessonId: string, newTitle: string) => {
     await updateLessonTitle(lessonId, newTitle)
+    router.refresh()
+  }
+
+  const handleUpdateCompetency = async (moduleId: string, value: string) => {
+    const competency = value === '' ? null : value
+    await updateModuleCompetency(moduleId, competency)
     router.refresh()
   }
 
@@ -128,6 +136,21 @@ export default function AdminCourseList({ initialModules }: { initialModules: Mo
                     onSave={(newTitle) => handleRenameModule(module.id, newTitle)}
                     className="font-serif text-xl text-white mt-1 hover:text-gold-500 transition-colors"
                   />
+
+                  {/* SELECTOR DE COMPETENCIA */}
+                  <select
+                    value={module.competency ?? ''}
+                    onChange={(e) => handleUpdateCompetency(module.id, e.target.value)}
+                    onClick={(e) => e.stopPropagation()}
+                    className="mt-1.5 text-[10px] uppercase tracking-widest font-bold bg-black/60 border border-white/10 text-zinc-400 rounded-sm px-2 py-1 hover:border-gold-500/40 focus:border-gold-500 focus:outline-none cursor-pointer transition-colors"
+                  >
+                    <option value="">Sin competencia</option>
+                    {(Object.keys(COMPETENCY_LABELS) as CompetencyKey[]).map((key) => (
+                      <option key={key} value={key}>
+                        {COMPETENCY_LABELS[key]}
+                      </option>
+                    ))}
+                  </select>
                 </div>
               </div>
 

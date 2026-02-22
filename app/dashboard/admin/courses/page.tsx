@@ -18,13 +18,14 @@ export default async function AdminCoursesPage() {
       id, 
       title, 
       order_index,
+      competency,
       lessons (
         id, 
         title, 
         order_index
       )
     `)
-    .order('order_index', { ascending: true })
+    .order('created_at', { ascending: true })
 
   if (error) {
     console.error('Error cargando estructura:', error)

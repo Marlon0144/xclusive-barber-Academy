@@ -50,7 +50,7 @@ export default async function DashboardPage() {
           <DashboardCard
             title="Progreso Profesional"
             description="Consulta tu avance, cumplimiento de etapas y desarrollo dentro del proceso formativo."
-            disabled={true}
+            href="/dashboard/progreso_profesional"
           />
 
           {/* 4. LA ACADEMIA — dimmed (opacity-45 in Figma) */}

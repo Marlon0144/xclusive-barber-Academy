@@ -1,5 +1,5 @@
 # PROJECT_CONTEXT.md
-> **Última actualización:** 2026-02-21 — Sprint 5e Zero-Warning Build (Linting Deep Clean)
+> **Última actualización:** 2026-02-21 — Sprint 6 Backend (Progreso Profesional)
 
 ## 1. Project Identity
 **Nombre:** Xclusive Barber Academy (LMS)
@@ -99,18 +99,73 @@
 * **`user_role`**: `'admin'` | `'student'` | `'instructor'`
 
 ### Tablas Core
-(Sin cambios estructurales recientes en DB - Ver versión anterior para detalles de tablas)
-* `profiles`
-* `modules`
-* `lessons`
-* `submissions`
-* `lesson_progress`
-* `invitations`
+
+* `profiles` — `id, role, full_name, created_at`
+* `modules` — `id, title, order_index, competency (nullable, CHECK constraint)` ← **Sprint 6**
+* `lessons` — `id, module_id, title, content, video_url, order_index`
+* `submissions` — `id, student_id, image_url, cut_type, description, status, scores (JSONB), feedback_ai, graded_at, grader_id`
+* `lesson_progress` — `user_id, lesson_id, completed (boolean)`
+* `invitations` — `invite_code, used`
+
+### Columna Nueva — Sprint 6
+```sql
+-- modules.competency
+ALTER TABLE public.modules
+ADD COLUMN IF NOT EXISTS competency TEXT
+  CHECK (competency IN (
+    'desarrollo_tecnico',
+    'aplicacion_estandares',
+    'atencion_cliente',
+    'mentalidad_profesional'
+  ));
+```
 
 ### Políticas RLS
 (Sin cambios recientes - Ver versión anterior para inventario de policies)
 
-## 5. Estado del Sprint 5 (Frontend Redesign + Performance)
+## 5. Estado del Sprint 6 (Progreso Profesional — Backend)
+
+### ✅ Sprint 6 — Backend Completo (2026-02-21)
+
+**Build Status:** ✅ 0 errores, 0 warnings, 13 rutas — `/dashboard/progreso_profesional` = 139 B (RSC puro)
+
+#### Archivos Nuevos
+| Archivo | Propósito |
+|---------|-----------|
+| `types/progress.ts` | Tipos TypeScript para toda la feature: `CompetencyKey`, `CompetencyProgress`, `ProfessionalLevel`, `StudentProgressData`, `COMPETENCY_LABELS`, `PROFESSIONAL_LEVELS` |
+| `app/dashboard/progreso_profesional/actions.ts` | Server Action `fetchProgressPageData()` — auth guard + delega a helper cacheado |
+| `app/dashboard/progreso_profesional/page.tsx` | RSC minimal — verifica datos del backend (diseño visual en Sprint 6b con Figma MCP) |
+
+#### Archivos Modificados
+| Archivo | Cambio | Regla Vercel |
+|---------|--------|--------------|
+| `utils/cache-helpers.ts` | `getStudentProgress(userId, email, enrolledAt)` — 4 queries paralelas + 1 loop para todo el cómputo | `async-parallel`, `server-cache-react`, `js-combine-iterations`, `js-set-map-lookups`, `js-index-maps` |
+| `app/dashboard/admin/courses/page.tsx` | Agrega `competency` al SELECT de módulos | — |
+| `app/dashboard/admin/courses/actions.ts` | Nueva action `updateModuleCompetency(moduleId, competency)` | `server-auth-actions` |
+| `app/dashboard/admin/courses/AdminCourseList.tsx` | `Module` type + `competency` + select dropdown para asignar competencia | — |
+
+#### Lógica de Negocio Implementada
+- **HU1** Datos del estudiante: nombre (`profiles.full_name`), email (auth), fecha inicio (auth `created_at`), estado (`'Activo'` derivado)
+- **HU2** Competencias: 4 competencias derivadas de módulos completados (100% = todos los módulos de esa competencia terminados)
+- **HU3** Métricas: progreso general (%), módulos completados (n/total), prácticas enviadas (count submissions)
+- **HU4** Nivel profesional: 0–24% Talento → 25–49% Técnico → 50–74% Avanzado → 75–100% Profesional (derivado, sin DB)
+- **HU5 (Admin)** Select dropdown en panel admin para asignar competencia a cada módulo
+
+#### Niveles Profesionales (Regla de Negocio Fija)
+| Nivel | Rango | Key |
+|-------|-------|-----|
+| Talento en Formación | 0–24% | `talento` |
+| Técnico en Desarrollo | 25–49% | `tecnico` |
+| Barbero Avanzado | 50–74% | `avanzado` |
+| Profesional Xclusive | 75–100% | `profesional` |
+
+#### Próximo Paso — Sprint 6b
+Integrar diseño visual con Figma MCP sobre la page.tsx existente.
+El contrato de datos (`StudentProgressData`) está listo y tipado.
+
+---
+
+## 5b. Estado del Sprint 5 (Frontend Redesign & Polish)
 
 ### ✅ Funcionalidades Activas & Rediseño - v0.1
 1.  **Design System "Premium Dark":**
@@ -321,52 +376,40 @@
 - [app/dashboard/grading/GradingCard.tsx](app/dashboard/grading/GradingCard.tsx) — Tipos from submissions
 - [next.config.ts](next.config.ts) — Removed bypass flags
 
-## 8. Performance Metrics (Post-Optimization - Sprint 5e)
+## 8. Performance Metrics (Post-Optimization - Sprint 6)
 
-- ✅ Build: **0 errores, 0 warnings** — Salida completamente limpia (Sprint 5e)
-- ✅ Type Safety: 100% — 0 `any` en rutas críticas, 0 `@ts-ignore`/`@ts-expect-error` activos
-- ✅ Import Hygiene: 0 imports no utilizados (bundle-barrel-imports)
-- ✅ Image Optimization: `next/image` en todas las imágenes remotas; blob URLs con eslint-disable justificado
-- ✅ First Load JS: Optimizado mediante code-splitting (dynamic imports)
-- ✅ Async Waterfalls: Eliminados mediante Promise.all()
-- ✅ DB Query Dedup: Implementado con React.cache()
+- ✅ Build: **0 errores, 0 warnings** — 13 rutas (Sprint 6)
+- ✅ `/dashboard/progreso_profesional`: **139 B** First Load JS — RSC puro, cero JS al cliente
+- ✅ Type Safety: 100% — `StudentProgressData`, `CompetencyProgress`, `ProfessionalLevel` tipados estrictos
+- ✅ Parallel Queries: 4 queries en Promise.all() en `getStudentProgress`
+- ✅ Single-pass computation: 1 loop para competencias + módulos + progreso general (`js-combine-iterations`)
+- ✅ O(1) lookup: `Set<string>` para lecciones completadas (`js-set-map-lookups`)
+- ✅ Import Hygiene: 0 imports no utilizados
+- ✅ Image Optimization: `next/image` en todas las imágenes remotas
 - ⏳ Core Web Vitals: Requiere monitoreo en producción
 
 ## 9. Próximos Pasos Recomendados
 
-### ✅ Completados (Sprint 5c / 5d / 5e)
+### ✅ Completados (Sprint 5c / 5d / 5e / Sprint 6)
 - Refactorización de Linting: Removidas suppressions, implementado strict type checking
 - DRY consolidation: Cachés helpers centralizados en utils/cache-helpers.ts
-- Type safety: 100% — Interfaces definidas para Submission, Lesson, etc.
-- **Zero-Warning Build:** 0 errores + 0 warnings — build completamente limpio
+- Type safety: 100% — Interfaces definidas para Submission, Lesson, StudentProgressData, etc.
+- **Zero-Warning Build:** 0 errores + 0 warnings (ahora 13 rutas)
 - **Image Optimization:** `<img>` migrado a `next/image` en GradingCard y FeedbackModal
-- **Import Hygiene:** Todos los imports no utilizados eliminados en 6 archivos
+- **Import Hygiene:** Todos los imports no utilizados eliminados
+- **Sprint 6 Backend:** `types/progress.ts`, `getStudentProgress()`, `actions.ts`, `page.tsx` (datos), admin competency assignment
 
-### 🔄 En Progreso / Próximas Prioridades
+### 🔄 Prioridad Inmediata
 
-1. ~~**Image Optimization**~~ ✅ COMPLETADO (Sprint 5e)
-   - Migradas `<img>` tags a `next/image` en GradingCard y FeedbackModal
-   - Blob URLs (tracker preview) mantenidas con eslint-disable justificado
+1. **Sprint 6b — Diseño Visual Progreso Profesional (ALTA)**
+   - Implementar UI con Figma MCP sobre `app/dashboard/progreso_profesional/page.tsx`
+   - El contrato de datos `StudentProgressData` ya está listo
+   - Diseño: Dark Premium, mobile-first, ver imagen de referencia
 
-2. **RLS Policy Audit (HIGH)**
-   - Revisar consistencia entre JWT metadata y tabla `profiles`
-   - Alinear policies a un sólo source of truth
-   - PRE-REQUISITO: antes de escalar a usuarios
+2. **Asignar competencias a módulos existentes (ALTA)**
+   - Ir a `/dashboard/admin/courses` y asignar una competencia a cada módulo existente
+   - Hasta que se haga esto, las competencias mostrarán 0% (datos correctos, sin módulos asignados)
 
-3. **Formal Logging System (MEDIUM)**
-   - Crear `/utils/logger.ts` con configuración centralizada
-   - Reemplazar `console.*` heredadas con logger tipado
-   - Impacto: Mejor debugging en producción
-
-4. **Core Web Vitals Monitoring (LOW)**
-   - Medir impacto real en LCP, CLS, FID usando Lighthouse
-   - Configurar analytics para monitoreo en producción
-
-5. **Lazy Loading Below-the-Fold (LOW)**
-   - Course cards en dashboard → lazy-load thumbnails
-   - Contenido de lecciones con Suspense boundaries
-   - Impacto: Reducir request waterfalls
-
-6. **Accesibilidad (LOW)**
-   - Agregar `alt` text a todas las imágenes
-   - Auditoría WCAG 2.1 usando axe-core
+3. **RLS Policy Audit (HIGH)**
+4. **Formal Logging System (MEDIUM)**
+5. **Core Web Vitals Monitoring (LOW)**

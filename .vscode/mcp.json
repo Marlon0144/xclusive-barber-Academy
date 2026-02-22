@@ -3,6 +3,25 @@
     "Figma": {
       "type": "http",
       "url": "https://mcp.figma.com/mcp"
+    },
+    "supabase": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@supabase/mcp-server-supabase@latest",
+        "--access-token",
+        "${input:supabaseAccessToken}",
+        "--project-ref",
+        "xmyqswwitqlhrzznrscy"
+      ]
     }
-  }
+  },
+  "inputs": [
+    {
+      "id": "supabaseAccessToken",
+      "type": "promptString",
+      "description": "Supabase Personal Access Token (supabase.com → Account → Access Tokens)",
+      "password": true
+    }
+  ]
 }
