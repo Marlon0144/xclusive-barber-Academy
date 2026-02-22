@@ -10,8 +10,6 @@ const AuthCard = React.forwardRef<
     className={cn(
       "w-full max-w-md mx-auto relative overflow-hidden rounded-sm",
       "bg-[#1A1A1A] border border-zinc-800 shadow-2xl",
-      // Subtle gold accent at the top
-      "before:absolute before:top-0 before:left-0 before:w-full before:h-[2px] before:bg-gradient-to-r before:from-transparent before:via-[#D4AF37] before:to-transparent before:opacity-50",
       className
     )}
     {...props}

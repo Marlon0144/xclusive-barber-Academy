@@ -10,6 +10,7 @@ import { Submission } from '@/types/submissions'
 import Image from 'next/image'
 import { SubmissionCard } from './SubmissionCard'
 import DashboardPageHeader from '@/components/headers/DashboardPageHeader'
+import { DashboardFooter } from '@/components/dashboard/DashboardFooter'
 
 export default function TrackerPage() {
   const [loading, setLoading] = useState(false)
@@ -346,6 +347,10 @@ export default function TrackerPage() {
            </div>
 
         </section>
+
+      {/* FOOTER */}
+      <DashboardFooter />
+
       </div>
 
     </div>

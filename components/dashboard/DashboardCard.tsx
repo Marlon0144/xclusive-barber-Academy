@@ -23,7 +23,7 @@ export function DashboardCard({
     disabled = false,
     isInstructor = false,
     isAdmin = false,
-    tall = false,
+    tall = true,
     dimmed = false,
     className,
 }: DashboardCardProps) {
@@ -33,7 +33,6 @@ export function DashboardCard({
             className={cn(
                 // Layout — Figma node 2065:14
                 'relative flex flex-col items-center justify-center w-full px-4',
-                tall ? 'h-[88px]' : 'h-[80px]',
                 // Appearance
                 dimmed ? 'bg-[#d3cbba] opacity-45' : 'bg-[#d3cbba] opacity-60',
                 'shadow-[0px_4px_4px_rgba(0,0,0,0.25)]',
@@ -46,18 +45,18 @@ export function DashboardCard({
         >
             {/* Role badge */}
             {(isAdmin || isInstructor) && (
-                <span className="absolute top-2 right-2 px-2 py-0.5 bg-[#1e3a27] text-[#d3cbba] text-[8px] font-bold uppercase tracking-widest rounded">
+                <span className="absolute top-2 right-2 px-2 py-0.5 bg-[#1E3A27] text-[#d3cbba] text-[8px] font-bold uppercase tracking-widest rounded">
                     {isAdmin ? 'Admin' : 'Instructor'}
                 </span>
             )}
 
             {/* Title — Poppins ExtraBold 17px */}
-            <h3 className="font-sans font-extrabold text-[17px] text-[#1e3a27] text-center uppercase leading-tight">
+            <h3 style= {{color: '#1E3A27'}} className="font-sans font-extrabold text-[17px] text-[#1E3A27] text-center uppercase leading-tight pt-1" >
                 {title}
             </h3>
 
             {/* Description — Poppins Light 7px */}
-            <p className="font-sans font-light text-[7px] text-[#1e3a27] text-center leading-[1.3] mt-1 max-w-[260px]">
+            <p className="font-sans font-light text-[10px] text-[#1E3A27] text-center leading-[1.3] mt-1 max-w-[260px] pb-1">
                 {description}
             </p>
         </div>

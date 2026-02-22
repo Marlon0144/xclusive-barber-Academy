@@ -11,6 +11,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { fetchProgressPageData } from './actions'
 import DashboardGreenHeader from '@/components/headers/DashboardGreenHeader'
+import { DashboardFooter } from '@/components/dashboard/DashboardFooter'
 import type { CompetencyProgress } from '@/types/progress'
 
 export const metadata = {
@@ -352,32 +353,7 @@ export default async function ProgressPage() {
           </section>
 
           {/* ── FOOTER ──────────────────────────────────────────────────────── */}
-          <footer className="px-5 pb-6 pt-2">
-            <div className="w-full h-px bg-[#1c1c1c] mb-5" />
-            <div className="relative flex items-center justify-center">
-              {/* Instagram */}
-              <div className="absolute left-0 flex items-center gap-2">
-                <div className="relative w-[26px] h-[26px]">
-                  <Image src="/assets/progreso_profesional/instagram-icon.png" alt="Instagram"
-                    fill className="object-contain opacity-70" sizes="26px" />
-                </div>
-                <p className="text-[9px] text-[#a09880] font-medium">@xclusivebarberau</p>
-              </div>
-              {/* Logo */}
-              <div className="relative w-[31px] h-[38px]">
-                <Image src="/assets/progreso_profesional/logo-xclusive.png" alt="Xclusive Barber Academy"
-                  fill className="object-contain" sizes="31px" />
-              </div>
-              {/* WhatsApp */}
-              <div className="absolute right-0 flex items-center gap-1.5">
-                <div className="relative w-[14px] h-[15px]">
-                  <Image src="/assets/progreso_profesional/wpp-icon.png" alt="WhatsApp"
-                    fill className="object-contain" sizes="14px" />
-                </div>
-                <p className="text-[9px] text-[#a09880] font-medium">+61 413 891 977</p>
-              </div>
-            </div>
-          </footer>
+          <DashboardFooter />
 
         </div>
       </div>

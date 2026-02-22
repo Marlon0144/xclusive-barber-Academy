@@ -4,6 +4,7 @@ import { AuthInput } from "@/components/ui/auth-input"
 import { AuthButton } from "@/components/ui/auth-button"
 import Link from "next/link"
 import Image from "next/image"
+import { DashboardFooter } from "@/components/dashboard/DashboardFooter"
 
 export default async function LoginPage({
   searchParams,
@@ -35,7 +36,7 @@ export default async function LoginPage({
           </Link>
 
           {/* Logo - Centered at top, overflowing if needed or just padding top */}
-          <div className="mt-8 mb-6 relative w-24 h-24 flex items-center justify-center">
+          <div className="mb-6 relative w-30 h-30 flex items-center justify-center mt-[-58px]">
             <Image
               src="/assets/login/logo-footer.png"
               alt="Xclusive Barber Academy"
@@ -47,7 +48,7 @@ export default async function LoginPage({
 
           {/* Title - Dark Green Strip */}
           <div className="bg-[#1e3a27]/60 w-full py-5 mb-4 shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)] backdrop-blur-sm">
-            <h1 className="text-[#d3cbba] font-cinzel font-bold text-2xl leading-none tracking-widest">
+            <h1 className="text-[#d3cbba] font-sans font-extrabold text-2xl leading-none tracking-widest">
               ACCEDE A LA
               <br />
               <span className="text-[#d3cbba]">ACADEMIA</span>
@@ -109,7 +110,7 @@ export default async function LoginPage({
             <div className="pt-2">
               <AuthButton
                 formAction={login}
-                className="w-full bg-gradient-to-r from-[#D4AF37] to-[#C5A028] text-[#1e3a27] hover:brightness-110 font-bold tracking-[0.2em] text-[13px] py-6 shadow-[0px_4px_15px_rgba(212,175,55,0.15)] border-none rounded-sm"
+                className="w-full bg-[#D3CBBA] text-[#1e3a27] hover:brightness-110 font-bold tracking-[0.2em] text-[13px] py-6 shadow-[0px_4px_15px_rgba(212,175,55,0.15)] border-none "
               >
                 ACCEDER A MI FORMACIÓN
               </AuthButton>
@@ -139,45 +140,8 @@ export default async function LoginPage({
 
       </AuthCard>
 
-      {/* Footer Outside Card */}
-      <div className="mt-8 mb-4 w-full max-w-[350px] flex flex-col items-center justify-center space-y-4">
-          
-          <div className="flex items-center justify-center gap-6 opacity-70">
-             {/* Logo Footer */}
-             <div className="w-8 h-8 relative">
-               <Image src="/assets/login/logo-footer.png" alt="Footer Logo" fill className="object-contain" />
-             </div>
-             
-             {/* Social Handles */}
-             <div className="flex flex-col text-[9px] text-[#d3cbba] font-medium leading-tight text-right">
-                <span>@xclusivebarberau</span>
-             </div>
+      <DashboardFooter tagline="Formación profesional para construir una carrera real." />
 
-             {/* Icons */}
-             <div className="flex gap-3">
-               <Link href="#" className="w-5 h-5 relative hover:opacity-80 transition-opacity">
-                  <Image src="/assets/login/icon-instagram.png" alt="Instagram" fill className="object-contain" />
-               </Link>
-               <Link href="#" className="w-4 h-4 relative hover:opacity-80 transition-opacity">
-                  <Image src="/assets/login/icon-whatsapp.png" alt="WhatsApp" fill className="object-contain" />
-               </Link>
-             </div>
-             
-             <div className="flex flex-col text-[9px] text-[#d3cbba] font-medium leading-tight">
-                <span>+61 413 891 977</span>
-             </div>
-          </div>
-          
-          {/* Separator */}
-          <div className="w-full h-[1px] relative opacity-50">
-             <Image src="/assets/login/divider.png" alt="divider" fill className="object-cover" />
-          </div>
-
-          <p className="text-[8px] text-[#d3cbba] text-center font-medium opacity-80 uppercase tracking-wider">
-            Formación profesional para construir una carrera real
-          </p>
-
-      </div>
     </div>
   )
 }

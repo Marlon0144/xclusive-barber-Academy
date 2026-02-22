@@ -1,11 +1,16 @@
 import type { Metadata } from "next";
-import { Cinzel, Montserrat } from "next/font/google";
+import { Poppins } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/Header";
 import HeaderWrapper from "@/components/HeaderWrapper";
 
-const cinzel = Cinzel({ subsets: ["latin"], weight: ["400", "700"], variable: "--font-cinzel" });
-const montserrat = Montserrat({ subsets: ["latin"], weight: ["300", "400", "500", "600", "700"], variable: "--font-montserrat" });
+// Figma source of truth: Poppins (ExtraBold for headings, Regular for body)
+const poppins = Poppins({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700", "800", "900"],
+  variable: "--font-poppins",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: "Xclusive Barber Academy | Formación Profesional",
@@ -19,7 +24,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es">
-      <body className={`${cinzel.variable} ${montserrat.variable} antialiased bg-background text-foreground-strong`}>
+      <body className={`${poppins.variable} antialiased bg-background text-foreground-strong`}>
         <HeaderWrapper>
           <Header />
         </HeaderWrapper>

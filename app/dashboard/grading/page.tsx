@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 import GradingCard from './GradingCard'
 import { GraduationCap, Inbox, Star } from 'lucide-react'
 import DashboardPageHeader from '@/components/headers/DashboardPageHeader'
+import { DashboardFooter } from '@/components/dashboard/DashboardFooter'
 
 export default async function GradingPage() {
   const supabase = await createClient()
@@ -92,6 +93,7 @@ export default async function GradingPage() {
         )}
       </div>
       </div>
+      <DashboardFooter tagline="Panel de evaluación — Xclusive Barber Academy." />
     </>
   )
 }
