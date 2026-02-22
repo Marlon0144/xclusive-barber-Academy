@@ -1,5 +1,5 @@
 # PROJECT_CONTEXT.md
-> **Última actualización:** 2026-02-16 — Sprint 5c Code Quality & Linting Fix (Deuda Técnica Resuelta)
+> **Última actualización:** 2026-02-21 — Sprint 5e Zero-Warning Build (Linting Deep Clean)
 
 ## 1. Project Identity
 **Nombre:** Xclusive Barber Academy (LMS)
@@ -201,10 +201,69 @@
 | # | Área | Descripción | Prioridad | Estado |
 |---|------|-------------|-----------|--------|
 | 1 | Linting | Múltiples suppressions de ESLint (`any`, `unused-vars`) introducidas para permitir el build. | 🟡 Media | ✅ RESUELTO (Sprint 5c) |
+| 6 | Type Error | `@ts-ignore` introdujo lint error en courses/page.tsx; `any` en lesson nav inference. | 🔴 Alta | ✅ RESUELTO (Sprint 5d) |
+| 7 | Build Warnings | ~23 warnings de unused imports, unused vars, y `<img>` sin optimizar. | 🟡 Media | ✅ RESUELTO (Sprint 5e) |
 | 2 | Video Player | El "Check" de completado en `CourseSidebar.tsx` visual, lógica backend OK. | 🟡 Media | ✅ Funcionando |
 | 3 | RLS Inconsistencia | Policies de admin usan JWT metadata vs tabla profiles. | 🔴 Alta | Requiere test |
 | 4 | ~Supabase re-renders~ | ~~Cliente recreado en cada render, causando deps inestables~~ | ✅ RESUELTO | Singleton pattern implementado |
 | 5 | ~N+1 queries courses~ | ~~Componente helper para cada módulo, causando N+1 queries~~ | ✅ RESUELTO | Promise.all parallelization |
+
+### Sprint 5e: Zero-Warning Build (Deep Clean) - IMPLEMENTADO
+
+**Fecha:** 2026-02-21 | **Branch:** `fix_build`  
+**Vercel Rules Aplicadas:** `bundle-barrel-imports`, `rendering-hydration-no-flicker`, `server-serialization`
+
+> **Objetivo:** Eliminar los ~23 ESLint warnings del build para lograr salida completamente limpia (`✓ Linting and checking validity of types`).
+
+#### Unused Imports / Vars (7 archivos)
+| Archivo | Eliminados |
+|---------|------------|
+| `app/dashboard/courses/[courseId]/layout.tsx` | `CourseSidebar` import, `params` de la firma y destructuring (sidebar desactivado por diseño) |
+| `app/dashboard/courses/[courseId]/[lessonId]/page.tsx` | `ChevronLeft`, `ChevronRight` (lucide); query completa `moduleData` (dato no utilizado en JSX) |
+| `app/dashboard/tracker/page.tsx` | `Clock`, `CheckCircle`, `Eye`, `Star`, `Camera`, `ChevronDown` (lucide); `cn`; estado `fileName`/`setFileName` |
+| `app/dashboard/tracker/SubmissionCard.tsx` | `CheckCircle`, `Clock` (solo `ChevronDown` usado) |
+| `app/login/page.tsx` | `AuthCardHeader` |
+| `components/landing/TargetAudienceSection.tsx` | `CheckCircle2` (usa custom div instead) |
+
+#### Image Optimization — `<img>` → `next/image` (2 archivos)
+| Archivo | Cambio |
+|---------|--------|
+| `app/dashboard/grading/GradingCard.tsx` | `<img src={submission.image_url}>` → `<Image fill alt="Corte del estudiante">` + import añadido |
+| `app/dashboard/tracker/FeedbackModal.tsx` | `<img src={submission.image_url}>` → `<Image fill alt="Corte evaluado">` + import añadido |
+
+#### Blob URL Exception (tracker preview)
+- `app/dashboard/tracker/page.tsx`: Preview de imagen usa `URL.createObjectURL(file)` (blob URL) — `next/image` no soporta blob URLs. Se mantiene `<img>` con `{/* eslint-disable-next-line @next/next/no-img-element */}` correctamente posicionado como JSX sibling (no dentro de ternario).
+- Refactorizado de ternario `{preview ? <img> : <div>}` a `{!preview && <div>}` + `{preview && <img>}` para habilitar el disable comment.
+
+**Build Status:** ✅ **Completamente limpio** — 0 errores, 0 warnings, 12 rutas generadas
+
+---
+
+### Sprint 5d: Type Error Hotfix - IMPLEMENTADO
+
+**Fecha:** 2026-02-21 | **Branch:** `fix_build`
+
+> **Root Cause:** En Sprint 5b se introdujo un `// @ts-ignore` en `courses/page.tsx` para suprimir un falso positivo de Supabase. ESLint `@typescript-eslint/ban-ts-comment` exige `@ts-expect-error` en su lugar. Sin embargo, al reemplazarlo, TypeScript detectó que la directiva era innecesaria ("Unused directive"), ya que Supabase v2 ya infería el tipo correctamente. Adicionalmente, dos usos de `any` en la page de lecciones bloqueaban el build.
+
+**Cambios realizados (Vercel Best Practice: `server-serialization` + `js-cache-function-results`):**
+
+1. **`app/dashboard/courses/page.tsx`**
+   - Eliminado `// @ts-ignore` (y luego `// @ts-expect-error`) — Supabase v2 ya tipifica `r.data?.id` correctamente sin directiva.
+
+2. **`app/dashboard/courses/[courseId]/[lessonId]/page.tsx`**
+   - Definida interface local `LessonNavItem { id: string; title: string; position: number }`
+   - Reemplazados dos usos de `(l: any)` con `(l: LessonNavItem)` para navegación entre lecciones.
+   - Anotación explícita: `const lessons: LessonNavItem[] = allLessons || []`
+
+**Archivos Modificados:**
+| Archivo | Cambio | Rule |
+|---------|--------|------|
+| `app/dashboard/courses/page.tsx` | Eliminada directiva `@ts-ignore` innecesaria | `@typescript-eslint/ban-ts-comment` |
+| `app/dashboard/courses/[courseId]/[lessonId]/page.tsx` | Interface `LessonNavItem` + tipado explícito | `server-serialization` |
+
+**Build Status:** ✅ Compilado exitosamente — 12 rutas generadas
+
+---
 
 ### Sprint 5c: Code Quality & Type Safety - IMPLEMENTADO
 
@@ -262,30 +321,32 @@
 - [app/dashboard/grading/GradingCard.tsx](app/dashboard/grading/GradingCard.tsx) — Tipos from submissions
 - [next.config.ts](next.config.ts) — Removed bypass flags
 
-## 8. Performance Metrics (Post-Optimization - Sprint 5c)
+## 8. Performance Metrics (Post-Optimization - Sprint 5e)
 
-- ✅ Build: Compilado sin errores, types + linting validados
+- ✅ Build: **0 errores, 0 warnings** — Salida completamente limpia (Sprint 5e)
+- ✅ Type Safety: 100% — 0 `any` en rutas críticas, 0 `@ts-ignore`/`@ts-expect-error` activos
+- ✅ Import Hygiene: 0 imports no utilizados (bundle-barrel-imports)
+- ✅ Image Optimization: `next/image` en todas las imágenes remotas; blob URLs con eslint-disable justificado
 - ✅ First Load JS: Optimizado mediante code-splitting (dynamic imports)
 - ✅ Async Waterfalls: Eliminados mediante Promise.all()
 - ✅ DB Query Dedup: Implementado con React.cache()
-- ✅ Type Safety: 100% — 0 suppressions de `any`, 0 `@ts-ignore`
-- ✅ Linting: 0 errores críticos, solo ~7 warnings (image optimization hints)
-- ✅ Imports: Limpiados, DRY patterns implementados
 - ⏳ Core Web Vitals: Requiere monitoreo en producción
 
 ## 9. Próximos Pasos Recomendados
 
-### ✅ Completados (Sprint 5c)
+### ✅ Completados (Sprint 5c / 5d / 5e)
 - Refactorización de Linting: Removidas suppressions, implementado strict type checking
 - DRY consolidation: Cachés helpers centralizados en utils/cache-helpers.ts
 - Type safety: 100% — Interfaces definidas para Submission, Lesson, etc.
+- **Zero-Warning Build:** 0 errores + 0 warnings — build completamente limpio
+- **Image Optimization:** `<img>` migrado a `next/image` en GradingCard y FeedbackModal
+- **Import Hygiene:** Todos los imports no utilizados eliminados en 6 archivos
 
 ### 🔄 En Progreso / Próximas Prioridades
 
-1. **Image Optimization (MEDIUM)**
-   - Migrar `<img>` tags a `next/image` component
-   - Implementar responsive images con srcset
-   - Impacto: Reducir ~7 warnings de LCP, mejor performance
+1. ~~**Image Optimization**~~ ✅ COMPLETADO (Sprint 5e)
+   - Migradas `<img>` tags a `next/image` en GradingCard y FeedbackModal
+   - Blob URLs (tracker preview) mantenidas con eslint-disable justificado
 
 2. **RLS Policy Audit (HIGH)**
    - Revisar consistencia entre JWT metadata y tabla `profiles`

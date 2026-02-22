@@ -25,7 +25,6 @@ export default async function CoursesIndexPage() {
     )
     const results = await Promise.all(promises)
     results.forEach((r, idx) => {
-      // @ts-ignore
       firstLessonMap[modules[idx].id] = r.data?.id ?? null
     })
   }

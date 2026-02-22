@@ -3,7 +3,6 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { createClient } from '@/utils/supabase/server'
 import { getUser, getLessonById } from '@/utils/cache-helpers'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
 import VideoPlayer from '@/components/courses/VideoPlayer'
 import { cn } from '@/lib/utils'
 import DashboardPageHeader from '@/components/headers/DashboardPageHeader'
@@ -13,6 +12,13 @@ interface LessonPageProps {
     courseId: string
     lessonId: string
   }>
+}
+
+/** Tipo local para los ítems de navegación entre lecciones */
+interface LessonNavItem {
+  id: string
+  title: string
+  position: number
 }
 
 export default async function LessonPage({ params }: LessonPageProps) {
@@ -36,21 +42,15 @@ export default async function LessonPage({ params }: LessonPageProps) {
     return notFound()
   }
 
-  // Fetch Module Info & All Lessons for Navigation
-  const { data: moduleData } = await supabase
-    .from('modules')
-    .select('title, course_id')
-    .eq('id', lesson.module_id)
-    .single()
-  
+  // Fetch All Lessons for Navigation
   const { data: allLessons } = await supabase
     .from('lessons')
     .select('id, title, position')
     .eq('module_id', lesson.module_id)
     .order('position', { ascending: true })
 
-  const lessons = allLessons || []
-  const currentLessonIndex = lessons.findIndex((l: any) => l.id === lessonId)
+  const lessons: LessonNavItem[] = allLessons || []
+  const currentLessonIndex = lessons.findIndex((l) => l.id === lessonId)
   const prevLesson = lessons[currentLessonIndex - 1]
   const nextLesson = lessons[currentLessonIndex + 1]
 
@@ -121,7 +121,7 @@ export default async function LessonPage({ params }: LessonPageProps) {
 
       {/* MODULE / LESSON NAVIGATION (Horizontal Tabs) */}
       <div className="relative z-10 w-full max-w-2xl mx-auto mb-12 flex flex-wrap justify-center items-center gap-4 md:gap-8 px-4">
-         {lessons.map((l: any, idx: number) => {
+         {lessons.map((l: LessonNavItem, idx: number) => {
            const isActive = l.id === lessonId
 
            return (

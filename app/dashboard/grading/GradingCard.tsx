@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Image from 'next/image'
 import { submitGrade } from './actions'
 import { Loader2, Save, Star } from 'lucide-react'
 import { Button } from "@/components/ui/button"
@@ -29,7 +30,7 @@ export default function GradingCard({ submission }: { submission: Submission }) 
     <div className="bg-surface border border-white/5 rounded-sm overflow-hidden flex flex-col md:flex-row group hover:border-green-500/30 transition-all duration-300 shadow-lg">
       {/* 1. La Foto del Estudiante */}
       <div className="md:w-1/2 relative min-h-[300px] md:h-auto overflow-hidden">
-        <img src={submission.image_url} className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+        <Image src={submission.image_url} alt="Corte del estudiante" fill className="object-cover transition-transform duration-700 group-hover:scale-105" />
         <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent"></div>
 
         <div className="absolute bottom-0 left-0 p-6 w-full">

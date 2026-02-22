@@ -1,6 +1,6 @@
 import { Submission } from '@/types/submissions'
 import { cn } from '@/lib/utils'
-import { CheckCircle, Clock, ChevronDown } from 'lucide-react'
+import { ChevronDown } from 'lucide-react'
 import Image from 'next/image'
 
 interface SubmissionCardProps {

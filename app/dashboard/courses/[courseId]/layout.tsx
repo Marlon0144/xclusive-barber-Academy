@@ -1,17 +1,9 @@
-import CourseSidebar from '@/components/courses/CourseSidebar'
-
 // En Next.js 15, params en layout también es una Promesa
 interface CourseLayoutProps {
   children: React.ReactNode
-  params: Promise<{
-    courseId: string
-  }>
 }
 
-export default async function CourseLayout({ children, params }: CourseLayoutProps) {
-  // Desempaquetamos el ID del módulo (courseId en la URL)
-  const { courseId } = await params
-
+export default async function CourseLayout({ children }: CourseLayoutProps) {
   return (
     <div className="flex flex-col min-h-screen">
       {/* SIDEBAR REMOVED FOR FIGMA DESIGN COMPLIANCE (Full Screen Lesson View) 

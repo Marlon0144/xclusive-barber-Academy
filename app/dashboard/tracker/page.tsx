@@ -3,10 +3,9 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { uploadSubmission } from './actions'
 import { createClient } from '@/utils/supabase/client'
-import { Loader2, Upload, Clock, CheckCircle, Eye, Star, Camera, ChevronDown, X } from 'lucide-react'
+import { Loader2, Upload, X } from 'lucide-react'
 import FeedbackModal from './FeedbackModal'
 import { Button } from '@/components/ui/button'
-import { cn } from '@/lib/utils'
 import { Submission } from '@/types/submissions'
 import Image from 'next/image'
 import { SubmissionCard } from './SubmissionCard'
@@ -16,7 +15,6 @@ export default function TrackerPage() {
   const [loading, setLoading] = useState(false)
   const [submissions, setSubmissions] = useState<Submission[]>([])
   const [preview, setPreview] = useState<string | null>(null)
-  const [fileName, setFileName] = useState<string | null>(null)
 
   // 2. ESTADO PARA CONTROLAR EL MODAL
   const [selectedSubmission, setSelectedSubmission] = useState<Submission | null>(null)
@@ -54,14 +52,12 @@ export default function TrackerPage() {
     const file = e.target.files?.[0]
     if (file) {
       setPreview(URL.createObjectURL(file))
-      setFileName(file.name)
     }
   }
 
   const clearImage = (e: React.MouseEvent) => {
     e.preventDefault()
     setPreview(null)
-    setFileName(null)
     const fileInput = formRef.current?.querySelector('input[type="file"]') as HTMLInputElement
     if (fileInput) fileInput.value = ''
   }
@@ -71,7 +67,6 @@ export default function TrackerPage() {
     try {
       await uploadSubmission(formData)
       setPreview(null)
-      setFileName(null)
       formRef.current?.reset()
       await fetchHistory()
     } catch (error) {
@@ -199,15 +194,15 @@ export default function TrackerPage() {
                  <div className='relative aspect-video w-full group cursor-pointer bg-[#3A3A3A] shadow-inner'>
                     {/* Background/Preview */}
                     <div className="absolute inset-2 bg-[#252525] flex flex-col items-center justify-center overflow-hidden border border-white/5">
-                       {preview ? (
-                         <img src={preview} alt="Preview" className="w-full h-full object-cover" />
-                       ) : (
+                       {!preview && (
                          <div className="flex flex-col items-center opacity-40">
                             {/* Icon placeholder */}
                             <div className="w-16 h-16 bg-black rounded-full mb-2 blur-[1px]"></div> 
                             <Upload size={32} className="text-[#666] mb-2" />
                          </div>
                        )}
+                       {/* eslint-disable-next-line @next/next/no-img-element -- blob URL no soportado por next/image */}
+                       {preview && <img src={preview} alt="Preview" className="w-full h-full object-cover" />}
                     </div>
                     
                     {/* Center Text Layout */}

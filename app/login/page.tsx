@@ -1,5 +1,5 @@
 import { login } from './actions'
-import { AuthCard, AuthCardContent, AuthCardHeader } from "@/components/ui/auth-card"
+import { AuthCard, AuthCardContent } from "@/components/ui/auth-card"
 import { AuthInput } from "@/components/ui/auth-input"
 import { AuthButton } from "@/components/ui/auth-button"
 import Link from "next/link"

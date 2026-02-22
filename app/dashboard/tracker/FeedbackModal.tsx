@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import { X, Star, Zap, Ruler, Scissors, LucideIcon } from 'lucide-react'
 import { Submission, Scores } from '@/types/submissions'
 
@@ -46,10 +47,11 @@ export default function FeedbackModal({ submission, onClose }: FeedbackModalProp
 
         {/* COLUMNA IZQUIERDA: FOTO */}
         <div className="md:w-2/5 relative h-64 md:h-auto bg-black">
-          <img
+          <Image
             src={submission.image_url}
             alt="Corte evaluado"
-            className="w-full h-full object-cover opacity-90"
+            fill
+            className="object-cover opacity-90"
           />
           <div className="absolute bottom-0 left-0 w-full p-4 bg-gradient-to-t from-black/90 to-transparent">
             <h3 className="text-white font-bold text-xl">{submission.cut_type}</h3>
