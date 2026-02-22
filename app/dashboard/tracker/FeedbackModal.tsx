@@ -1,22 +1,16 @@
 'use client'
 
-import { X, Star, Zap, Ruler, Scissors } from 'lucide-react'
-
-// Definimos la estructura exacta de las notas para que TS no se queje
-interface Scores {
-  fade: number
-  cleanliness: number
-  technique: number
-  symmetry: number
-}
+import Image from 'next/image'
+import { X, Star, Zap, Ruler, Scissors, LucideIcon } from 'lucide-react'
+import { Submission, Scores } from '@/types/submissions'
 
 interface FeedbackModalProps {
-  submission: any
+  submission: Submission
   onClose: () => void
 }
 
 // Helper para renderizar barras de progreso
-const ScoreBar = ({ label, value, icon: Icon }: { label: string, value: number, icon: any }) => (
+const ScoreBar = ({ label, value, icon: Icon }: { label: string, value: number, icon: LucideIcon }) => (
   <div className="mb-3">
     <div className="flex justify-between text-sm mb-1 text-zinc-300">
       <span className="flex items-center gap-2"><Icon size={14} className="text-blue-400" /> {label}</span>
@@ -34,7 +28,7 @@ const ScoreBar = ({ label, value, icon: Icon }: { label: string, value: number, 
 export default function FeedbackModal({ submission, onClose }: FeedbackModalProps) {
   if (!submission) return null
 
-  // Casteamos scores para asegurar tipado
+  // scores are typed directly from Submission interface
   const scores = submission.scores as Scores
 
 
@@ -53,10 +47,11 @@ export default function FeedbackModal({ submission, onClose }: FeedbackModalProp
 
         {/* COLUMNA IZQUIERDA: FOTO */}
         <div className="md:w-2/5 relative h-64 md:h-auto bg-black">
-          <img
+          <Image
             src={submission.image_url}
             alt="Corte evaluado"
-            className="w-full h-full object-cover opacity-90"
+            fill
+            className="object-cover opacity-90"
           />
           <div className="absolute bottom-0 left-0 w-full p-4 bg-gradient-to-t from-black/90 to-transparent">
             <h3 className="text-white font-bold text-xl">{submission.cut_type}</h3>

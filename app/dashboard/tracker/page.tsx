@@ -1,25 +1,15 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { uploadSubmission } from './actions'
 import { createClient } from '@/utils/supabase/client'
-import { Loader2, Upload, Clock, CheckCircle, Eye, Star, Camera, Scissors } from 'lucide-react'
+import { Loader2, Upload, X } from 'lucide-react'
 import FeedbackModal from './FeedbackModal'
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { cn } from "@/lib/utils"
-
-// Definimos la forma de nuestros datos
-interface Submission {
-  id: string
-  image_url: string
-  cut_type: string
-  description: string
-  status: 'pending' | 'reviewed'
-  created_at: string
-  scores: any
-  feedback_ai: string | null
-}
+import { Button } from '@/components/ui/button'
+import { Submission } from '@/types/submissions'
+import Image from 'next/image'
+import { SubmissionCard } from './SubmissionCard'
+import DashboardPageHeader from '@/components/headers/DashboardPageHeader'
 
 export default function TrackerPage() {
   const [loading, setLoading] = useState(false)
@@ -29,10 +19,16 @@ export default function TrackerPage() {
   // 2. ESTADO PARA CONTROLAR EL MODAL
   const [selectedSubmission, setSelectedSubmission] = useState<Submission | null>(null)
 
+  // Referencia directa al form – evita querySelector que puede agarrar otro form (ej. logout)
+  const formRef = useRef<HTMLFormElement>(null)
+
+  // singleton client – stable reference
   const supabase = createClient()
 
   const fetchHistory = useCallback(async () => {
-    const { data: { user } } = await supabase.auth.getUser()
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
     if (!user) return
 
     const { data, error } = await supabase
@@ -59,30 +55,44 @@ export default function TrackerPage() {
     }
   }
 
+  const clearImage = (e: React.MouseEvent) => {
+    e.preventDefault()
+    setPreview(null)
+    const fileInput = formRef.current?.querySelector('input[type="file"]') as HTMLInputElement
+    if (fileInput) fileInput.value = ''
+  }
+
   async function handleSubmit(formData: FormData) {
     setLoading(true)
     try {
       await uploadSubmission(formData)
       setPreview(null)
-      // alert("¡Práctica enviada correctamente!") // Removed alert for cleaner UI
-
-      const form = document.querySelector('form') as HTMLFormElement
-      form?.reset()
-
+      formRef.current?.reset()
       await fetchHistory()
-
     } catch (error) {
       console.error(error)
-      alert("Error al subir la práctica")
+      alert('Error al subir la práctica')
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    <div className="min-h-screen p-8 max-w-7xl mx-auto space-y-12">
+    <div className='relative min-h-screen bg-[#161616] text-[#D3CBBA] font-sans pb-20 overflow-x-hidden selection:bg-gold-500/30'>
+      
+      {/* NAV HEADER - Dark variant (sticky) */}
+      <DashboardPageHeader title="Evolución Profesional" />
 
-      {/* 3. RENDERIZADO CONDICIONAL DEL MODAL */}
+      {/* Background Effects */}
+      <div className='fixed inset-0 pointer-events-none z-0'>
+        {/* Subtle texture overlay - consistent with other pages if they have it, or just clean */}
+        
+        {/* Ambient gradients matching design - made more subtle */}
+        <div className='absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-green-950/20 blur-[120px] rounded-full'></div>
+        <div className='absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-gold-600/5 blur-[120px] rounded-full'></div>
+      </div>
+
+      {/* MODAL */}
       {selectedSubmission && (
         <FeedbackModal
           submission={selectedSubmission}
@@ -90,223 +100,254 @@ export default function TrackerPage() {
         />
       )}
 
-      {/* HEADER */}
-      <header className="relative border-b border-white/10 pb-8 flex flex-col md:flex-row md:items-end justify-between gap-6">
-        <div className="relative z-10">
-          <div className="flex items-center gap-3 mb-2">
-            <Star className="w-5 h-5 text-gold-500 fill-gold-500" />
-            <h2 className="text-gold-500 text-xs tracking-[0.3em] uppercase font-bold">Progreso Técnico</h2>
-          </div>
-          <h1 className="text-4xl md:text-5xl font-serif text-white mb-2">
-            Mastery Tracker
+      {/* TOP NAVIGATION & COURSE BANNER */}
+      <div className='relative z-20 pt-6 px-6 flex flex-col items-center w-full'>
+         {/* Back Arrow */}
+         <button className='absolute top-6 left-6 text-[#d3cbba] hover:text-white transition-colors' onClick={() => window.history.back()}>
+            <Image 
+               src="/assets/login/icon-arrow-back.png" 
+               alt="Back" 
+               width={24} 
+               height={24}
+               className="opacity-80 hover:opacity-100 transition-opacity"
+            />
+         </button>
+
+         {/* Course Name Banner */}
+         <div className="w-full max-w-md bg-[#0F1F15] border border-[#1E3A27] py-6 px-4 mb-10 text-center shadow-lg">
+            <h2 className="font-serif font-bold text-[#D4AF37] text-xl tracking-wider mb-1">
+              NOMBRE DEL CURSO
+            </h2>
+            <p className="text-[#5A7A66] text-[10px] uppercase tracking-[0.2em] font-light">
+              Formación Profesional en Barbería
+            </p>
+         </div>
+      </div>
+
+      {/* HEADER CONTENT */}
+      <header className='relative z-10 flex flex-col items-center text-center px-6'>
+        
+        {/* Title Group */}
+        <div className='relative mb-6'>
+           <h1 className='font-serif font-bold text-[#E5E5E5] text-2xl md:text-3xl tracking-wide leading-tight drop-shadow-sm uppercase'>
+            Seguimiento y<br/>Evaluación
           </h1>
-          <p className="text-zinc-400 max-w-xl text-lg font-light">
-            Registra tus cortes, recibe feedback profesional y perfecciona tu técnica día a día.
+          {/* Gold Underline */}
+          <div className="w-24 h-[1px] bg-[#D4AF37] mx-auto mt-4"></div>
+        </div>
+        
+        {/* Description */}
+        <p className='font-light text-[#d3cbba]/80 text-[11px] text-center max-w-[340px] leading-relaxed mb-8'>
+          Revisa observaciones, evaluaciones y retroalimentación profesional sobre tu desempeño y evolución dentro del programa.
+        </p>
+
+        {/* Gold Square Icon */}
+        <div className='w-4 h-4 bg-gradient-to-b from-[#D4AF37] to-[#8C721F] shadow-[0_0_15px_rgba(212,175,55,0.4)] rotate-45 mb-10'></div>
+      </header>
+
+      <div className='relative z-10 px-6 pb-20 max-w-lg mx-auto'>
+        
+        {/* HERO / CONTEXT SECTION */}
+        <div className='flex flex-col items-center mb-10'>
+          {/* Dark Button Label */}
+          <div className='relative w-full max-w-[280px] py-4 bg-[#111] border border-[#222] shadow-black/50 shadow-lg mb-8 mx-auto flex items-center justify-center rounded-sm'>
+             <p className='font-montserrat font-medium text-[#888] text-[10px] tracking-[3px] text-center uppercase'>
+               Formación Profesional
+             </p>
+          </div>
+
+          <p className='font-serif font-bold text-[#E5E5E5] text-xl text-center mb-3 tracking-widest uppercase'>
+            Entrega de Evidencia
+          </p>
+          
+          <p className='font-light text-[#d3cbba]/60 text-[10px] tracking-wider text-center max-w-[300px] leading-relaxed uppercase'>
+            ENVÍA TU PRÁCTICA, RECIBE EVALUACIÓN PROFESIONAL Y ELEVA TU ESTÁNDAR TÉCNICO.
           </p>
         </div>
 
-        {/* Stats Summary (Optional Future Feature) */}
-        <div className="flex items-center gap-4 text-right">
-          <div className="bg-surface border border-white/5 px-6 py-3 rounded-sm">
-            <div className="text-2xl font-serif text-gold-500">{submissions.length}</div>
-            <div className="text-[10px] text-zinc-500 uppercase tracking-widest">Entregas</div>
-          </div>
-          <div className="bg-surface border border-white/5 px-6 py-3 rounded-sm">
-            <div className="text-2xl font-serif text-white">
-              {submissions.filter(s => s.status === 'reviewed').length}
-            </div>
-            <div className="text-[10px] text-zinc-500 uppercase tracking-widest">Revisadas</div>
-          </div>
-        </div>
-      </header>
+        {/* FORM SECTION */}
+        <section className='relative mb-16 w-full max-w-[360px] mx-auto'>
+          
+          {/* Main Card Container matching the reference color (taupe/grey) */}
+          <div className='bg-[#8C8C84] rounded-sm p-1 pb-16 shadow-2xl relative overflow-hidden'>
+             
+             {/* Header inside card */}
+             <div className="pt-8 pb-4 text-center">
+                <h3 className="font-montserrat font-black text-[#1A2E1A] text-2xl uppercase tracking-tighter shadow-sm">
+                   ENTREGA DE EVIDENCIA
+                </h3>
+                <p className="text-[#E5E5E5]/60 text-[9px] font-light tracking-[0.2em] mt-2 uppercase">
+                   REGISTRO VISUAL
+                </p>
+             </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+             <form ref={formRef} action={handleSubmit} className='flex flex-col items-center space-y-6 px-4'>
+            
+              {/* Image Upload Area with Brackets */}
+              <div className='w-full relative py-2'>
+                 {/* Corner Brackets */}
+                 <div className="absolute top-0 left-0 w-6 h-6 border-t-4 border-l-4 border-[#D9D9D9]/40 -translate-x-1 -translate-y-1"></div>
+                 <div className="absolute top-0 right-0 w-6 h-6 border-t-4 border-r-4 border-[#D9D9D9]/40 translate-x-1 -translate-y-1"></div>
+                 <div className="absolute bottom-0 left-0 w-6 h-6 border-b-4 border-l-4 border-[#D9D9D9]/40 -translate-x-1 translate-y-1"></div>
+                 <div className="absolute bottom-0 right-0 w-6 h-6 border-b-4 border-r-4 border-[#D9D9D9]/40 translate-x-1 translate-y-1"></div>
 
-        {/* COLUMNA IZQUIERDA: FORMULARIO */}
-        <div className="lg:col-span-1 space-y-8">
-          <section className="bg-surface p-8 rounded-sm border border-white/5 relative overflow-hidden group hover:border-gold-500/30 transition-colors">
-            <div className="absolute top-0 right-0 bg-gold-500/10 w-24 h-24 rounded-bl-full -mr-10 -mt-10 blur-xl"></div>
-
-            <h2 className="text-xl font-serif text-white mb-6 flex items-center gap-3">
-              <Camera className="w-5 h-5 text-gold-500" />
-              Nueva Práctica
-            </h2>
-
-            <form action={handleSubmit} className="space-y-6">
-
-              {/* Image Upload Area */}
-              <div className="space-y-2">
-                <label className="text-xs text-zinc-500 uppercase tracking-wider ml-1">Evidencia</label>
-                <div className="relative group/upload cursor-pointer">
-                  <input
-                    type="file"
-                    name="image"
-                    accept="image/*"
-                    required
-                    onChange={handleImageChange}
-                    className="absolute inset-0 w-full h-full opacity-0 z-10 cursor-pointer"
-                  />
-                  <div className={cn(
-                    "border border-dashed border-zinc-700 rounded-sm p-8 flex flex-col items-center justify-center transition-all bg-black/20",
-                    preview ? "border-gold-500 bg-black/50" : "group-hover/upload:border-gold-500/50 group-hover/upload:bg-white/5"
-                  )}>
-                    {preview ? (
-                      <div className="relative w-full aspect-video rounded-sm overflow-hidden border border-white/10 shadow-lg">
-                        <img src={preview} alt="Preview" className="w-full h-full object-cover" />
-                        <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
-                          <p className="text-xs text-white uppercase tracking-widest font-bold">Cambiar Imagen</p>
-                        </div>
+                 <div className='relative aspect-video w-full group cursor-pointer bg-[#3A3A3A] shadow-inner'>
+                    {/* Background/Preview */}
+                    <div className="absolute inset-2 bg-[#252525] flex flex-col items-center justify-center overflow-hidden border border-white/5">
+                       {!preview && (
+                         <div className="flex flex-col items-center opacity-40">
+                            {/* Icon placeholder */}
+                            <div className="w-16 h-16 bg-black rounded-full mb-2 blur-[1px]"></div> 
+                            <Upload size={32} className="text-[#666] mb-2" />
+                         </div>
+                       )}
+                       {/* eslint-disable-next-line @next/next/no-img-element -- blob URL no soportado por next/image */}
+                       {preview && <img src={preview} alt="Preview" className="w-full h-full object-cover" />}
+                    </div>
+                    
+                    {/* Center Text Layout */}
+                    {!preview && (
+                      <div className='absolute inset-0 flex flex-col items-center justify-center pointer-events-none z-10'>
+                          <div className="mt-12 text-center">
+                            <span className='block text-[#111] font-black text-lg uppercase leading-none drop-shadow-md text-stroke'>
+                              NUEVO CORTE
+                            </span>
+                            <div className="mt-2 bg-[#333] flex items-center gap-2 px-3 py-1 border border-white/10 rounded-sm">
+                               <div className="bg-[#555] rounded-full p-0.5"><Upload size={10} className="text-white"/></div>
+                               <span className="text-[9px] text-[#999] uppercase tracking-wide">Subir archivo</span>
+                            </div>
+                          </div>
                       </div>
-                    ) : (
-                      <>
-                        <div className="bg-surface w-12 h-12 rounded-full flex items-center justify-center mb-3 text-gold-500 border border-gold-500/20 shadow-[0_0_15px_rgba(212,175,55,0.1)]">
-                          <Upload size={20} />
-                        </div>
-                        <p className="text-sm text-zinc-400 font-medium">Click para subir foto</p>
-                        <p className="text-xs text-zinc-600 mt-1">JPG, PNG max 5MB</p>
-                      </>
                     )}
+
+                    {/* Input hidden */}
+                    <input
+                      type='file'
+                      name='image'
+                      accept='image/*'
+                      required
+                      onChange={handleImageChange}
+                      className='absolute inset-0 opacity-0 cursor-pointer z-20 w-full h-full'
+                    />
+                    
+                    {/* Clear Button */}
+                    {preview && (
+                      <button 
+                        onClick={clearImage}
+                        type="button" 
+                        className="absolute top-4 right-4 z-30 bg-red-900/80 text-white p-1.5 hover:bg-red-700 transition-colors pointer-events-auto rounded-sm"
+                      >
+                        <X size={14} />
+                      </button>
+                    )}
+                 </div>
+              </div>
+
+              {/* Inputs Container */}
+              <div className='w-full space-y-5 pt-2'>
+                
+                {/* Technique Selection */}
+                <div className='space-y-0'>
+                  {/* Label Bar */}
+                  <div className="bg-[#102818] py-2 px-4 shadow-lg border-b border-[#2C4835]">
+                     <p className='text-[#E5E5E5] text-[11px] font-bold text-center uppercase tracking-wider'>
+                       TÉCNICA IMPLEMENTADA
+                     </p>
+                  </div>
+                  {/* Input Area */}
+                  <div className='relative h-[40px] w-full'>
+                     <select 
+                        name='cutType' 
+                        required
+                        className='w-full h-full bg-[#4A4A44] text-[#D3CBBA] text-[10px] font-medium text-center focus:outline-none appearance-none px-4 shadow-inner border-t border-black/20 cursor-pointer'
+                     >
+                        <option value='' className='bg-[#4A4A44]'>⊝ Selecciona Estilo de Corte</option>
+                        <option value='Low Fade' className='bg-[#1c3123]'>Low Fade</option>
+                        <option value='Mid Fade' className='bg-[#1c3123]'>Mid Fade</option>
+                        <option value='High Fade' className='bg-[#1c3123]'>High Fade</option>
+                        <option value='Taper Fade' className='bg-[#1c3123]'>Taper Fade</option>
+                        <option value='Buzz Cut' className='bg-[#1c3123]'>Buzz Cut</option>
+                        <option value='Scissor Cut' className='bg-[#1c3123]'>Corte a Tijera</option>
+                     </select>
                   </div>
                 </div>
-              </div>
 
-              <div className="space-y-2">
-                <label className="text-xs text-zinc-500 uppercase tracking-wider ml-1">Tipo de Corte</label>
-                <div className="relative">
-                  <select
-                    name="cutType"
-                    required
-                    className="w-full h-10 bg-transparent border-b border-white/20 text-white text-sm focus:outline-none focus:border-gold-500 transition-colors appearance-none py-2 px-3 rounded-none"
-                  >
-                    <option value="" className="bg-black text-zinc-500">Seleccionar estilo...</option>
-                    <option value="Low Fade" className="bg-black">Low Fade</option>
-                    <option value="Mid Fade" className="bg-black">Mid Fade</option>
-                    <option value="High Fade" className="bg-black">High Fade</option>
-                    <option value="Taper Fade" className="bg-black">Taper Fade</option>
-                    <option value="Buzz Cut" className="bg-black">Buzz Cut</option>
-                    <option value="Scissor Cut" className="bg-black">Corte a Tijera</option>
-                  </select>
-                  <Scissors className="absolute right-3 top-2.5 w-4 h-4 text-zinc-500 pointer-events-none" />
+                 {/* Notes Input */}
+                 <div className='space-y-0'>
+                  {/* Label Bar */}
+                  <div className="bg-[#102818] py-2 px-4 shadow-lg border-b border-[#2C4835]">
+                     <p className='text-[#E5E5E5] text-[11px] font-bold text-center uppercase tracking-wider'>
+                       NOTAS TÉCNICAS
+                     </p>
+                  </div>
+                  {/* Textarea Area */}
+                  <div className='w-full bg-[#999990] p-1 shadow-inner'>
+                      <textarea
+                        name='description'
+                        required
+                        placeholder='Describe brevemente el proceso realizado, herramientas utilizadas y consideraciones profesionales aplicadas...'
+                        className='w-full h-[80px] bg-transparent text-[#1a1a1a] text-[9px] font-medium p-3 focus:outline-none resize-none placeholder:text-[#1a1a1a]/40 leading-relaxed text-center'
+                      />
+                  </div>
                 </div>
+
               </div>
-
-              <div className="space-y-2">
-                <label className="text-xs text-zinc-500 uppercase tracking-wider ml-1">Notas Técnicas</label>
-                <textarea
-                  name="description"
-                  placeholder="Describe los desafíos y técnicas utilizadas..."
-                  className="w-full border border-white/20 rounded-sm p-3 bg-transparent text-sm focus:outline-none focus:border-gold-500 min-h-[100px] placeholder:text-zinc-600 text-white resize-y"
-                />
-              </div>
-
-              <Button
-                type="submit"
-                disabled={loading}
-                className="w-full font-bold tracking-widest mt-4"
-              >
-                {loading ? (
-                  <><Loader2 className="animate-spin mr-2" size={18} /> SUBIENDO...</>
-                ) : (
-                  'ENVIAR A REVISIÓN'
-                )}
-              </Button>
-            </form>
-          </section>
-        </div>
-
-        {/* COLUMNA DERECHA: HISTORIAL */}
-        <div className="lg:col-span-2">
-          <div className="flex items-center justify-between mb-8 pb-4 border-b border-white/10">
-            <h2 className="text-xl font-serif text-white flex items-center gap-3">
-              <Clock className="w-5 h-5 text-gold-500" />
-              Historial
-            </h2>
-            {/* Filter placeholder */}
-            <span className="text-xs text-zinc-500 uppercase tracking-widest">Orden: Reciente</span>
-          </div>
-
-          {submissions.length === 0 ? (
-            <div className="text-center py-20 bg-surface/30 rounded-sm border border-dashed border-white/10 flex flex-col items-center">
-              <div className="bg-black/50 w-16 h-16 rounded-full flex items-center justify-center mb-4 text-zinc-600 border border-white/5">
-                <Camera className="w-6 h-6" />
-              </div>
-              <p className="text-zinc-400 font-serif text-lg">Tu portafolio está vacío</p>
-              <p className="text-zinc-600 text-sm mt-1">Sube tu primera práctica para comenzar tu registro.</p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {submissions.map((sub) => (
-                <div
-                  key={sub.id}
-                  onClick={() => sub.status === 'reviewed' && setSelectedSubmission(sub)}
-                  className={`
-                    group relative bg-surface border border-white/5 rounded-sm overflow-hidden transition-all duration-300
-                    ${sub.status === 'reviewed'
-                      ? 'cursor-pointer hover:border-gold-500/50 hover:shadow-[0_0_20px_rgba(212,175,55,0.1)]'
-                      : 'cursor-default opacity-80'}
-                    `}
+             </form>
+             
+             {/* Bottom Gold Button (Full Width of Card) */}
+             <div className="absolute bottom-0 left-0 right-0">
+                <Button 
+                  type="button"
+                  onClick={() => formRef.current?.requestSubmit()}
+                  disabled={loading}
+                  className='w-full h-[54px] bg-gradient-to-r from-[#C5A028] via-[#E8C547] to-[#C5A028] hover:via-[#F0D570] text-[#111] font-black tracking-[1px] text-[13px] shadow-[0_-5px_15px_rgba(0,0,0,0.2)] rounded-none uppercase transition-all duration-300 border-t border-[#FFF8E6]/20'
                 >
+                  {loading ? (
+                    <span className='flex items-center gap-2'>
+                      <Loader2 className='animate-spin w-4 h-4'/> ENVIANDO...
+                    </span>
+                  ) : (
+                    'PRESENTAR PARA EVALUACIÓN'
+                  )}
+                </Button>
+             </div>
+          </div>
+        </section>
 
-                  <div className="relative aspect-video overflow-hidden">
-                    <img src={sub.image_url} alt={sub.cut_type} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
 
-                    {/* Overlay Gradient */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-80 group-hover:opacity-100 transition-opacity"></div>
+        {/* HISTORY SECTION */}
+        <section className='relative mt-20 px-4'>
+           {/* Section Title */}
+           <div className='relative flex flex-col items-center mb-12'>
+              <h2 className='text-[#d3cbba] font-serif font-bold text-[18px] text-center tracking-wide uppercase border-b border-[#d3cbba]/20 pb-4 w-full'>
+                HISTORIAL DE PRÁCTICAS
+              </h2>
+           </div>
 
-                    {/* Status Badge */}
-                    <div className="absolute top-3 right-3">
-                      {sub.status === 'reviewed' ? (
-                        <span className="bg-[#0A1F0A] border border-green-500/30 text-green-400 text-[10px] font-bold px-3 py-1 rounded-full flex items-center gap-1.5 shadow-lg backdrop-blur-md">
-                          <CheckCircle size={10} className="text-green-500" />
-                          CALIFICADO
-                        </span>
-                      ) : (
-                        <span className="bg-[#1F120A] border border-orange-500/30 text-orange-400 text-[10px] font-bold px-3 py-1 rounded-full flex items-center gap-1.5 shadow-lg backdrop-blur-md">
-                          <Clock size={10} className="text-orange-500" />
-                          PENDIENTE
-                        </span>
-                      )}
-                    </div>
+           {/* List */}
+           <div className='space-y-4 relative px-2 max-w-md mx-auto'>
+              
+              {submissions.length === 0 ? (
+                 <div className="py-12 text-center border border-dashed border-[#d3cbba]/10 rounded-lg bg-white/5 mx-4">
+                    <p className='text-[#d3cbba]/40 text-[10px] uppercase tracking-widest'>No hay prácticas registradas</p>
+                 </div>
+              ) : (
+                submissions.map((sub, index) => (
+                  <SubmissionCard 
+                    key={sub.id}
+                    submission={sub}
+                    index={index}
+                    total={submissions.length}
+                    onClick={() => sub.status === 'reviewed' && setSelectedSubmission(sub)}
+                  />
+                ))
+              )}
 
-                    {/* Hover Action */}
-                    {sub.status === 'reviewed' && (
-                      <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
-                        <div className="bg-black/60 backdrop-blur-sm border border-white/10 px-4 py-2 rounded-full flex items-center gap-2 transform translate-y-4 group-hover:translate-y-0 transition-transform">
-                          <Eye size={16} className="text-gold-500" />
-                          <span className="text-xs font-bold text-white tracking-widest">VER FEEDBACK</span>
-                        </div>
-                      </div>
-                    )}
-                  </div>
+           </div>
 
-                  <div className="p-5 relative">
-                    <div className="flex justify-between items-start mb-2">
-                      <h3 className="font-serif text-lg text-white group-hover:text-gold-500 transition-colors">{sub.cut_type}</h3>
-                      <span className="text-[10px] text-zinc-500 font-mono">{new Date(sub.created_at).toLocaleDateString()}</span>
-                    </div>
-
-                    <p className="text-xs text-zinc-400 line-clamp-2 leading-relaxed font-light">
-                      {sub.description || "Sin notas técnicas añadidas."}
-                    </p>
-
-                    {sub.status === 'reviewed' && (
-                      <div className="mt-4 pt-3 border-t border-white/5 flex items-center justify-between">
-                        <span className="text-[10px] text-zinc-500 uppercase tracking-widest">Calificación Global</span>
-                        <div className="flex gap-1">
-                          {[1, 2, 3, 4, 5].map(i => (
-                            <div key={i} className={`h-1 w-4 rounded-full ${i <= 3 ? 'bg-gold-500' : 'bg-zinc-800'}`}></div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-
+        </section>
       </div>
+
     </div>
   )
 }

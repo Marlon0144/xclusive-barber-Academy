@@ -78,8 +78,9 @@ export async function submitGrade(submissionId: string, grades: Grades): Promise
     revalidatePath('/dashboard/grading')
     return { success: true }
 
-  } catch (err: any) {
-    console.error("Error inesperado en submitGrade:", err)
-    return { error: "Ocurrió un error inesperado en el servidor." }
+  } catch (err) {
+    const error = err instanceof Error ? err.message : 'Ocurrió un error inesperado en el servidor.'
+    console.error("Error inesperado en submitGrade:", error)
+    return { error }
   }
 }

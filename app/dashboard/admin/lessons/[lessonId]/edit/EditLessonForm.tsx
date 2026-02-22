@@ -1,15 +1,20 @@
 'use client'
 
 import { useState, useTransition, useMemo } from 'react'
-import RichTextEditor from '@/components/admin/RichTextEditor'
+import dynamic from 'next/dynamic'
 import { updateLessonContent } from '@/app/dashboard/admin/lessons/[lessonId]/edit/actions'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import YouTube from 'react-youtube'
-import { Save, Loader2, Video, ArrowLeft, Star, MonitorPlay } from 'lucide-react'
+import { Save, Loader2, Video, ArrowLeft, MonitorPlay } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { cn } from "@/lib/utils"
+
+// Lazy load RichTextEditor (heavy Tiptap bundle ~50KB) - only on admin pages
+const RichTextEditor = dynamic(() => import('@/components/admin/RichTextEditor'), {
+  ssr: false,
+  loading: () => <div className="w-full h-64 bg-gray-100 dark:bg-gray-900 rounded-lg animate-pulse border border-gray-200 dark:border-gray-800"></div>
+})
 
 // Definimos bien la interfaz para saber qué datos trae la lección
 interface LessonData {

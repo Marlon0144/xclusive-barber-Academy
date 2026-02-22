@@ -1,7 +1,6 @@
 'use server'
 
-// CAMBIO CRÍTICO: Usamos la librería base, NO la de SSR
-import { createClient } from '@supabase/supabase-js' 
+import { createAdminClient } from '@/utils/supabase/server'
 import { revalidatePath } from 'next/cache'
 
 export type ActionState = {
@@ -10,16 +9,7 @@ export type ActionState = {
 }
 
 // Cliente Admin "Puro" (Sin cookies, solo llave maestra)
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!, 
-  {
-    auth: {
-      autoRefreshToken: false, // No necesitamos refrescar tokens
-      persistSession: false    // No guardar sesión en memoria
-    }
-  }
-)
+const supabaseAdmin = createAdminClient()
 
 // --- MÓDULOS ---
 

@@ -1,11 +1,16 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Montserrat:wght@300;400;500;700;800&display=swap');
 @import "tailwindcss";
 @plugin "@tailwindcss/typography"; 
 
 :root {
-  /* Pattern Background (Dark Brick/Texture) */
+  /* Figma-derived Patterns & Textures */
   --pattern-dark: url("data:image/svg+xml,%3Csvg width='42' height='44' viewBox='0 0 42 44' xmlns='http://www.w3.org/2000/svg'%3E%3Cg id='Page-1' fill='none' fill-rule='evenodd'%3E%3Cg id='brick-wall' fill='%23121212' fill-opacity='0.4'%3E%3Cpath d='M0 0h42v44H0V0zm1 1h40v20H1V1zM0 22h20v20H0V22zm22 0h20v20H22V22z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  --pattern-rect: url("https://www.figma.com/api/mcp/asset/e8d517fa-b191-4358-a5ec-3217fb401600");
+  --pattern-subtle: url("https://www.figma.com/api/mcp/asset/9778206e-173b-466f-8c27-e83fd7498796");
 
-  /* Primary Gold Palette */
+  /* Primary Gold Palette (Figma tokens) */
+  --gold-50: #FFF8E6;
+  --gold-300: #E9D8A6;
   --gold-500: #D4AF37;
   --gold-600: #B4941F;
   --gold-gradient: linear-gradient(135deg, #FFD700 0%, #D4AF37 50%, #B4941F 100%);
@@ -15,31 +20,148 @@
 
   /* Neutrals */
   --background: #050505;
-  --foreground: #EDEDED;
-  --surface: #121212;
+  --foreground: #D3CBBA;
+  --foreground-strong: #EDEDED;
+  --surface: #0F0F0F;
+  --surface-elevated: #121212;
+
+  /* Neutral utility tones */
+  --neutral-950: #0A0A0A;
+  --neutral-900: #1A1A1A;
+
+  /* Light CTA surface */
+  --cta-light: #D3D3D3;
+
+  /* Landing Hero semantic colors */
+  --hero-bg: #0A0A0A;
+  --hero-title: #E5E5E5;
+  --hero-highlight: #F2EFE9;
+  --hero-banner: #1A2E1A;
+
+  /* Header semantic colors */
+  --header-base: #0d0f12;
+  --header-foreground: #d9d9d9;
+  --header-muted: #b9bec7;
+  --header-accent-line: #d3b85a;
+  /* Header gradient: Dark edges, Green center */
+  --header-gradient-bg: linear-gradient(90deg, #050505 0%, #0A1F0A 35%, #0A1F0A 65%, #050505 100%);
+
+  /* Typography tokens */
+  --font-cinzel: 'Cinzel', serif;
+  --font-montserrat: 'Montserrat', sans-serif;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-foreground-strong: var(--foreground-strong);
   --color-gold-500: var(--gold-500);
   --color-gold-600: var(--gold-600);
   --color-green-950: var(--green-950);
   --color-surface: var(--surface);
+  --color-surface-elevated: var(--surface-elevated);
+  --color-neutral-950: var(--neutral-950);
+  --color-neutral-900: var(--neutral-900);
+  --color-cta-light: var(--cta-light);
+  --color-hero-bg: var(--hero-bg);
+  --color-hero-title: var(--hero-title);
+  --color-hero-highlight: var(--hero-highlight);
+  --color-hero-banner: var(--hero-banner);
+  --color-header-base: var(--header-base);
+  --color-header-foreground: var(--header-foreground);
+  --image-header-gradient: var(--header-gradient-bg);
+  --color-header-muted: var(--header-muted);
+  --color-header-accent-line: var(--header-accent-line);
   
-  --font-serif: var(--font-cinzel), serif;
-  --font-sans: var(--font-montserrat), sans-serif;
+  --font-serif: var(--font-cinzel);
+  --font-sans: var(--font-montserrat);
 
   --image-pattern: var(--pattern-dark);
 }
 
+/* Body and base styles */
 body {
   background-color: var(--background);
-  background-image: var(--pattern-dark); 
+  background-image: var(--pattern-dark), var(--pattern-subtle);
+  background-repeat: repeat;
+  background-size: auto, cover;
   color: var(--foreground);
-  font-family: var(--font-sans);
+  font-family: var(--font-montserrat);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: var(--font-serif);
+  font-family: var(--font-cinzel);
+  color: white;
 }
+
+/* Utility helpers (used across the landing) */
+.mask-image-b-fade {
+  -webkit-mask-image: linear-gradient(to bottom, black 80%, transparent 100%);
+  mask-image: linear-gradient(to bottom, black 80%, transparent 100%);
+}
+
+.shadow-gold {
+  box-shadow: 0 12px 30px rgba(212,175,55,0.12), inset 0 -4px 10px rgba(0,0,0,0.45);
+}
+
+.bg-gold-gradient {
+  background: var(--gold-gradient);
+}
+
+.text-gold-500 { color: var(--gold-500); }
+.border-gold-500 { border-color: var(--gold-500); }
+
+.header-premium-bg {
+  background-image:
+    linear-gradient(90deg, rgba(23, 25, 30, 0.95) 0%, rgba(16, 57, 38, 0.92) 26%, rgba(28, 61, 41, 0.9) 50%, rgba(16, 57, 38, 0.92) 74%, rgba(23, 25, 30, 0.95) 100%),
+    linear-gradient(180deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0) 100%);
+}
+
+/* Small responsive helpers for text scaling to match Figma */
+@media (min-width: 768px) {
+  .hero-title { font-size: 4.25rem; line-height: 1.02; }
+}
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideInFromBottom {
+  from { transform: translateY(2rem); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes slideInFromTop {
+  from { transform: translateY(-1rem); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.animate-in {
+  animation-duration: 0.5s;
+  animation-fill-mode: both;
+  animation-timing-function: ease-out;
+}
+
+.fade-in {
+  animation-name: fadeIn;
+}
+
+.slide-in-from-bottom-4 {
+  animation-name: slideInFromBottom;
+}
+
+.slide-in-from-bottom-8 {
+  animation-name: slideInFromBottom;
+}
+
+.slide-in-from-top-2 {
+  animation-name: slideInFromTop;
+}
+
+.delay-200 { animation-delay: 200ms; }
+.delay-500 { animation-delay: 500ms; }
+.duration-700 { animation-duration: 700ms; }
+.duration-1000 { animation-duration: 1000ms; }

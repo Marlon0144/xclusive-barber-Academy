@@ -1,128 +1,121 @@
-import { createClient } from '@/utils/supabase/server'
-import Link from 'next/link'
-import { BookOpen, Target, GraduationCap, ArrowRight, Settings, Star } from 'lucide-react'
+
+import { getUser, getProfile } from '@/utils/cache-helpers'
+import { DashboardHeader } from '@/components/dashboard/DashboardHeader'
+import { DashboardCard } from '@/components/dashboard/DashboardCard'
+import { AdminToolsMenu } from '@/components/dashboard/AdminToolsMenu'
+import DashboardGreenHeader from '@/components/headers/DashboardGreenHeader'
+import Image from 'next/image'
 
 export default async function DashboardPage() {
-  const supabase = await createClient()
+  const user = await getUser()
 
-  // 1. Obtener usuario y rol para renderizado condicional
-  const { data: { user } } = await supabase.auth.getUser()
-
-  let userRole = 'student' // Default
+  let userRole = 'student'
 
   if (user) {
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('role')
-      .eq('id', user.id)
-      .single()
-
+    const profile = await getProfile(user.id)
     if (profile) userRole = profile.role
   }
 
-  // Definimos permisos
   const isInstructor = userRole === 'admin' || userRole === 'instructor'
   const isAdmin = userRole === 'admin'
 
   return (
-    <div className="min-h-screen p-8 max-w-7xl mx-auto space-y-12">
+    <div className="min-h-screen bg-[#161616] text-white">
+      
+      {/* NAV HEADER - Green variant (sticky) */}
+      <DashboardGreenHeader userName={user?.email?.split('@')[0]} userEmail={user?.email} />
 
-      {/* HEADER DE BIENVENIDA */}
-      <header className="relative py-8 border-b border-white/10">
-        <div className="absolute top-0 right-0 opacity-20 hidden md:block">
-          <Star className="w-24 h-24 text-gold-500" />
-        </div>
-        <div className="relative z-10">
-          <h2 className="text-gold-500 text-sm tracking-[0.2em] uppercase font-bold mb-2">Panel de Control</h2>
-          <h1 className="text-4xl md:text-5xl font-serif text-white mb-4">
-            Hola, <span className="text-transparent bg-clip-text bg-gradient-to-r from-gold-500 to-gold-600 font-bold">{user?.email?.split('@')[0]}</span>
-          </h1>
-          <p className="text-zinc-400 max-w-xl text-lg">
-            Bienvenido a tu espacio en Xclusive Barber Academy. Aquí comienza tu camino hacia la maestría.
-          </p>
-        </div>
-      </header>
+      {/* HERO Section — Figma node 136:377 */}
+      <DashboardHeader />
 
-      {/* GRID DE NAVEGACIÓN */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      {/* NAVIGATION CARDS — pulled up 45px to overlap the hero, matching Figma */}
+      <div className="relative z-10 flex flex-col items-center gap-[19px] w-full px-6 pb-6 -mt-[45px] max-w-[400px] mx-auto">
 
-        {/* OPCIÓN 1: MIS CURSOS (Todos) */}
-        <Link href="/dashboard/courses" className="group">
-          <div className="h-full bg-surface border border-white/5 hover:border-gold-500 p-8 rounded-sm transition-all duration-300 hover:shadow-[0_0_20px_rgba(212,175,55,0.1)] flex flex-col group-hover:-translate-y-1">
-            <div className="bg-black/50 w-14 h-14 rounded-full flex items-center justify-center mb-6 text-gold-500 border border-gold-500/20 group-hover:bg-gold-500 group-hover:text-black transition-colors">
-              <BookOpen size={24} />
-            </div>
-            <h3 className="text-2xl font-serif text-white mb-3 group-hover:text-gold-500 transition-colors">Aprender</h3>
-            <p className="text-zinc-400 text-sm leading-relaxed flex-1">
-              Catálogo de cursos. Accede a lecciones teóricas, tutoriales en video y material de estudio.
-            </p>
-            <div className="mt-8 flex items-center text-gold-500 text-xs font-bold uppercase tracking-widest gap-2">
-              Ver Cursos <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
-            </div>
-          </div>
-        </Link>
+          {/* 1. PROGRAMA DE FORMACIÓN — tall variant h-[88px] per Figma */}
+          <DashboardCard
+            title="Programa de Formación"
+            description="Accede al contenido académico, módulos prácticos y estructura oficial del programa alineado a los estándares del mercado australiano."
+            href="/dashboard/courses"
+            tall
+          />
 
-        {/* OPCIÓN 2: MASTERY TRACKER (Todos) */}
-        <Link href="/dashboard/tracker" className="group">
-          <div className="h-full bg-surface border border-white/5 hover:border-gold-500 p-8 rounded-sm transition-all duration-300 hover:shadow-[0_0_20px_rgba(212,175,55,0.1)] flex flex-col group-hover:-translate-y-1">
-            <div className="bg-black/50 w-14 h-14 rounded-full flex items-center justify-center mb-6 text-gold-500 border border-gold-500/20 group-hover:bg-gold-500 group-hover:text-black transition-colors">
-              <Target size={24} />
-            </div>
-            <h3 className="text-2xl font-serif text-white mb-3 group-hover:text-gold-500 transition-colors">Practicar</h3>
-            <p className="text-zinc-400 text-sm leading-relaxed flex-1">
-              Sube tus cortes, recibe feedback potenciado por IA y valida tu progreso técnico.
-            </p>
-            <div className="mt-8 flex items-center text-gold-500 text-xs font-bold uppercase tracking-widest gap-2">
-              Subir Práctica <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
-            </div>
-          </div>
-        </Link>
+          {/* 2. SEGUIMIENTO Y EVALUACIÓN */}
+          <DashboardCard
+            title="Seguimiento y Evaluación"
+            description="Revisa observaciones, evaluaciones y retroalimentación profesional sobre tu desempeño y evolución dentro del programa."
+            href="/dashboard/tracker"
+          />
 
-        {/* OPCIÓN 3: GRADING (SOLO INSTRUCTORES) */}
-        {isInstructor && (
-          <Link href="/dashboard/grading" className="group">
-            <div className="h-full bg-[#0A1F0A]/40 border border-white/5 hover:border-green-500/50 p-8 rounded-sm transition-all duration-300 flex flex-col relative overflow-hidden group-hover:-translate-y-1">
-              {/* Etiqueta de Staff */}
-              <div className="absolute top-0 right-0 bg-white/5 text-zinc-400 text-[10px] font-bold px-3 py-1 border-b border-l border-white/10 tracking-widest uppercase">
-                Staff Only
-              </div>
+          {/* 3. PROGRESO PROFESIONAL */}
+          <DashboardCard
+            title="Progreso Profesional"
+            description="Consulta tu avance, cumplimiento de etapas y desarrollo dentro del proceso formativo."
+            disabled={true}
+          />
 
-              <div className="bg-black/50 w-14 h-14 rounded-full flex items-center justify-center mb-6 text-zinc-300 border border-white/10 group-hover:bg-green-900 group-hover:text-green-400 transition-colors">
-                <GraduationCap size={24} />
-              </div>
-              <h3 className="text-2xl font-serif text-white mb-3 group-hover:text-green-400 transition-colors">Evaluar</h3>
-              <p className="text-zinc-500 group-hover:text-zinc-300 text-sm leading-relaxed flex-1 transition-colors">
-                Panel de instructor. Revisa los trabajos de los estudiantes y califica su desempeño.
-              </p>
-              <div className="mt-8 flex items-center text-zinc-500 group-hover:text-green-400 text-xs font-bold uppercase tracking-widest gap-2 transition-colors">
-                Panel de Notas <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
-              </div>
-            </div>
-          </Link>
-        )}
+          {/* 4. LA ACADEMIA — dimmed (opacity-45 in Figma) */}
+          <DashboardCard
+            title="La Academia"
+            description="Conoce nuestra metodología, fundamentos y estándares que rigen la formación profesional."
+            disabled={true}
+            dimmed
+          />
 
-        {/* --- NUEVA OPCIÓN 4: GESTIÓN DE CURSOS (SOLO ADMIN) --- */}
-        {isAdmin && (
-          <Link href="/dashboard/admin/courses" className="group">
-            <div className="h-full bg-[#1A1010]/40 border border-white/5 hover:border-red-500/50 p-8 rounded-sm transition-all duration-300 flex flex-col relative overflow-hidden group-hover:-translate-y-1">
-              <div className="absolute top-0 right-0 bg-red-900/20 text-red-500 text-[10px] font-bold px-3 py-1 border-b border-l border-red-500/20 tracking-widest uppercase">
-                Admin
-              </div>
-              <div className="bg-black/50 w-14 h-14 rounded-full flex items-center justify-center mb-6 text-zinc-300 border border-white/10 group-hover:bg-red-900 group-hover:text-red-400 transition-colors">
-                <Settings size={24} />
-              </div>
-              <h3 className="text-2xl font-serif text-white mb-3 group-hover:text-red-400 transition-colors">Cursos</h3>
-              <p className="text-zinc-500 group-hover:text-zinc-300 text-sm leading-relaxed flex-1 transition-colors">
-                Editor de contenido. Gestiona módulos, lecciones y estructura académica.
-              </p>
-              <div className="mt-8 flex items-center text-zinc-500 group-hover:text-red-400 text-xs font-bold uppercase tracking-widest gap-2 transition-colors">
-                Gestionar Contenido <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
-              </div>
-            </div>
-          </Link>
-        )}
+          {/* PRIVILEGED ROLES: collapsible admin/instructor tools */}
+          <AdminToolsMenu isInstructor={isInstructor} isAdmin={isAdmin} />
 
       </div>
+
+      {/* FOOTER — Figma node 136:377 (bottom section) */}
+      <footer className="flex flex-col items-center pb-8 pt-4 max-w-[400px] mx-auto px-6">
+
+          {/* Tagline */}
+          <p className="font-sans font-medium text-[11px] text-[#d3cbba] text-center tracking-[0.09em] mb-6">
+              Plataforma oficial de desarrollo académico.
+          </p>
+
+          {/* Logo + Social Row */}
+          <div className="relative flex items-center justify-center w-full mb-6">
+              {/* Left: Instagram */}
+              <div className="absolute left-0 flex items-center gap-2">
+                  <div className="w-[26px] h-[26px] opacity-70">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="#d3cbba" strokeWidth="1.5" className="w-full h-full">
+                          <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+                          <circle cx="12" cy="12" r="4"/>
+                          <circle cx="17.5" cy="6.5" r="0.5" fill="#d3cbba"/>
+                      </svg>
+                  </div>
+                  <p className="font-sans font-medium text-[9px] text-[#d3cbba] leading-[1.3]">
+                      @xclusivebarberau
+                  </p>
+              </div>
+
+              {/* Center: Logo */}
+              <Image
+                  src="/assets/header_dash/logo-academia.png"
+                  alt="Xclusive Barber Academy"
+                  width={31}
+                  height={38}
+                  className="object-contain"
+              />
+
+              {/* Right: Phone */}
+              <div className="absolute right-0 flex items-center gap-1.5">
+                  <div className="w-[14px] h-[15px] opacity-70">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="#d3cbba" strokeWidth="1.5" className="w-full h-full">
+                          <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81a19.79 19.79 0 01-3.07-8.68A2 2 0 012 1h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L6.09 8.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/>
+                      </svg>
+                  </div>
+                  <p className="font-sans font-medium text-[9px] text-[#d3cbba] leading-[1.3]">
+                      +61 413 891 977
+                  </p>
+              </div>
+          </div>
+
+          {/* Bottom divider — full width, gradient */}
+          <div className="w-full h-[2px] bg-gradient-to-r from-transparent via-[#d3cbba]/60 to-transparent" />
+
+      </footer>
     </div>
   )
 }

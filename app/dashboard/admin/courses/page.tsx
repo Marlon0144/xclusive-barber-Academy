@@ -1,7 +1,8 @@
 import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
 import AdminCourseList from './AdminCourseList'
-import { Settings, Layers, Star } from 'lucide-react'
+import { Settings, Star } from 'lucide-react'
+import DashboardPageHeader from '@/components/headers/DashboardPageHeader'
 
 export default async function AdminCoursesPage() {
   const supabase = await createClient()
@@ -40,7 +41,9 @@ export default async function AdminCoursesPage() {
   }))
 
   return (
-    <div className="min-h-screen p-8 max-w-5xl mx-auto space-y-12">
+    <>
+      <DashboardPageHeader title="Administración" />
+      <div className="min-h-screen p-8 max-w-5xl mx-auto space-y-12">
 
       {/* HEADER DE LA PÁGINA */}
       <header className="relative border-b border-white/10 pb-8">
@@ -64,6 +67,7 @@ export default async function AdminCoursesPage() {
       {/* COMPONENTE INTERACTIVO */}
       <AdminCourseList initialModules={sortedModules || []} />
 
-    </div>
+      </div>
+    </>
   )
 }

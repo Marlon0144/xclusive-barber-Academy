@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Plus, Trash2, Edit, ChevronDown, ChevronRight, BookOpen, Video, GripVertical, FolderOpen, Save } from 'lucide-react'
+import { Plus, Trash2, Edit, ChevronRight, BookOpen, Video, GripVertical, FolderOpen } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 // Importamos las actions (asegúrate de que updateModuleTitle y updateLessonTitle estén en actions.ts)
 import { createModule, deleteModule, createLesson, deleteLesson, updateModuleTitle, updateLessonTitle } from './actions'

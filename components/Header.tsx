@@ -1,64 +1,90 @@
-import Link from 'next/link'
-import { createClient } from '@/utils/supabase/server'
-import { signout } from '@/app/auth/actions'
+import Link from "next/link"
+import Image from "next/image"
+import { createClient } from "@/utils/supabase/server"
+import { signout } from "@/app/auth/actions"
 import { Button } from "@/components/ui/button"
+import React from "react"
+
+// cache the current user so multiple components can read it without
+// re-running the request during the same render/flight.
+const getCurrentUser = React.cache(async () => {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  return user
+})
 
 export default async function Header() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  // by starting both operations early we satisfy async-defer-await
+  const userPromise = getCurrentUser()
+
+  const user = await userPromise
 
   return (
-    <header className="w-full border-b border-white/10 bg-black/80 backdrop-blur-md p-4 sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto flex justify-between items-center">
+    <header className="sticky top-0 z-50 w-full border-b border-white/5 bg-[image:var(--image-header-gradient)] shadow-2xl">
+      <div className="w-full">
+        <div className="mx-auto flex h-20 w-full max-w-[1500px] items-center justify-between px-4 md:px-8">
+          <Link href="/" className="group flex items-center gap-4">
+            <div className="relative h-16 w-16 md:h-20 md:w-20">
+              <Image
+                src="/assets/header/logo-academia.png"
+                alt="Xclusive Barber Academy Logo"
+                fill
+                priority
+                className="object-contain"
+                sizes="(max-width: 768px) 64px, 80px"
+              />
+            </div>
+            <div className="flex flex-col justify-center leading-none">
+              <span className="font-serif text-lg font-bold tracking-wider text-gold-500 md:text-2xl">
+                XCLUSIVE
+              </span>
+              <span className="font-sans text-[0.6rem] font-medium tracking-[0.2em] text-foreground-strong md:text-[0.7rem]">
+                BARBER ACADEMY
+              </span>
+            </div>
+          </Link>
 
-        {/* LOGO */}
-        <Link href="/" className="flex items-center gap-2 group">
-          {/* Icono de Tijeras (SVG simple por ahora) */}
-          <div className="text-gold-500 w-8 h-8">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="6" cy="6" r="3" /><circle cx="6" cy="18" r="3" /><line x1="20" y1="4" x2="8.12" y2="15.88" /><line x1="14.47" y1="14.48" x2="20" y2="20" /><line x1="8.12" y1="8.12" x2="12" y2="12" /></svg>
-          </div>
-          <div className="flex flex-col">
-            <span className="text-lg font-bold text-gold-500 tracking-widest leading-none font-serif">XCLUSIVE</span>
-            <span className="text-[10px] text-white tracking-[0.3em] leading-none uppercase">Barber Academy</span>
-          </div>
-        </Link>
-
-        {/* HUD DE USUARIO */}
-        <div className="flex items-center gap-4 text-sm">
           {user ? (
-            <div className="flex items-center gap-4 bg-surface border border-white/10 py-1 pl-4 pr-1 rounded-full">
+            <div className="flex items-center gap-2 md:gap-3">
               <Link
                 href="/dashboard"
-                className="text-gold-500 hover:text-gold-400 font-bold text-xs uppercase tracking-wider transition-colors"
+                className="rounded-md border border-gold-500/30 px-3 py-2 text-xs font-semibold uppercase tracking-wider text-gold-500 transition-colors hover:bg-gold-500/10 md:text-sm"
               >
                 Dashboard
               </Link>
-
-              <div className="h-4 w-px bg-white/10"></div>
-
-              <span className="text-xs text-zinc-400 truncate max-w-[100px]">
-                {user.email}
-              </span>
-
               <form action={signout}>
-                <Button variant="ghost" size="sm" className="h-7 text-xs text-zinc-400 hover:text-white hover:bg-white/5 rounded-full">
+                <Button
+                  variant="ghost"
+                  className="h-auto px-3 py-2 text-xs font-semibold uppercase tracking-wider text-header-foreground hover:bg-white/5 hover:text-white md:text-sm"
+                >
                   Salir
                 </Button>
               </form>
             </div>
           ) : (
-            <div className="flex gap-3">
-              <Link href="/login">
-                <Button variant="ghost" className="text-gold-500 hover:text-gold-400 hover:bg-gold-500/10">
-                  Entrar
-                </Button>
+            <nav className="flex items-center gap-4 md:gap-8">
+              <Link
+                href="/models"
+                className="hidden text-xs font-light uppercase tracking-wide text-foreground transition-colors hover:text-white md:inline-block md:text-sm"
+              >
+                Ser modelo
               </Link>
-              <Link href="/signup">
-                <Button className="font-bold tracking-wide">
-                  INSCRIBIRSE
-                </Button>
+              <Link
+                href="/login"
+                className="text-xs font-light uppercase tracking-wide text-foreground transition-colors hover:text-white md:text-sm"
+              >
+                Acceder
               </Link>
-            </div>
+              <Link
+                href="/apply"
+                className="group relative pb-1 text-base font-bold uppercase tracking-wider text-foreground-strong md:text-lg"
+              >
+                Aplicar
+                <span className="absolute -bottom-1 left-0 h-[2px] w-full scale-x-100 bg-gold-500 transition-transform duration-300 md:h-[3px]" />
+              </Link>
+            </nav>
           )}
         </div>
       </div>

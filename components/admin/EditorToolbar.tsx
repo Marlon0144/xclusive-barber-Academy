@@ -2,7 +2,7 @@
 
 import { type Editor } from '@tiptap/react'
 import { 
-  Bold, Italic, List, ListOrdered, Heading1, Heading2, Quote, 
+  Bold, Italic, List, ListOrdered, Heading1, Heading2, 
   Undo, Redo, Image as ImageIcon, Youtube // Asegúrate de importar Youtube icono
 } from 'lucide-react'
 

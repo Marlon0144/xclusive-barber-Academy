@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Cinzel, Montserrat } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/Header";
+import HeaderWrapper from "@/components/HeaderWrapper";
 
 const cinzel = Cinzel({ subsets: ["latin"], weight: ["400", "700"], variable: "--font-cinzel" });
 const montserrat = Montserrat({ subsets: ["latin"], weight: ["300", "400", "500", "600", "700"], variable: "--font-montserrat" });
@@ -18,8 +19,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es">
-      <body className={`${cinzel.variable} ${montserrat.variable} antialiased bg-[#050505] text-[#EDEDED]`}>
-        <Header />
+      <body className={`${cinzel.variable} ${montserrat.variable} antialiased bg-background text-foreground-strong`}>
+        <HeaderWrapper>
+          <Header />
+        </HeaderWrapper>
         <main>
           {children}
         </main>
