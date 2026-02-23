@@ -32,14 +32,8 @@ export default function CourseListView({ modules, firstLessonMap }: CourseListPr
     return bgs[index % bgs.length]
   }
 
-  const getCardBg = (index: number) => {
-    // SVGs for card backgrounds
-    const cards = [
-      '/assets/dashboard/courses/module-card-bg-1.svg', 
-      '/assets/dashboard/courses/module-card-bg-2.svg',
-      '/assets/dashboard/courses/module-card-bg-3.svg',
-    ]
-    return cards[index % cards.length]
+  const getCardBg = (_index: number) => {
+    return '/assets/dashboard/courses/module-card-bg-2.svg'
   }
 
   return (
@@ -131,17 +125,17 @@ export default function CourseListView({ modules, firstLessonMap }: CourseListPr
                  {/* Content Layer (on top of card bg) */}
                  <div className="relative z-20 pointer-events-none pl-8 pr-6 md:pl-10 pb-1">
                     {/* Module Number */}
-                    <p className="font-sans font-extralight text-[9px] md:text-[10px] tracking-[0.72px] text-[#1e3a27] uppercase">
+                    <p className="font-sans font-extralight text-[9px] md:text-[10px] tracking-[0.72px] uppercase" style={{ color: '#1E3A27' }}>
                       MÓDULO {index + 1}
                     </p>
                     
                     {/* Module Title */}
-                    <h3 className="font-sans font-extrabold text-lg md:text-xl text-[#1e3a27] leading-none mt-1 w-[85%] uppercase">
+                    <h3 className="font-sans font-extrabold text-lg md:text-xl leading-none mt-1 w-[85%] uppercase" style={{ color: '#1E3A27' }}>
                       {module.title}
                     </h3>
                     
                     {/* Description - Hidden on very small screens if needed, adjusted here */}
-                    <p className="font-sans font-light text-[8px] md:text-[9px] text-[#1e3a27] leading-[1.3] mt-2 max-w-[260px] line-clamp-2">
+                    <p className="font-sans font-light text-[8px] md:text-[9px] leading-[1.3] mt-2 max-w-[260px] line-clamp-2" style={{ color: '#1E3A27' }}>
                       {module.description || "Contenido esencial para tu formación."}
                     </p>
                  </div>
@@ -150,7 +144,7 @@ export default function CourseListView({ modules, firstLessonMap }: CourseListPr
                  <div className="absolute left-0 top-[-20px] z-20 flex items-center gap-1 pointer-events-none">
                     <span className="font-sans font-semibold text-[8px] md:text-[9px] text-[#d3cbba]">ESTADO:</span>
                     <span className="font-sans font-extralight text-[8px] md:text-[9px] text-[#d3cbba]">
-                      {index === 0 ? "En progreso" : "Bloqueado"}
+                      {firstLessonId ? "En progreso" : "Bloqueado"}
                     </span>
                  </div>
 
