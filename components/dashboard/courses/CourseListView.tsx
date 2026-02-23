@@ -32,7 +32,7 @@ export default function CourseListView({ modules, firstLessonMap }: CourseListPr
     return bgs[index % bgs.length]
   }
 
-  const getCardBg = (_index: number) => {
+  const getCardBg = () => {
     return '/assets/dashboard/courses/module-card-bg-2.svg'
   }
 
@@ -114,7 +114,7 @@ export default function CourseListView({ modules, firstLessonMap }: CourseListPr
                       {/* Background Vector Shape - Responsive SVG */}
                       <div className="absolute inset-0 transform rotate-180 -scale-y-100 opacity-90 transition-transform duration-300 group-hover:scale-[1.02]">
                          <Image 
-                           src={getCardBg(index)} 
+                           src={getCardBg()} 
                            alt="bg-shape" 
                            fill 
                            className="object-contain" 
