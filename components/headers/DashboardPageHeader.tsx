@@ -15,15 +15,17 @@ import Image from "next/image"
 
 interface DashboardPageHeaderProps {
   title: string
+  bgColor?: string
 }
 
 export default function DashboardPageHeader({
   title,
+  bgColor = '#1d1d1d',
 }: DashboardPageHeaderProps) {
   return (
     <header className="relative z-50 w-full h-[61px]">
-      {/* Fondo oscuro que ocupa solo los 51px inferiores */}
-      <div className="absolute inset-x-0 bottom-0 h-[51px] bg-[#1d1d1d] backdrop-blur-[2px] shadow-md" />
+      {/* Fondo que cubre todo el header */}
+      <div className="absolute inset-0 backdrop-blur-[2px] shadow-md" style={{ backgroundColor: bgColor }} />
 
       <div className="relative mx-auto flex h-full w-full max-w-[1500px] justify-between px-4 md:px-8">
         {/* ---- LOGO ---- */}
@@ -42,21 +44,20 @@ export default function DashboardPageHeader({
         </Link>
 
         {/* ---- RIGHT SIDE: Dashboard pill + Page Title ---- */}
-        {/* Contenedor alineado al fondo, con altura de 51px para centrar sus elementos en la franja oscura */}
-        <div className="flex h-[51px] self-end items-center gap-4 md:gap-6 relative z-10">
+        <div className="flex h-full items-center gap-4 md:gap-6 relative z-10">
           {/* Dashboard Pill Button */}
           <Link
             href="/dashboard"
-            className="flex items-center justify-center h-[14px] md:h-[20px] rounded-full bg-[#d9d9d9]/40 px-3 md:px-4 transition-all hover:bg-[#d9d9d9]/60"
+            className="flex items-center justify-center h-[22px] md:h-[26px] rounded-full bg-[#d9d9d9]/40 px-3 md:px-4 transition-all hover:bg-[#d9d9d9]/60"
           >
-            <span className="font-sans text-[8px] md:text-[10px] font-light text-[#161616] uppercase tracking-wider">
+            <span className="font-sans text-[10px] md:text-[12px] font-light text-[#161616] uppercase tracking-wider">
               DASHBOARD
             </span>
           </Link>
 
           {/* Page Title with Gold Underline */}
           <div className="flex flex-col items-end justify-center">
-            <h1 className="font-sans text-[10px] md:text-xs font-bold tracking-wider text-[#d3cbba] uppercase whitespace-nowrap">
+            <h1 className="font-sans text-[13px] md:text-[15px] font-bold tracking-wider text-[#d3cbba] uppercase whitespace-nowrap">
               {title}
             </h1>
             {/* Divider: explicit size preserves natural aspect ratio (183×9) */}

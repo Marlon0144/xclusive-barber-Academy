@@ -153,7 +153,7 @@ export default async function ProgressPage() {
 
   return (
     <>
-      <DashboardGreenHeader userName={student.name} userEmail={student.email} showDashboardLink />
+      <DashboardGreenHeader userName={student.name} userEmail={student.email} />
 
       <div className="min-h-screen bg-[#161616] text-white">
         <div className="max-w-[402px] mx-auto">
