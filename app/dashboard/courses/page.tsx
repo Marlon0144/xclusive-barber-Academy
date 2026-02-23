@@ -1,5 +1,4 @@
 import { createClient } from '@/utils/supabase/server'
-import { DashboardFooter } from '@/components/dashboard/DashboardFooter'
 import CourseListView from '@/components/dashboard/courses/CourseListView'
 import DashboardPageHeader from '@/components/headers/DashboardPageHeader'
 
@@ -32,12 +31,11 @@ export default async function CoursesIndexPage() {
 
   return (
     <>
-      <DashboardPageHeader title="Módulos" />
+      <DashboardPageHeader title="Módulos" bgColor="#161616" />
       <CourseListView 
         modules={modules || []} 
         firstLessonMap={firstLessonMap} 
       />
-      <DashboardFooter tagline="Programa de Formación — Xclusive Barber Academy." />
     </>
   )
 }

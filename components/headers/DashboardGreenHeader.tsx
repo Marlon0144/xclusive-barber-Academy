@@ -26,8 +26,8 @@ export default function DashboardGreenHeader({
 }: DashboardGreenHeaderProps) {
   return (
     <header className="relative z-50 w-full h-[61px]">
-      {/* Fondo verde: empieza a 10px del top para que el logo sobresalga */}
-      <div className="absolute inset-x-0 bottom-0 h-[51px] bg-[#1c3122] backdrop-blur-[2px] shadow-md" />
+      {/* Fondo verde: cubre todo el header */}
+      <div className="absolute inset-0 bg-[#1c3122] backdrop-blur-[2px] shadow-md" />
 
       {/* Contenedor principal: items-end + pb alinea todo en la franja verde */}
       <div className="relative mx-auto flex h-full w-full max-w-[1500px] items-end justify-between pb-[10px] px-6">
