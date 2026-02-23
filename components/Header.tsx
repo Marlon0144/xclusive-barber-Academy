@@ -29,7 +29,7 @@ export default async function Header() {
      *                    Inset 9 px from top/bottom so the outer frame shows
      *                    through at the edges, creating the subtle two-tone depth.
      */
-    <header className="sticky top-0 z-50 w-full overflow-hidden">
+    <header className="relative z-50 w-full overflow-hidden">
       {/* ── Layer 1: outer semi-transparent frame ── */}
       <div
         aria-hidden="true"
