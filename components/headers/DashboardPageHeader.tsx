@@ -23,15 +23,15 @@ export default function DashboardPageHeader({
   bgColor = '#1d1d1d',
 }: DashboardPageHeaderProps) {
   return (
-    <header className="relative z-50 w-full h-[61px]">
+    <header className="relative z-50 w-full h-[53px] mt-4">
       {/* Fondo que cubre todo el header */}
       <div className="absolute inset-0 backdrop-blur-[2px] shadow-md" style={{ backgroundColor: bgColor }} />
 
       <div className="relative mx-auto flex h-full w-full max-w-[1500px] justify-between px-4 md:px-8">
         {/* ---- LOGO ---- */}
         <Link href="/dashboard" className="group relative h-full w-[55px]">
-          {/* El logo empieza desde arriba (top-0) y mide 67px, sobresaliendo 6px por debajo del fondo */}
-          <div className="absolute top-0 left-0 h-[67px] w-[55px] z-10">
+          {/* Logo 67px en barra de 53px → centrado, sobresale 7px arriba y 7px abajo simétricamente */}
+          <div className="absolute top-[-7px] left-0 h-[67px] w-[55px] z-10">
             <Image
               src="/assets/header_pages/logo-academia.png"
               alt="Xclusive Barber Academy"

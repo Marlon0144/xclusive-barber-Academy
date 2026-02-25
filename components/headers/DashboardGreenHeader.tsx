@@ -25,15 +25,15 @@ export default function DashboardGreenHeader({
   showDashboardLink,
 }: DashboardGreenHeaderProps) {
   return (
-    <header className="relative z-50 w-full h-[61px]">
+    <header className="relative z-50 w-full h-[53px] mt-4">
       {/* Fondo verde: cubre todo el header */}
       <div className="absolute inset-0 bg-[#1c3122] backdrop-blur-[2px] shadow-md" />
 
-      {/* Contenedor principal: items-end + pb alinea todo en la franja verde */}
-      <div className="relative mx-auto flex h-full w-full max-w-[1500px] items-end justify-between pb-[10px] px-6">
+      {/* Contenedor principal: items-center centra contenido; el logo (67px) sobresale 7px arriba y abajo */}
+      <div className="relative mx-auto flex h-full w-full max-w-[1500px] items-center justify-between px-6">
 
-        {/* ---- LOGO: sobresale desde top=0, h=67px ---- */}
-        <Link href="/dashboard" className="relative flex-shrink-0" style={{ width: 55, height: 67, marginBottom: -18 }}>
+        {/* ---- LOGO: 67px en barra de 53px → sobresale 7px arriba y 7px abajo ---- */}
+        <Link href="/dashboard" className="relative flex-shrink-0" style={{ width: 55, height: 67 }}>
           <Image
             src="/assets/header_dash/logo-academia.png"
             alt="Xclusive Barber Academy"
@@ -48,7 +48,7 @@ export default function DashboardGreenHeader({
         {showDashboardLink && (
           <Link
             href="/dashboard"
-            className="flex-shrink-0 flex items-center justify-center rounded-[7px] bg-[rgba(217,217,217,0.4)] hover:bg-[rgba(217,217,217,0.6)] transition-colors mb-[10px]"
+            className="flex-shrink-0 flex items-center justify-center rounded-[7px] bg-[rgba(217,217,217,0.4)] hover:bg-[rgba(217,217,217,0.6)] transition-colors"
             style={{ width: 74, height: 14 }}
           >
             <span className="font-sans font-light text-[8px] uppercase tracking-wider text-[#1e3a27]">
