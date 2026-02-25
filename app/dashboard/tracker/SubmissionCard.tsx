@@ -1,110 +1,166 @@
-import { Submission } from '@/types/submissions'
-import { cn } from '@/lib/utils'
-import { ChevronDown } from 'lucide-react'
+'use client'
+
+/**
+ * SubmissionCard
+ * ─────────────────────────────────────────────────────────────────────────────
+ * Tarjeta que representa una práctica enviada por el estudiante.
+ *
+ * Diseño fiel a Figma (node 2134:48):
+ *  - Tarjeta de 97px de alto + badge inferior de 22px = 119px total
+ *  - Imagen del usuario: 81px × 97px, con margen izquierdo de 17px
+ *  - Fondo angular (clipPath diagonal) color #8C8C84 cubriendo el área de texto
+ *  - Overlay oscuro verde en esquina superior derecha
+ *  - Badge "EN PROCESO DE REVISIÓN" → beige semitransparente, 125px de ancho
+ *  - Badge "RETROALIMENTACIÓN ▼"   → verde #1E3A27, expandible inline
+ *
+ * Props:
+ *  submission – datos de la práctica
+ *  index      – posición en el arreglo (0 = más reciente)
+ *  total      – total de prácticas (para numerar descendente: "PRÁCTICA 4, 3, 2, 1")
+ */
+
+import { useState } from 'react'
 import Image from 'next/image'
+import { cn } from '@/lib/utils'
+import { Submission } from '@/types/submissions'
+import FeedbackModal from './FeedbackModal'
 
 interface SubmissionCardProps {
   submission: Submission
   index: number
-  total: number // Added to correctly display practice number if needed (e.g. descending)
-  onClick: () => void
+  total: number
 }
 
-export function SubmissionCard({ submission, index, total, onClick }: SubmissionCardProps) {
+export function SubmissionCard({ submission, index, total }: SubmissionCardProps) {
   const isReviewed = submission.status === 'reviewed'
-  
-  // Format based on the first image "PRÁCTICA 1", "TÉCNICA IMPLEMENTADA", "Notas técnicas"
-  // The first image shows a card with:
-  // Left: Image
-  // Right: 
-  //   - "PRÁCTICA X" (small)
-  //   - "TÉCNICA IMPLEMENTADA" (Bold Title)
-  //   - "Notas técnicas" (smaller text)
-  // Botton Badge (on the left image part): "EN PROCESO DE REVISIÓN" or "RETROALIMENTACIÓN"
+  const practiceNumber = total - index
 
+  // ── Estado del modal de retroalimentación (solo prácticas revisadas) ───────
+  const [isModalOpen, setIsModalOpen] = useState(false)
+
+  const handleBadgeClick = () => {
+    if (isReviewed) setIsModalOpen((prev) => !prev)
+  }
+
+  // ── Render ─────────────────────────────────────────────────────────────────
   return (
-    <div 
-      className="group relative w-full h-[140px] mb-4 cursor-pointer overflow-hidden rounded-sm shadow-xl transition-transform hover:scale-[1.01]"
-      onClick={onClick}
-    >
-      <div className="flex h-full w-full bg-[#161616]">
-        
-        {/* Left: Image Container (approx 35-40%) */}
-        <div className="relative w-[140px] sm:w-[160px] h-full flex-shrink-0">
-           {submission.image_url ? (
-             <Image 
-               src={submission.image_url} 
-               alt="Corte" 
-               fill
-               className="object-cover grayscale group-hover:grayscale-0 transition-all duration-500"
-             />
-           ) : (
-             <div className="w-full h-full bg-[#2A2A2A] flex items-center justify-center">
-                <span className="text-white/20 text-[10px]">SIN FOTO</span>
-             </div>
-           )}
-           
-           {/* Gradient Overlay on Image */}
-           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-60"></div>
+    <div className="w-screen relative left-1/2 -translate-x-1/2 mb-2">
 
-           {/* Status Badge - Absolute Bottom Left of the whole card context usually, but here inside image area matches design */}
-           <div className={cn(
-             "absolute bottom-0 left-0 right-0 py-1.5 px-3 flex items-center justify-center z-20 text-center border-t border-white/10",
-             isReviewed ? "bg-[#1E3A27]" : "bg-[#C4C4BC]"
-           )}>
-              <div className="flex items-center gap-1">
-                 <span className={cn(
-                   "text-[9px] font-bold uppercase tracking-widest",
-                   isReviewed ? "text-white" : "text-[#4A4A44]"
-                 )}>
-                   {isReviewed ? "RETROALIMENTACIÓN" : "EN PROCESO DE REVISIÓN"}
-                 </span>
-                 {isReviewed && <ChevronDown size={10} className="text-[#D4AF37]" />}
-              </div>
-           </div>
-        </div>
+      {/* ── TARJETA PRINCIPAL (119px total: 97px contenido + 22px badge) ──── */}
+      <div
+        className="relative w-full bg-[#161616] overflow-hidden shadow-xl"
+        style={{ height: '123px' }}
+      >
 
-        {/* Right: Content Area with Angled Background (100% fill like first image) */}
-        <div className="relative flex-1 h-full z-10 ml-0 overflow-hidden"> 
-           {/* Background Shape */}
-           <div className="absolute inset-0 bg-[#8C8C84]" 
-                style={{ 
-                   clipPath: 'polygon(0 0, 100% 0, 85% 100%, 0% 100%)' 
-                }}>
-           </div>
-           
-           {/* Decorative Black Corner on Right if needed, but first image shows the card simply ending with the slant revealing the black background BEHIND it. 
-               Wait, the image shows the grey shape CUTTING into the black.
-               Let's stick to the polygon clipping the grey shape.
-           */}
+        {/* ── FONDO ANGULAR (forma diagonal, cubre área de texto) ───────────
+            Ocupa los 97px de alto del contenido.
+            ClipPath: corte diagonal en la esquina inferior-derecha.       */}
+        <div
+          className="absolute top-0 left-0 right-0 bg-[#8C8C84]"
+          style={{
+            height: '97px',
+            clipPath: 'polygon(0 0, 100% 0, 88% 100%, 0% 100%)',
+          }}
+        />
 
-           {/* Text Content */}
-           <div className="relative z-20 pl-6 pr-10 h-full flex flex-col justify-center items-start text-[#1A2E1A]">
-              
-              {/* Top Label */}
-              <span className="font-medium text-[10px] uppercase tracking-[0.2em] opacity-60 mb-1 mix-blend-multiply">
-                PRÁCTICA {total - index}
+
+
+        {/* ── IMAGEN DEL USUARIO ────────────────────────────────────────────
+            Figma: left 17px, top 0, width 81px, height 97px (fijo)         */}
+        <div
+          className="absolute top-0 z-10"
+          style={{ left: '17px', width: '81px', height: '97px' }}
+        >
+          {submission.image_url ? (
+            <Image
+              src={submission.image_url}
+              alt={`Práctica ${practiceNumber} – ${submission.cut_type}`}
+              fill
+              className="object-cover"
+              sizes="81px"
+            />
+          ) : (
+            <div className="w-full h-full bg-[#2A2A2A] flex items-center justify-center">
+              <span className="text-white/20 text-[9px] uppercase tracking-wider text-center leading-tight px-1">
+                Sin foto
               </span>
-
-              {/* Main Title */}
-              <div className="mb-1 leading-none">
-                 <h3 className="font-black text-xl sm:text-2xl uppercase tracking-tighter text-[#1A2E1A] drop-shadow-sm leading-none">
-                   TÉCNICA IMPLEMENTADA
-                 </h3>
-                 <p className="font-bold text-[11px] uppercase tracking-wider text-[#1A2E1A]/80 mt-1">
-                   {submission.cut_type || 'SIN TIPO'}
-                 </p>
-              </div>
-
-              {/* Notes / Description */}
-              <p className="text-[10px] font-medium leading-tight text-[#1A2E1A]/60 line-clamp-2 max-w-[200px] mt-2">
-                 {submission.description || 'Notas técnicas...'}
-              </p>
-
-           </div>
+            </div>
+          )}
         </div>
+
+        {/* ── BLOQUE DE TEXTO ───────────────────────────────────────────────
+            Posicionado desde después de la imagen (17 + 81 = 98px → +10px gap = 108px)
+            Figma: "PRÁCTICA N" top 12px | título top 24px | notas top 50px  */}
+        <div
+          className="absolute top-0 right-0 z-20 flex flex-col justify-start"
+          style={{ left: '108px', height: '97px', paddingTop: '12px', paddingRight: '20px' }}
+        >
+          {/* Número de práctica — ExtraLight 10px tracking 0.9px */}
+          <span
+            className="font-extralight text-[10px] uppercase leading-normal"
+            style={{ letterSpacing: '0.9px', color: '#1E3A27' }}
+          >
+            PRÁCTICA {practiceNumber}
+          </span>
+
+          {/* Título principal — ExtraBold 17px */}
+          <h3
+            className="font-extrabold text-[17px] uppercase leading-tight mt-0.5"
+            style={{ color: '#1E3A27' }}
+          >
+            TÉCNICA IMPLEMENTADA
+          </h3>
+
+          {/* Subtítulo — tipo de corte (bold pequeño para no perder el dato) */}
+          {submission.cut_type && (
+            <p
+              className="font-semibold text-[9px] uppercase tracking-wide leading-none mt-0.5"
+              style={{ color: '#1E3A27' }}
+            >
+              {submission.cut_type}
+            </p>
+          )}
+        </div>
+
+        {/* ── BADGE DE ESTADO ───────────────────────────────────────────────
+            Figma: left 0, top 99px, width 125px, height 22px
+            pending  → beige rgba(211,203,186,0.79) con sombra
+            reviewed → verde #1E3A27 con chevron dorado                     */}
+        <button
+          onClick={handleBadgeClick}
+          disabled={!isReviewed}
+          className={cn(
+            'absolute flex items-center justify-center transition-all',
+            isReviewed ? 'cursor-pointer hover:brightness-110' : 'cursor-default opacity-50 blur-[0.6px]'
+          )}
+          style={{
+            left: 0,
+            top: '101px',
+            width: '125px',
+            height: '22px',
+            backgroundColor: 'rgba(211,203,186,0.79)',
+            boxShadow: '0px 4px 4px 0px rgba(0,0,0,0.25)',
+          }}
+        >
+          <span
+            className="font-extrabold text-[8px] uppercase text-center"
+            style={{ letterSpacing: '0.06em', color: '#1E3A27' }}
+          >
+            {isReviewed ? 'RETROALIMENTACIÓN' : 'EN PROCESO DE REVISIÓN'}
+          </span>
+
+        </button>
 
       </div>
+
+      {/* ── MODAL DE RETROALIMENTACIÓN ────────────────────────────────────── */}
+      {isReviewed && isModalOpen && (
+        <FeedbackModal
+          submission={submission}
+          onClose={() => setIsModalOpen(false)}
+        />
+      )}
+
     </div>
   )
 }

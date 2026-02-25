@@ -1,5 +1,5 @@
 # PROJECT_CONTEXT.md
-> **Última actualización:** 2026-02-21 — Sprint 6 Backend (Progreso Profesional)
+> **Última actualización:** 2026-02-25 — Sprint 6 Backend (Progreso Profesional)
 
 ## 1. Project Identity
 **Nombre:** Xclusive Barber Academy (LMS)
