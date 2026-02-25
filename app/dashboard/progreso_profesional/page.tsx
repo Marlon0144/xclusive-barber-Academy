@@ -58,7 +58,7 @@ function ProgressCircle({ pct }: { pct: number }) {
       <text
         x="37.5" y="43"
         textAnchor="middle"
-        fill="white"
+        fill="#d3cbba"
         fontSize="14"
         fontWeight="bold"
         fontFamily="sans-serif"
@@ -97,7 +97,7 @@ function LevelTimeline({ idx }: { idx: number }) {
         const active = i === idx
         const past   = i < idx
         const fill   = active ? '#D4AF37' : past ? '#7aab7a' : '#333'
-        const tColor = active ? '#D4AF37' : '#555'
+        const tColor = active ? '#d3cbba' : '#2b2b2b'
         const y1 = dot.below ? dot.cy + 18 : dot.cy - 18
         const y2 = dot.below ? dot.cy + 27 : dot.cy - 9
         return (
@@ -128,7 +128,7 @@ function CompetencyRow({ comp }: { comp: CompetencyProgress }) {
       <p className="text-[9px] font-bold uppercase tracking-widest leading-tight text-[#1e3a27]">
         {comp.label}
       </p>
-      <p className="text-[9px] mt-0.5 font-normal text-[#1e3a27]/70">{status}</p>
+      <p className="text-[9px] mt-0.5 font-normal text-[#1e3a27]">{status}</p>
     </div>
   )
 }
@@ -190,7 +190,7 @@ export default async function ProgressPage() {
               {/* Título */}
               <div className="flex-1 pt-6 pr-4 pl-3">
                 <h1
-                  className="font-serif font-black uppercase leading-none text-white"
+                  className="font-serif font-black uppercase leading-none text-[#d3cbba]"
                   style={{ fontSize: 'clamp(22px, 7vw, 30px)' }}
                 >
                   PROGRESO<br />PROFESIONAL
@@ -205,7 +205,7 @@ export default async function ProgressPage() {
                     sizes="(max-width: 402px) 100vw, 260px"
                   />
                 </div>
-                <p className="text-[10px] text-[#a09880] leading-tight">
+                <p className="text-[10px] text-[#d3cbba] leading-tight">
                   Seguimiento de tu desarrollo dentro del programa formativo.
                 </p>
               </div>
@@ -217,13 +217,13 @@ export default async function ProgressPage() {
             {/* Columna izquierda */}
             <div className="w-[142px] flex-shrink-0 bg-[#1d1d1d] px-6 py-6 space-y-5">
               {[
-                { label: 'Estudiante',    value: student.name,       valueColor: '#c8c0b0' },
-                { label: 'Correo',        value: student.email,      valueColor: '#c8c0b0' },
-                { label: 'Fecha de Inicio', value: enrolledDate,     valueColor: '#c8c0b0' },
-                { label: 'Estado Actual', value: student.status,     valueColor: '#7aab7a' },
+                { label: 'Estudiante',    value: student.name,       valueColor: '#d3cbba' },
+                { label: 'Correo',        value: student.email,      valueColor: '#d3cbba' },
+                { label: 'Fecha de Inicio', value: enrolledDate,     valueColor: '#d3cbba' },
+                { label: 'Estado Actual', value: student.status,     valueColor: '#d3cbba' },
               ].map(({ label, value, valueColor }) => (
                 <div key={label}>
-                  <p className="text-[8px] font-bold uppercase tracking-[0.15em] text-[#D4AF37]">
+                  <p className="text-[8px] font-bold uppercase tracking-[0.15em] text-[#d3cbba]">
                     {label}
                   </p>
                   <p className="text-[9px] mt-0.5 leading-tight break-all" style={{ color: valueColor }}>
@@ -254,7 +254,7 @@ export default async function ProgressPage() {
             {/* Labels */}
             <div className="grid grid-cols-3 text-center mb-3">
               {['Progreso\nGeneral', 'Módulos\nCompletados', 'Prácticas\nEnviadas'].map((lbl) => (
-                <p key={lbl} className="text-[8px] font-bold uppercase tracking-widest text-[#c8c0b0] leading-tight whitespace-pre-line">
+                <p key={lbl} className="text-[8px] font-bold uppercase tracking-widest text-[#d3cbba] leading-tight whitespace-pre-line">
                   {lbl}
                 </p>
               ))}
@@ -265,16 +265,16 @@ export default async function ProgressPage() {
                 <ProgressCircle pct={metrics.generalProgressPercentage} />
               </div>
               <div>
-                <span className="font-serif font-black text-white text-[28px]">
+                <span className="font-serif font-black text-[#d3cbba] text-[28px]">
                   {metrics.completedModules}
                 </span>
-                <span className="text-[#D4AF37] font-bold mx-1 text-sm">DE</span>
-                <span className="font-serif font-black text-white text-[28px]">
+                <span className="text-[#1e3a27] font-bold mx-1 text-sm">DE</span>
+                <span className="font-serif font-black text-[#d3cbba] text-[28px]">
                   {metrics.totalModules}
                 </span>
               </div>
               <div>
-                <span className="font-serif font-black text-white text-[36px]">
+                <span className="font-serif font-black text-[#d3cbba] text-[36px]">
                   {metrics.submittedPractices}
                 </span>
               </div>
@@ -309,14 +309,14 @@ export default async function ProgressPage() {
           {nextLevel && nextLevelInfo && (
             <section className="px-4 pb-6">
               <div className="relative border border-[#1c3122]/60 bg-[rgba(28,49,34,0.64)] rounded-sm px-4 pt-8 pb-4 shadow-md">
-                <p className="absolute top-3 left-0 right-0 text-center text-[10px] font-bold uppercase tracking-[0.3em] text-[#a0a080]">
+                <p className="absolute top-3 left-0 right-0 text-center text-[10px] font-bold uppercase tracking-[0.3em] text-[#d3cbba]">
                   PRÓXIMO NIVEL:
                 </p>
-                <p className="text-center font-serif font-black uppercase text-[#D4AF37]"
+                <p className="text-center font-serif font-black uppercase text-[#d3cbba]"
                    style={{ fontSize: '15px', letterSpacing: '0.05em' }}>
                   {nextLevel.label}
                 </p>
-                <p className="text-center mt-2 text-[8px] uppercase tracking-widest leading-relaxed text-[#555]">
+                <p className="text-center mt-2 text-[8px] uppercase tracking-widest leading-relaxed text-[#d3cbba]">
                   REQUIERE: {nextLevelInfo.required} DE {metrics.totalModules} MÓDULOS COMPLETADOS
                   <br />
                   FALTAN: {nextLevelInfo.remaining}{' '}
@@ -329,17 +329,17 @@ export default async function ProgressPage() {
           {/* ── CTA ─────────────────────────────────────────────────────────── */}
           <section className="px-5 py-8 text-center space-y-4">
             <h2
-              className="font-serif font-black uppercase leading-tight text-white"
+              className="font-serif font-black uppercase leading-tight text-[#d3cbba]"
               style={{ fontSize: 'clamp(20px, 7vw, 28px)' }}
             >
               ¡ESTÁS AVANZANDO CON CONSISTENCIA!
             </h2>
-            <p className="text-[11px] font-bold uppercase tracking-widest leading-relaxed text-[#a09880]">
+            <p className="text-[11px] font-bold uppercase tracking-widest leading-relaxed text-[#d3cbba]">
               Mantén el ritmo para alcanzar<br />tu máximo potencial.
             </p>
             <Link
               href="/dashboard/courses"
-              className="inline-block mt-2 border border-[#D4AF37] text-[#D4AF37] font-bold uppercase tracking-[0.2em] text-[11px] px-8 py-3 hover:bg-[#D4AF37] hover:text-black transition-colors duration-200"
+              className="inline-block mt-2 bg-[#d3cbba] text-[#1e3a27] font-bold uppercase tracking-[0.2em] text-[11px] px-8 py-3 hover:bg-[#c8c0b0] transition-colors duration-200"
             >
               ¡SIGUE APRENDIENDO!
             </Link>

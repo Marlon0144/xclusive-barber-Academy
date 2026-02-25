@@ -168,7 +168,7 @@ export default function CourseListView({ modules, firstLessonMap }: CourseListPr
 
        {/* --- BOTTOM CTA --- */}
       <div className="relative pb-20 flex flex-col items-center w-full max-w-md mx-auto z-10 px-4">
-         <Link href="/dashboard" className="relative group cursor-pointer w-full max-w-[300px]">
+         <Link href="/dashboard/tracker" className="relative group cursor-pointer w-full max-w-[300px]">
              <div className="absolute inset-0 bg-[#1e3a27]/50 blur-sm group-hover:bg-[#1e3a27]/70 transition-colors rounded-sm" />
              <div className="relative bg-[rgba(30,58,39,0.51)] w-full h-[40px] flex items-center justify-center border border-white/5 shadow-lg backdrop-blur-sm group-hover:scale-[1.02] transition-transform">
                 <span className="font-sans font-extrabold text-[13px] text-[#d3cbba] tracking-[0.78px]">
