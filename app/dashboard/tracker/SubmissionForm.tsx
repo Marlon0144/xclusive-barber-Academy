@@ -152,7 +152,7 @@ export function SubmissionForm({ onSubmitSuccess }: SubmissionFormProps) {
 
             {/* ── TÍTULO ── */}
             {/* Figma: Poppins ExtraBold 24px, color #1e3a27 */}
-            <h2 className="font-montserrat font-extrabold text-[#1e3a27] text-[22px] text-center leading-normal tracking-tight px-5">
+            <h2 className="font-montserrat font-extrabold !text-[#1e3a27] text-[22px] text-center leading-normal tracking-tight px-5">
               ENTREGA DE EVIDENCIA
             </h2>
 
@@ -216,7 +216,7 @@ export function SubmissionForm({ onSubmitSuccess }: SubmissionFormProps) {
 
                   </div>
                 ) : (
-                  // eslint-disable-next-line @next/next/no-img-element — blob URL
+                  // eslint-disable-next-line @next/next/no-img-element
                   <img src={preview} alt="Preview" className="w-full h-full object-cover" />
                 )}
               </div>

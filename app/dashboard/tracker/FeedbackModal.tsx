@@ -33,7 +33,7 @@ const ScoreBar = ({ label, value }: { label: string; value: number }) => (
   </div>
 )
 
-export default function FeedbackModal({ submission, onClose }: FeedbackModalProps) {
+export default function FeedbackModal({ submission }: FeedbackModalProps) {
   if (!submission) return null
 
   const scores = submission.scores as Scores

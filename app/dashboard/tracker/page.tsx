@@ -12,32 +12,43 @@ import { DashboardFooter } from '@/components/dashboard/DashboardFooter'
 export default function TrackerPage() {
   // ── Estado del orquestador (solo el historial de prácticas) ──────────────
   const [submissions, setSubmissions] = useState<Submission[]>([])
+  const [refreshTrigger, setRefreshTrigger] = useState(0)
 
   // singleton client – stable reference
   const supabase = createClient()
 
-  const fetchHistory = useCallback(async () => {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser()
-    if (!user) return
-
-    const { data, error } = await supabase
-      .from('submissions')
-      .select('*')
-      .eq('student_id', user.id)
-      .order('created_at', { ascending: false })
-
-    if (error) {
-      console.error('Error fetching history:', error)
-    } else if (data) {
-      setSubmissions(data as Submission[])
-    }
-  }, [supabase])
+  // Called by SubmissionForm after a successful upload to reload the list
+  const fetchHistory = useCallback(() => {
+    setRefreshTrigger(t => t + 1)
+  }, [])
 
   useEffect(() => {
-    fetchHistory()
-  }, [fetchHistory])
+    let active = true
+
+    const load = async () => {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser()
+      if (!user || !active) return
+
+      const { data, error } = await supabase
+        .from('submissions')
+        .select('*')
+        .eq('student_id', user.id)
+        .order('created_at', { ascending: false })
+
+      if (!active) return
+
+      if (error) {
+        console.error('Error fetching history:', error)
+      } else if (data) {
+        setSubmissions(data as Submission[])
+      }
+    }
+
+    load()
+    return () => { active = false }
+  }, [supabase, refreshTrigger])
 
   return (
     <div className="relative min-h-screen bg-[#161616] text-[#D3CBBA] font-sans overflow-x-hidden">
