@@ -4,6 +4,7 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { cn } from '@/lib/utils'
+import { DashboardFooter } from '@/components/dashboard/DashboardFooter'
 
 interface Module {
   id: string
@@ -177,18 +178,7 @@ export default function CourseListView({ modules, firstLessonMap }: CourseListPr
              </div>
          </Link>
 
-         {/* Bottom Separator */}
-         <div className="relative w-full max-w-[326px] h-[1px] mt-8 mb-8 opacity-60">
-             <Image src="/assets/dashboard/courses/separator.png" fill className="object-cover" alt="sep" />
-         </div>
-         
-         {/* Social Handle */}
-         <div className="flex flex-col items-center opacity-70 hover:opacity-100 transition-opacity cursor-pointer">
-             <div className="w-[31px] h-[38px] relative mb-2">
-                 <Image src="/assets/dashboard/courses/logo-small.png" fill className="object-contain" alt="logo" />
-             </div>
-             <span className="font-sans font-medium text-[9px] text-[#d3cbba]">@xclusivebarberau</span>
-         </div>
+         <DashboardFooter />
       </div>
     </div>
   )
