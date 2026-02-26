@@ -50,7 +50,7 @@ export default function ApplyForm() {
                 placeholder="NOMBRE"
                 required
                 autoComplete="name"
-                className="text-center placeholder:text-[10px] placeholder:text-[#d3cbba]/50 placeholder:font-light tracking-wide uppercase"
+                className="text-center placeholder:text-[10px] placeholder:text-[#d3cbba]/50 placeholder:font-light tracking-wide"
               />
             </div>
 
@@ -61,7 +61,7 @@ export default function ApplyForm() {
                 placeholder="CORREO ELECTRÓNICO"
                 required
                 autoComplete="email"
-                className="text-center placeholder:text-[10px] placeholder:text-[#d3cbba]/50 placeholder:font-light tracking-wide uppercase"
+                className="text-center placeholder:text-[10px] placeholder:text-[#d3cbba]/50 placeholder:font-light tracking-wide"
               />
             </div>
 
@@ -71,7 +71,7 @@ export default function ApplyForm() {
                 type="text"
                 placeholder="CÓDIGO DE ACCESO"
                 required
-                className="text-center placeholder:text-[10px] placeholder:text-[#d3cbba]/50 placeholder:font-light tracking-wide uppercase" 
+                className="text-center placeholder:text-[10px] placeholder:text-[#d3cbba]/50 placeholder:font-light tracking-wide"
               />
             </div>
 
@@ -82,7 +82,7 @@ export default function ApplyForm() {
                 placeholder="CREAR CONTRASEÑA"
                 required
                 autoComplete="new-password"
-                className="text-center placeholder:text-[10px] placeholder:text-[#d3cbba]/50 placeholder:font-light tracking-wide uppercase"
+                className="text-center placeholder:text-[10px] placeholder:text-[#d3cbba]/50 placeholder:font-light tracking-wide"
               />
             </div>
           </div>
