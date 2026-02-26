@@ -19,24 +19,37 @@
  *  total      – total de prácticas (para numerar descendente: "PRÁCTICA 4, 3, 2, 1")
  */
 
-import { useState } from 'react'
+import { useState, useTransition } from 'react'
 import Image from 'next/image'
 import { cn } from '@/lib/utils'
 import { Submission } from '@/types/submissions'
 import FeedbackModal from './FeedbackModal'
+import { deleteSubmission } from './actions'
 
 interface SubmissionCardProps {
   submission: Submission
   index: number
   total: number
+  onDelete: (id: string) => void
 }
 
-export function SubmissionCard({ submission, index, total }: SubmissionCardProps) {
+export function SubmissionCard({ submission, index, total, onDelete }: SubmissionCardProps) {
   const isReviewed = submission.status === 'reviewed'
   const practiceNumber = total - index
 
   // ── Estado del modal de retroalimentación (solo prácticas revisadas) ───────
   const [isModalOpen, setIsModalOpen] = useState(false)
+
+  // ── Eliminación con feedback visual ────────────────────────────────────────
+  const [isPending, startTransition] = useTransition()
+
+  const handleDelete = () => {
+    startTransition(async () => {
+      await deleteSubmission(submission.id)
+      // Eliminar la card del estado local del padre → sin recarga de página
+      onDelete(submission.id)
+    })
+  }
 
   const handleBadgeClick = () => {
     if (isReviewed) setIsModalOpen((prev) => !prev)
@@ -44,13 +57,30 @@ export function SubmissionCard({ submission, index, total }: SubmissionCardProps
 
   // ── Render ─────────────────────────────────────────────────────────────────
   return (
-    <div className="w-screen relative left-1/2 -translate-x-1/2 mb-2">
+    <div className={cn('w-screen relative left-1/2 -translate-x-1/2 mb-2 transition-opacity duration-300', isPending && 'opacity-40 pointer-events-none')}>
 
       {/* ── TARJETA PRINCIPAL (119px total: 97px contenido + 22px badge) ──── */}
       <div
         className="relative w-full bg-[#161616] overflow-hidden shadow-xl"
         style={{ height: '123px' }}
       >
+
+        {/* ── BOTÓN ELIMINAR (×) ────────────────────────────────────────────
+            Posicionado en la esquina superior derecha de la tarjeta.
+            Solo visible en hover para no saturar la UI.                   */}
+        <button
+          onClick={handleDelete}
+          disabled={isPending}
+          aria-label="Eliminar práctica"
+          className="absolute top-4 right-7 z-30 w-5 h-5 flex items-center justify-center rounded-full bg-black/40 text-white/60 hover:bg-red-700/80 hover:text-white transition-all duration-200 text-[11px] font-bold leading-none"
+        >
+          {isPending ? (
+            // Micro spinner mientras se procesa el borrado
+            <span className="block w-2.5 h-2.5 border border-white/60 border-t-transparent rounded-full animate-spin" />
+          ) : (
+            '×'
+          )}
+        </button>
 
         {/* ── FONDO ANGULAR (forma diagonal, cubre área de texto) ───────────
             Ocupa los 97px de alto del contenido.

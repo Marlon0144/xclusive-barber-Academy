@@ -9,6 +9,7 @@
  */
 
 import { useRef, useState } from 'react'
+import { useFormStatus } from 'react-dom'
 import Image from 'next/image'
 import { Loader2 } from 'lucide-react'
 import { uploadSubmission } from './actions'
@@ -71,8 +72,49 @@ interface SubmissionFormProps {
 // ─────────────────────────────────────────────────────────────────────────────
 // Component
 // ─────────────────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────────
+// SubmitButton — componente separado para poder usar useFormStatus.
+//
+// ¿Por qué no funciona useState para el spinner?
+// En React 19, al usar `action={asyncFn}` en un <form>, React ejecuta la
+// función dentro de una TRANSICIÓN implícita. El estado intermedio de
+// `setLoading(true)` se puede agrupar con `setLoading(false)` en un solo
+// ciclo de render, por lo que el spinner nunca se pinta.
+//
+// `useFormStatus` es gestionado internamente por React y SÍ refleja el
+// estado `pending` de forma fiable durante la ejecución del form action.
+// ─────────────────────────────────────────────────────────────────────────────
+function SubmitButton() {
+  const { pending } = useFormStatus()
+
+  return (
+    <div className="relative w-[360px] mx-auto mt-2 h-[41px]">
+      {/* Imagen del botón como fondo (gradiente dorado) */}
+      <Image
+        src="/assets/dashboard/tracker/SubmissionForm/bg-button.png"
+        fill
+        alt=""
+        className="object-fill"
+      />
+      <button
+        type="submit"
+        disabled={pending}
+        className="relative z-10 w-full h-full font-montserrat font-bold text-[#161616] text-[clamp(11px,3.5vw,15px)] text-center tracking-[0.9px] disabled:opacity-70 flex items-center justify-center gap-2"
+      >
+        {pending ? (
+          <>
+            <Loader2 className="animate-spin w-4 h-4" />
+            ENVIANDO...
+          </>
+        ) : (
+          'PRESENTAR PARA EVALUACIÓN'
+        )}
+      </button>
+    </div>
+  )
+}
+
 export function SubmissionForm({ onSubmitSuccess }: SubmissionFormProps) {
-  const [loading, setLoading]         = useState(false)
   const [preview, setPreview]         = useState<string | null>(null)
   const [selectedCut, setSelectedCut] = useState('')
   const [fileError, setFileError]     = useState<string | null>(null)
@@ -115,7 +157,6 @@ export function SubmissionForm({ onSubmitSuccess }: SubmissionFormProps) {
     // Guardia de doble envío (ref se actualiza síncronamente, antes del re-render)
     if (isSubmittingRef.current) return
     isSubmittingRef.current = true
-    setLoading(true)
     try {
       await uploadSubmission(formData)
       setPreview(null)
@@ -129,7 +170,6 @@ export function SubmissionForm({ onSubmitSuccess }: SubmissionFormProps) {
       alert(message)
     } finally {
       isSubmittingRef.current = false
-      setLoading(false)
     }
   }
 
@@ -351,34 +391,11 @@ export function SubmissionForm({ onSubmitSuccess }: SubmissionFormProps) {
         </div>
 
         {/* ══════════════════════════════════════════════════════════════════
-            BOTÓN SUBMIT
+            BOTÓN SUBMIT — usa <SubmitButton> con useFormStatus (React 19)
             Figma: left=13px w=333px h=41px, bg-button.png como fondo
             Gap desde card: 474px - 466px = 8px → mt-2
         ═══════════════════════════════════════════════════════════════════ */}
-        <div className="relative w-[360px] mx-auto mt-2 h-[41px]">
-          {/* Imagen del botón como fondo (gradiente dorado) */}
-          <Image
-            src="/assets/dashboard/tracker/SubmissionForm/bg-button.png"
-            fill
-            alt=""
-            className="object-fill"
-          />
-          {/* Botón nativo encima */}
-          <button
-            type="submit"
-            disabled={loading}
-            className="relative z-10 w-full h-full font-montserrat font-bold text-[#161616] text-[clamp(11px,3.5vw,15px)] text-center tracking-[0.9px] disabled:opacity-70 flex items-center justify-center gap-2"
-          >
-            {loading ? (
-              <>
-                <Loader2 className="animate-spin w-4 h-4" />
-                ENVIANDO...
-              </>
-            ) : (
-              'PRESENTAR PARA EVALUACIÓN'
-            )}
-          </button>
-        </div>
+        <SubmitButton />
 
       </form>
     </div>

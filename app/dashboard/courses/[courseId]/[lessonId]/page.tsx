@@ -6,6 +6,7 @@ import { getUser, getLessonById } from '@/utils/cache-helpers'
 import VideoPlayer from '@/components/courses/VideoPlayer'
 import { cn } from '@/lib/utils'
 import DashboardPageHeader from '@/components/headers/DashboardPageHeader'
+import { DashboardFooter } from '@/components/dashboard/DashboardFooter'
 
 interface LessonPageProps {
   params: Promise<{
@@ -23,250 +24,379 @@ interface LessonNavItem {
 
 export default async function LessonPage({ params }: LessonPageProps) {
   const { courseId, lessonId } = await params
-  
-  // Data Fetching
+
+  // ── Data Fetching ────────────────────────────────────────────────────────────
   const supabasePromise = createClient()
   const userPromise = getUser()
   const lessonPromise = getLessonById(lessonId)
 
-  const [supabase, user, lessonResult] = await Promise.all([supabasePromise, userPromise, lessonPromise])
+  const [supabase, user, lessonResult] = await Promise.all([
+    supabasePromise,
+    userPromise,
+    lessonPromise,
+  ])
 
-  if (!user) {
-    redirect('/login')
-  }
+  if (!user) redirect('/login')
 
   const { lesson, error } = lessonResult
-
   if (error || !lesson) {
     console.error('Error fetching lesson:', error)
     return notFound()
   }
 
-  // Fetch All Lessons for Navigation
-  const { data: allLessons } = await supabase
-    .from('lessons')
-    .select('id, title, position')
-    .eq('module_id', lesson.module_id)
-    .order('position', { ascending: true })
+  // Fetch navigation lessons + module info in parallel
+  const [{ data: allLessons }, { data: moduleData }] = await Promise.all([
+    supabase
+      .from('lessons')
+      .select('id, title, position')
+      .eq('module_id', lesson.module_id)
+      .order('position', { ascending: true }),
+    supabase
+      .from('modules')
+      .select('title, position')
+      .eq('id', lesson.module_id)
+      .single(),
+  ])
 
   const lessons: LessonNavItem[] = allLessons || []
   const currentLessonIndex = lessons.findIndex((l) => l.id === lessonId)
   const prevLesson = lessons[currentLessonIndex - 1]
   const nextLesson = lessons[currentLessonIndex + 1]
+  const moduleTitle = moduleData?.title ?? 'FUNDAMENTOS TÉCNICOS'
+  const moduleNumber = moduleData?.position ?? 1
 
-  // Define URLs for assets (from public folder)
-  const assets = {
-    logo: '/assets/dashboard/lessons/logo-header.png',
-    separator: '/assets/dashboard/lessons/separator-line.png',
-    titleDecor: '/assets/dashboard/lessons/title-decoration.png',
-    navSeparator: '/assets/dashboard/lessons/nav-separator.svg',
-    arrowDecor: '/assets/dashboard/lessons/arrow-decoration.png',
-  }
+  // ── Asset paths (all from /assets/dashboard/courses/lessons/) ────────────────
+  const A = {
+    textRecurso: '/assets/dashboard/courses/lessons/text-recurso.png',
+    marcoVideo:  '/assets/dashboard/courses/lessons/marco-video.png',
+    dividerDorado: '/assets/dashboard/courses/lessons/divider-dorado.png',
+    backRow:     '/assets/dashboard/courses/lessons/back-row.png',
+    nextRow:     '/assets/dashboard/courses/lessons/next-row.png',
+  } as const
 
   return (
-    <div className="min-h-screen bg-[#161616] text-[#D3CBBA] font-sans relative overflow-x-hidden pb-20">
-      
-      {/* NAV HEADER - Dark variant (sticky) */}
-      <DashboardPageHeader title="Lecciones" />
+    <div className="min-h-screen bg-[#161616] text-[#D3CBBA] font-sans overflow-x-hidden">
 
-      {/* BACKGROUND ELEMENTS */}
-      <div className="absolute top-0 left-0 w-full h-full pointer-events-none z-0">
-        <div className="absolute top-[-10%] right-[-10%] w-[50vw] h-[50vw] bg-gold-500/5 blur-[120px] rounded-full opacity-30" />
-        <div className="absolute bottom-[-10%] left-[-10%] w-[40vw] h-[40vw] bg-green-950/20 blur-[100px] rounded-full opacity-30" />
+      {/* ── STICKY HEADER ────────────────────────────────────────────────────── */}
+      <DashboardPageHeader title="LECCIONES" />
+
+      {/* ── BACK ARROW ROW ───────────────────────────────────────────────────── */}
+      {/* Positioned below header, left-aligned, mirroring Figma top-87 placement */}
+      <div className="w-full max-w-[402px] mx-auto px-[34px] mt-5">
+        <Link
+          href={`/dashboard/courses/${courseId}`}
+          className="inline-flex items-start"
+        >
+          <div className="w-[29.6px] h-[9.2px] relative">
+            <Image src={A.backRow} alt="Volver" fill className="object-contain" />
+          </div>
+        </Link>
       </div>
 
-      {/* HEADER / HERO SECTION */}
-      <header className="relative z-10 pt-12 pb-8 flex flex-col items-center text-center gap-4 px-4 w-full max-w-4xl mx-auto">
-        
-        {/* Logo Element (Top Left absolute or relative in flow?) Design shows absolute top-left */}
-        <div className="hidden md:absolute md:left-6 md:top-6 w-[55px] h-[67px] opacity-80">
-           <Image src={assets.logo} alt="Logo Element" width={55} height={67} className="object-contain" />
+      {/* ── COURSE BANNER (green band) ───────────────────────────────────────── */}
+      {/*
+        Figma: bg rgba(30,58,39,0.51), w-333px / 402px total → ~83%, h-65px
+        The title-decoration (text-recurso.png) overlaps the top edge of the banner.
+      */}
+      <section className="w-full flex justify-center mt-5">
+        <div
+          className="flex flex-col items-center justify-center gap-[5px] w-[83%] max-w-[333px] h-[82px]"
+          style={{ background: 'rgba(30,58,39,0.51)', boxShadow: '0px 4px 4px rgba(0,0,0,0.25)' }}
+        >
+          {/* text-recurso.png: decorative title element */}
+          <div className="w-[231px] h-[15px] relative">
+            <Image src={A.textRecurso} alt="" fill className="object-contain" priority />
+          </div>
+
+          {/* "FORMACIÓN PROFESIONAL EN BARBERÍA" subtitle */}
+          <p
+            className="text-[#D3CBBA] text-[11px] font-extralight text-center uppercase leading-normal px-2"
+            style={{ letterSpacing: '0.99px' }}
+          >
+            FORMACIÓN PROFESIONAL EN BARBERÍA
+          </p>
         </div>
+      </section>
 
-        {/* Separator Line Top */}
-        <div className="w-[77px] h-[1px] relative opacity-60 mb-2">
-            <Image src={assets.separator} alt="" fill className="object-cover" />
-        </div>
+      {/* ── MODULE INFO BLOCK ────────────────────────────────────────────────── */}
+      {/*
+        Figma:
+          "MÓDULO 1"          → text-8px  ExtraLight tracking-0.72px  top-235
+          "FUNDAMENTOS…"      → text-17px ExtraBold  uppercase         top-253
+          separator line      → w-221px h-1px                          top-285
+          description         → text-6px  Light                        top-298
+      */}
+      <div className="w-full max-w-[402px] mx-auto flex flex-col items-center text-center mt-8 px-4">
+        <p
+          className="text-[#D3CBBA] text-[8px] font-extralight uppercase leading-normal"
+          style={{ letterSpacing: '0.72px' }}
+        >
+          MÓDULO {moduleNumber}
+        </p>
 
-        {/* Top Label */}
-        <h3 className="text-[10px] md:text-sm font-bold tracking-[0.2em] text-[#D3CBBA] opacity-80 uppercase">
-          LECCIONES
-        </h3>
+        <h2 className="text-[#D3CBBA] text-[17px] font-extrabold uppercase leading-normal mt-2 tracking-tight">
+          {moduleTitle.toUpperCase()}
+        </h2>
 
-        {/* Main Title Group */}
-        <div className="space-y-2 relative w-full">
-           <h2 className="text-[11px] md:text-xs font-light tracking-[0.2em] text-[#D3CBBA] uppercase opacity-90">
-             FORMACIÓN PROFESIONAL EN BARBERÍA
-           </h2>
-           
-           {/* Decorative Element under top title */}
-           <div className="w-[231px] h-[15px] relative mx-auto my-2 opacity-80">
-             <Image src={assets.titleDecor} alt="" fill className="object-contain" />
-           </div>
+        {/* thin cream separator */}
+        <div
+          className="w-[221px] h-px mt-4"
+          style={{ background: '#D3CBBA', opacity: 0.4, boxShadow: '0px 4px 4px rgba(0,0,0,0.25)' }}
+        />
 
-           <h1 className="text-xl md:text-3xl lg:text-4xl font-extrabold text-[#D3CBBA] tracking-tight font-serif uppercase leading-tight">
-             FUNDAMENTOS TÉCNICOS
-           </h1>
+        <p className="text-[#D3CBBA] text-[6px] font-light text-center leading-[1.3] mt-2 w-[336px] max-w-full opacity-70">
+          Bases esenciales de técnica, herramientas y precisión profesional.
+        </p>
+      </div>
 
-           <div className="w-[221px] h-[1px] relative mx-auto mt-4 opacity-50">
-             <Image src={assets.separator} alt="" fill className="object-cover" />
-           </div>
-           
-           <p className="text-[8px] md:text-[10px] font-light tracking-wide text-[#D3CBBA]/70 max-w-md mx-auto mt-2 leading-relaxed">
-             Bases esenciales de técnica, herramientas y precisión profesional.
-           </p>
-        </div>
-
-      </header>
-
-      {/* MODULE / LESSON NAVIGATION (Horizontal Tabs) */}
-      <div className="relative z-10 w-full max-w-2xl mx-auto mb-12 flex flex-wrap justify-center items-center gap-4 md:gap-8 px-4">
-         {lessons.map((l: LessonNavItem, idx: number) => {
-           const isActive = l.id === lessonId
-
-           return (
-             <Link 
-               key={l.id} 
-               href={`/dashboard/courses/${courseId}/${l.id}`}
-               className={cn(
-                 "group relative flex flex-col items-center gap-2 transition-all duration-300 min-w-[30px]",
-                 isActive ? "scale-110 opacity-100" : "opacity-40 hover:opacity-70 scale-100"
-               )}
-             >
-                <span className={cn(
-                  "text-xs md:text-sm font-extrabold tracking-widest uppercase transition-colors",
-                  isActive ? "text-[#D3CBBA]" : "text-[#1E3A27]"
-                )}>
+      {/* ── LESSONS NAV BAR ──────────────────────────────────────────────────── */}
+      {/*
+        Figma: h-30px, full-width cream band (bg #D3CBBA opacity-47),
+               L1…Ln labels in ExtraBold 12px color #1E3A27 inside it,
+               vertical 1px separators between labels.
+               "LECCIONES" label below in ExtraLight 8px tracking-2.4px
+      */}
+      <div className="w-full max-w-[402px] mx-auto mt-8">
+        {/* cream band */}
+        <div
+          className="w-full h-[30px] flex items-center justify-center gap-0"
+          style={{ background: 'rgba(211,203,186,0.47)', boxShadow: '0px 4px 4px rgba(0,0,0,0.25)' }}
+        >
+          {lessons.map((l, idx) => {
+            const isActive = l.id === lessonId
+            return (
+              <div key={l.id} className="flex items-center">
+                <Link
+                  href={`/dashboard/courses/${courseId}/${l.id}`}
+                  className={cn(
+                    "text-[#1E3A27] text-[12px] font-extrabold px-[14px] leading-none",
+                    "shadow-[0px_4px_4px_rgba(0,0,0,0.25)] transition-opacity",
+                    isActive ? "opacity-100" : "opacity-40"
+                  )}
+                  style={{ textShadow: '0px 4px 4px rgba(0,0,0,0.25)' }}
+                >
                   L{idx + 1}
-                </span>
-                
-                {isActive && (
-                   <div className="w-1.5 h-1.5 rounded-full bg-gold-500 shadow-[0_0_10px_rgba(212,175,55,0.8)]" />
-                )}
-                
-                {/* Separator Lines (Except last) */}
+                </Link>
+                {/* vertical separator, except after last */}
                 {idx < lessons.length - 1 && (
-                  <div className="hidden md:block absolute right-[-16px] md:right-[-32px] top-1/2 -translate-y-1/2 w-[1px] h-4 bg-[#1E3A27]/30">
-                    <div className="relative w-full h-full"> 
-                        <Image src={assets.navSeparator} alt="" fill className="object-cover opacity-50" />
-                    </div>
-                  </div>
+                  <div className="w-px h-[22px] bg-[#1E3A27]/40" />
                 )}
-             </Link>
-           )
-         })}
+              </div>
+            )
+          })}
+        </div>
+
+        {/* LECCIONES label below bar */}
+        <p
+          className="text-[#D3CBBA] text-[8px] font-extralight text-center uppercase leading-normal mt-2"
+          style={{ letterSpacing: '2.4px' }}
+        >
+          LECCIONES
+        </p>
       </div>
 
-      {/* MAIN CONTENT AREA */}
-      <main className="relative z-10 w-full max-w-5xl mx-auto px-4 grid grid-cols-1 gap-12">
-        
-        {/* VIDEO PLAYER SECTION */}
-        <div className="w-full relative aspect-video bg-black/40 rounded-sm border border-white/5 overflow-hidden shadow-2xl">
-           <VideoPlayer url={lesson.video_url} lessonId={lesson.id} />
-           
-           {/* Decorative corner elements */}
-           <div className="absolute top-0 left-0 w-8 h-8 border-t border-l border-[#D3CBBA]/20 rounded-tl-lg" />
-           <div className="absolute bottom-0 right-0 w-8 h-8 border-b border-r border-[#D3CBBA]/20 rounded-br-lg" />
+      {/* ── LESSON TITLE AREA ────────────────────────────────────────────────── */}
+      {/*
+        Figma:
+          H1 "TÍTULO PRINCIPAL"    → text-24px ExtraBold centered         top-431
+          "Lección X" micro-label  → text-5px  ExtraLight left-aligned    top-461
+          Subtitle                 → text-13px Medium     right-aligned   top-475
+          Vector13 (divider-dorado)→ h-0 w-122px left side                top-481
+      */}
+      <div className="w-full max-w-[402px] mx-auto mt-8 px-[30px]">
+        {/* Main lesson title */}
+        <h1
+          className="text-[#D3CBBA] text-[24px] font-extrabold text-center uppercase leading-normal w-full"
+        >
+          {lesson.title.toUpperCase()}
+        </h1>
+
+        {/* Micro label (left) + Subtitle (right) on same row */}
+        <div className="flex items-start justify-between mt-2">
+          {lesson.description && (
+            <span className="text-[#D3CBBA] text-[13px] font-medium text-right leading-normal uppercase">
+              {lesson.description}
+            </span>
+          )}
         </div>
 
-        {/* TEXT CONTENT */}
-        <div className="flex flex-col md:flex-row gap-12 items-start justify-between">
-           
-           {/* Left details */}
-           <div className="flex-1 space-y-6">
-              <div className="space-y-2">
-                 <span className="text-[10px] font-light tracking-[0.2em] text-[#D3CBBA]/60 uppercase block">
-                    MÓDULO 1
-                 </span>
-                 <h2 className="text-2xl md:text-3xl font-bold font-serif text-[#D3CBBA]">
-                   {lesson.title}
-                 </h2>
-                 {lesson.description && (
-                   <h3 className="text-sm md:text-base font-medium text-[#D3CBBA]/80 tracking-wide uppercase">
-                     Resumen de la lección
-                   </h3>
-                 )}
-              </div>
+        {/* divider-dorado: golden line on the left side */}
+        <div className="mt-1 w-[122px] h-[2px] relative">
+          <Image src={A.dividerDorado} alt="" fill className="object-cover" />
+        </div>
+      </div>
 
-              {/* Decorative Separator */}
-              <div className="w-[120px] h-0.5 bg-gradient-to-r from-gold-500/50 to-transparent" />
+      {/* ── VIDEO SECTION ────────────────────────────────────────────────────── */}
+      {/*
+        Figma:
+          image10 (marco frame bg):  w-346px h-201px opacity-57 centered  top-543
+          image11 (video content):   w-320px h-171px             left-41px top-558
 
-              <div className="prose prose-invert prose-gold max-w-none text-xs md:text-sm font-light text-[#D3CBBA]/70 leading-relaxed text-justify">
-                 {/* Render description properly */}
-                 {lesson.content ? (
-                    <div dangerouslySetInnerHTML={{ __html: lesson.content }} />
-                 ) : (
-                    <p>Sin descripción disponible.</p>
-                 )}
-              </div>
-           </div>
+        The marco-video.png decorative frame sits behind the player as background.
+        Video content (320px) is centered inside the 346px frame container.
+        Bottom row: italic "Micro texto Opcional" (left) + "Unidad Audiovisual" (right)
+      */}
+      <div className="w-full max-w-[402px] mx-auto mt-6 flex flex-col items-center">
+        {/* frame + video wrapper */}
+        <div className="relative w-[346px] max-w-full flex items-center justify-center"
+             style={{ height: '201px' }}>
+          {/* marco-video decorative frame (behind video) */}
+          <div className="absolute inset-0" style={{ opacity: 0.57, pointerEvents: 'none' }}>
+            <Image src={A.marcoVideo} alt="" fill className="object-fill" />
+          </div>
 
-           {/* Right: References / Downloads */}
-           <div className="w-full md:w-64 flex-shrink-0 space-y-4">
-              <h4 className="text-[8px] font-light tracking-[0.2em] text-[#D3CBBA]/60 uppercase text-right border-b border-white/5 pb-2">
-                 Referencias Visuales
-              </h4>
-              <div className="grid grid-cols-3 gap-2">
-                 {[1,2,3,4,5,6,7,8,9].map((i) => (
-                   <div key={i} className="aspect-square bg-[#D9D9D9]/10 rounded-sm hover:bg-[#D9D9D9]/20 transition-colors cursor-pointer border border-white/5" />
-                 ))}
-              </div>
-              <p className="text-[7px] text-right text-[#D3CBBA]/40 tracking-wider mt-2">
-                 Unidad Audiovisual 
-              </p>
-           </div>
-
+          {/* Actual video player: 320px wide, 171px tall, centered */}
+          <div
+            className="relative z-10 bg-black overflow-hidden"
+            style={{ width: '320px', height: '171px' }}
+          >
+            <VideoPlayer url={lesson.video_url} lessonId={lesson.id} />
+          </div>
         </div>
 
-      </main>
+        {/* Below-video captions */}
+        <div className="w-[343px] max-w-full flex justify-between mt-[3px] px-0">
+          <p className="text-[#D3CBBA] text-[5px] font-light italic leading-[1.3]">
+            Micro texto Opcional
+          </p>
+          <p className="text-[#D3CBBA] text-[5px] font-extralight leading-[1.3]">
+            Unidad Audiovisual
+          </p>
+        </div>
+      </div>
 
-      {/* FOOTER NAVIGATION */}
-      <footer className="relative z-10 mt-20 pb-12 w-full max-w-4xl mx-auto px-8 flex justify-between items-center border-t border-white/5 pt-8">
-         
-         {/* PREV BUTTON */}
-         <div className="flex-1 flex justify-start">
+      {/* ── BODY TEXT ────────────────────────────────────────────────────────── */}
+      {/*
+        Figma: left-[calc(50%-171px)] w-343px text-10px font-Regular leading-1.3 justify text-justify top-796
+      */}
+      <div className="w-full max-w-[402px] mx-auto mt-8 px-[30px]">
+        <div
+          className="text-[#D3CBBA] text-[10px] font-normal leading-[1.3] text-justify [&>p]:mb-0 [&>p+p]:mt-3"
+        >
+          {lesson.content ? (
+            <div dangerouslySetInnerHTML={{ __html: lesson.content }} />
+          ) : (
+            <p>Sin descripción disponible.</p>
+          )}
+        </div>
+      </div>
+
+      {/* ── REFERENCIAS VISUALES ─────────────────────────────────────────────── */}
+      {/*
+        Figma: "Referencias Visuales" right-aligned text-7px ExtraLight
+               3 columns × 3 rows of bg-[#d9d9d9] boxes, each 107×111px
+               Columns left: 30px, 146px, 262px → gap ~5px, padding ~30px sides
+      */}
+      <div className="w-full max-w-[402px] mx-auto mt-10 px-[30px]">
+        <p className="text-[#D3CBBA] text-[7px] font-extralight text-right leading-[1.3] tracking-wide mb-2">
+          Referencias Visuales
+        </p>
+        <div className="grid grid-cols-3 gap-[5px]">
+          {Array.from({ length: 9 }).map((_, i) => (
+            <div
+              key={i}
+              className="bg-[#D9D9D9] w-full"
+              style={{ aspectRatio: '111/107' }}
+            />
+          ))}
+        </div>
+      </div>
+
+      {/* ── FOOTER NAVIGATION ────────────────────────────────────────────────── */}
+      {/*
+        Figma layout:
+          - "SIGUIENTE LECCIÓN" right-aligned SemiBold 8px tracking-0.48px  top-1523
+          - thin separator line w-343px                                       top-1546
+          - "LECCIÓN ANTERIOR"  left        SemiBold 8px tracking-0.48px  top-1549
+          - next arrow (right)  w-29.6 h-9.2 rotated 180°                    top-1550
+          - prev arrow (left)                                                 top-1534
+          - full-width 2px separator line                                     top-1661
+      */}
+      <footer className="w-full max-w-[402px] mx-auto mt-14 pb-0">
+
+        {/* ── ROW ABOVE SEPARATOR ──────────────────────────────────────────────
+            Left:  ← prev arrow only  (top-1534)
+            Right: "SIGUIENTE LECCIÓN" text only  (top-1523)
+        */}
+        <div className="px-[30px] flex justify-between items-center mb-[3px]">
+          {/* Prev arrow — left side, above separator */}
+          <div>
             {prevLesson ? (
-                <Link href={`/dashboard/courses/${courseId}/${prevLesson.id}`} className="group flex flex-col items-start gap-1">
-                <span className="text-[8px] font-semibold text-[#D3CBBA] group-hover:text-gold-500 transition-colors uppercase tracking-widest">
-                    Lección Anterior
-                </span>
-                <div className="flex items-center gap-2 opacity-50 group-hover:opacity-100 transition-opacity">
-                    <div className="w-[29px] h-[9px] relative transform scale-x-[-1]">
-                        <Image src={assets.arrowDecor} alt="" fill className="object-contain" />
-                    </div>
+              <Link href={`/dashboard/courses/${courseId}/${prevLesson.id}`}>
+                <div className="w-[29px] h-[9px] relative">
+                  <Image src={A.backRow} alt="Lección anterior" fill className="object-contain" />
                 </div>
-                </Link>
-            ) : <div />}
-         </div>
-
-         {/* NEXT BUTTON */}
-         <div className="flex-1 flex justify-end">
-            {nextLesson ? (
-                <Link href={`/dashboard/courses/${courseId}/${nextLesson.id}`} className="group flex flex-col items-end gap-1">
-                <span className="text-[8px] font-semibold text-[#D3CBBA] group-hover:text-gold-500 transition-colors uppercase tracking-widest text-right">
-                    Siguiente Lección
-                </span>
-                <div className="flex items-center gap-2 opacity-50 group-hover:opacity-100 transition-opacity">
-                    <div className="w-[29px] h-[9px] relative">
-                        <Image src={assets.arrowDecor} alt="" fill className="object-contain" />
-                    </div>
-                </div>
-                </Link>
+              </Link>
             ) : (
-                <div className="text-[8px] text-[#D3CBBA]/40 uppercase tracking-widest">Fin del módulo</div>
+              <div className="w-[29px] h-[9px]" />
             )}
-         </div>
+          </div>
 
+          {/* "SIGUIENTE LECCIÓN" — right side, above separator */}
+          {nextLesson ? (
+            <Link href={`/dashboard/courses/${courseId}/${nextLesson.id}`}>
+              <span
+                className="text-[#D3CBBA] text-[8px] font-semibold uppercase text-right leading-[20px]"
+                style={{ letterSpacing: '0.48px' }}
+              >
+                SIGUIENTE LECCIÓN
+              </span>
+            </Link>
+          ) : (
+            <div />
+          )}
+        </div>
+
+        {/* thin cream separator */}
+        <div
+          className="mx-auto w-[343px] h-px"
+          style={{ background: '#D3CBBA', opacity: 0.35, boxShadow: '0px 4px 4px rgba(0,0,0,0.25)' }}
+        />
+
+        {/* ── ROW BELOW SEPARATOR ──────────────────────────────────────────────
+            Left:  "LECCIÓN ANTERIOR" text only  (top-1549)
+            Right: → next arrow only             (top-1550)
+        */}
+        <div className="px-[30px] flex justify-between items-center mt-[3px]">
+          {/* "LECCIÓN ANTERIOR" — left side, below separator */}
+          {prevLesson ? (
+            <Link href={`/dashboard/courses/${courseId}/${prevLesson.id}`}>
+              <span
+                className="text-[#D3CBBA] text-[8px] font-semibold uppercase leading-[20px]"
+                style={{ letterSpacing: '0.48px' }}
+              >
+                LECCIÓN ANTERIOR
+              </span>
+            </Link>
+          ) : (
+            <div />
+          )}
+
+          {/* Next arrow — right side, below separator */}
+          <div>
+            {nextLesson ? (
+              <Link href={`/dashboard/courses/${courseId}/${nextLesson.id}`}>
+                <div className="w-[29.6px] h-[9.2px] relative">
+                  <Image src={A.nextRow} alt="Siguiente lección" fill className="object-contain" />
+                </div>
+              </Link>
+            ) : (
+              <span className="text-[#D3CBBA] text-[8px] font-extralight uppercase tracking-widest opacity-40">
+                Fin del módulo
+              </span>
+            )}
+          </div>
+        </div>
+
+        {/* full-width 2px separator at very bottom of nav */}
+        <div
+          className="w-full mt-8 h-[2px]"
+          style={{ background: '#D3CBBA', opacity: 0.15, boxShadow: '0px 4px 4px rgba(0,0,0,0.25)' }}
+        />
       </footer>
 
-      {/* Bottom Contact Info */}
-      <div className="relative z-10 w-full max-w-md mx-auto mt-8 flex justify-center items-center gap-6 opacity-60 pb-12">
-         <span className="text-[9px] font-medium text-[#D3CBBA]">@xclusivebarberau</span>
-         <div className="w-[30px] h-[38px] relative opacity-70">
-            <Image src={assets.logo} alt="" fill className="object-contain" />
-         </div>
-         <span className="text-[9px] font-medium text-[#D3CBBA]">+61 413 891 977</span>
-      </div>
+      {/* ── CONTACT FOOTER ────────────────────────────────────────────────── */}
+      <DashboardFooter />
 
     </div>
   )

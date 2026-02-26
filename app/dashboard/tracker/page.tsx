@@ -214,6 +214,7 @@ export default function TrackerPage() {
                   submission={sub}
                   index={index}
                   total={submissions.length}
+                  onDelete={(id) => setSubmissions(prev => prev.filter(s => s.id !== id))}
                 />
               ))
             )}

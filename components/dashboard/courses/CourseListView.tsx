@@ -4,6 +4,7 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { cn } from '@/lib/utils'
+import { DashboardFooter } from '@/components/dashboard/DashboardFooter'
 
 interface Module {
   id: string
@@ -168,7 +169,7 @@ export default function CourseListView({ modules, firstLessonMap }: CourseListPr
 
        {/* --- BOTTOM CTA --- */}
       <div className="relative pb-20 flex flex-col items-center w-full max-w-md mx-auto z-10 px-4">
-         <Link href="/dashboard" className="relative group cursor-pointer w-full max-w-[300px]">
+         <Link href="/dashboard/tracker" className="relative group cursor-pointer w-full max-w-[300px]">
              <div className="absolute inset-0 bg-[#1e3a27]/50 blur-sm group-hover:bg-[#1e3a27]/70 transition-colors rounded-sm" />
              <div className="relative bg-[rgba(30,58,39,0.51)] w-full h-[40px] flex items-center justify-center border border-white/5 shadow-lg backdrop-blur-sm group-hover:scale-[1.02] transition-transform">
                 <span className="font-sans font-extrabold text-[13px] text-[#d3cbba] tracking-[0.78px]">
@@ -177,18 +178,7 @@ export default function CourseListView({ modules, firstLessonMap }: CourseListPr
              </div>
          </Link>
 
-         {/* Bottom Separator */}
-         <div className="relative w-full max-w-[326px] h-[1px] mt-8 mb-8 opacity-60">
-             <Image src="/assets/dashboard/courses/separator.png" fill className="object-cover" alt="sep" />
-         </div>
-         
-         {/* Social Handle */}
-         <div className="flex flex-col items-center opacity-70 hover:opacity-100 transition-opacity cursor-pointer">
-             <div className="w-[31px] h-[38px] relative mb-2">
-                 <Image src="/assets/dashboard/courses/logo-small.png" fill className="object-contain" alt="logo" />
-             </div>
-             <span className="font-sans font-medium text-[9px] text-[#d3cbba]">@xclusivebarberau</span>
-         </div>
+         <DashboardFooter />
       </div>
     </div>
   )
