@@ -57,12 +57,11 @@ export function SubmissionCard({ submission, index, total, onDelete }: Submissio
 
   // ── Render ─────────────────────────────────────────────────────────────────
   return (
-    <div className={cn('w-screen relative left-1/2 -translate-x-1/2 mb-2 transition-opacity duration-300', isPending && 'opacity-40 pointer-events-none')}>
+    <div className={cn('w-screen md:w-full relative left-1/2 md:left-auto -translate-x-1/2 md:translate-x-0 mb-2 md:mb-3 transition-opacity duration-300 md:rounded-lg md:overflow-hidden', isPending && 'opacity-40 pointer-events-none')}>
 
       {/* ── TARJETA PRINCIPAL (119px total: 97px contenido + 22px badge) ──── */}
       <div
-        className="relative w-full bg-[#161616] overflow-hidden shadow-xl"
-        style={{ height: '123px' }}
+        className="relative w-full bg-[#161616] overflow-hidden shadow-xl h-[123px] md:h-[155px] lg:h-[170px]"
       >
 
         {/* ── BOTÓN ELIMINAR (×) ────────────────────────────────────────────
@@ -86,11 +85,8 @@ export function SubmissionCard({ submission, index, total, onDelete }: Submissio
             Ocupa los 97px de alto del contenido.
             ClipPath: corte diagonal en la esquina inferior-derecha.       */}
         <div
-          className="absolute top-0 left-0 right-0 bg-[#8C8C84]"
-          style={{
-            height: '97px',
-            clipPath: 'polygon(0 0, 100% 0, 88% 100%, 0% 100%)',
-          }}
+          className="absolute top-0 left-0 right-0 bg-[#8C8C84] h-[97px] md:h-[125px] lg:h-[138px]"
+          style={{ clipPath: 'polygon(0 0, 100% 0, 88% 100%, 0% 100%)' }}
         />
 
 
@@ -98,8 +94,7 @@ export function SubmissionCard({ submission, index, total, onDelete }: Submissio
         {/* ── IMAGEN DEL USUARIO ────────────────────────────────────────────
             Figma: left 17px, top 0, width 81px, height 97px (fijo)         */}
         <div
-          className="absolute top-0 z-10"
-          style={{ left: '17px', width: '81px', height: '97px' }}
+          className="absolute top-0 z-10 left-[17px] md:left-[24px] w-[81px] md:w-[110px] lg:w-[130px] h-[97px] md:h-[125px] lg:h-[138px]"
         >
           {submission.image_url ? (
             <Image
@@ -107,7 +102,7 @@ export function SubmissionCard({ submission, index, total, onDelete }: Submissio
               alt={`Práctica ${practiceNumber} – ${submission.cut_type}`}
               fill
               className="object-cover"
-              sizes="81px"
+              sizes="(min-width: 1024px) 130px, (min-width: 768px) 110px, 81px"
             />
           ) : (
             <div className="w-full h-full bg-[#2A2A2A] flex items-center justify-center">
@@ -122,21 +117,18 @@ export function SubmissionCard({ submission, index, total, onDelete }: Submissio
             Posicionado desde después de la imagen (17 + 81 = 98px → +10px gap = 108px)
             Figma: "PRÁCTICA N" top 12px | título top 24px | notas top 50px  */}
         <div
-          className="absolute top-0 right-0 z-20 flex flex-col justify-start"
-          style={{ left: '108px', height: '97px', paddingTop: '12px', paddingRight: '20px' }}
+          className="absolute top-0 right-0 z-20 flex flex-col justify-start left-[108px] md:left-[150px] lg:left-[175px] h-[97px] md:h-[125px] lg:h-[138px] pt-[12px] md:pt-4 lg:pt-5 pr-[20px] md:pr-6"
         >
           {/* Número de práctica — ExtraLight 10px tracking 0.9px */}
           <span
-            className="font-extralight text-[10px] uppercase leading-normal"
-            style={{ letterSpacing: '0.9px', color: '#1E3A27' }}
+            className="font-extralight text-[10px] md:text-xs uppercase leading-normal tracking-[0.9px] text-[#1E3A27]"
           >
             PRÁCTICA {practiceNumber}
           </span>
 
           {/* Título principal — ExtraBold 17px */}
           <h3
-            className="font-extrabold text-[17px] uppercase leading-tight mt-0.5"
-            style={{ color: '#1E3A27' }}
+            className="font-extrabold text-[17px] md:text-xl lg:text-2xl uppercase leading-tight mt-0.5 text-[#1E3A27]"
           >
             TÉCNICA IMPLEMENTADA
           </h3>
@@ -144,8 +136,7 @@ export function SubmissionCard({ submission, index, total, onDelete }: Submissio
           {/* Subtítulo — tipo de corte (bold pequeño para no perder el dato) */}
           {submission.cut_type && (
             <p
-              className="font-semibold text-[9px] uppercase tracking-wide leading-none mt-0.5"
-              style={{ color: '#1E3A27' }}
+              className="font-semibold text-[9px] md:text-xs uppercase tracking-wide leading-none mt-0.5 text-[#1E3A27]"
             >
               {submission.cut_type}
             </p>
@@ -160,21 +151,16 @@ export function SubmissionCard({ submission, index, total, onDelete }: Submissio
           onClick={handleBadgeClick}
           disabled={!isReviewed}
           className={cn(
-            'absolute flex items-center justify-center transition-all',
+            'absolute flex items-center justify-center transition-all left-0 top-[101px] md:top-[128px] lg:top-[142px] w-[125px] md:w-[160px] lg:w-[180px] h-[22px] md:h-[27px]',
             isReviewed ? 'cursor-pointer hover:brightness-110' : 'cursor-default opacity-50 blur-[0.6px]'
           )}
           style={{
-            left: 0,
-            top: '101px',
-            width: '125px',
-            height: '22px',
             backgroundColor: 'rgba(211,203,186,0.79)',
             boxShadow: '0px 4px 4px 0px rgba(0,0,0,0.25)',
           }}
         >
           <span
-            className="font-extrabold text-[8px] uppercase text-center"
-            style={{ letterSpacing: '0.06em', color: '#1E3A27' }}
+            className="font-extrabold text-[8px] md:text-[10px] uppercase text-center tracking-[0.06em] text-[#1E3A27]"
           >
             {isReviewed ? 'RETROALIMENTACIÓN' : 'EN PROCESO DE REVISIÓN'}
           </span>

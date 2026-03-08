@@ -138,7 +138,7 @@ export default function MissionVisionSection() {
           DESKTOP LAYOUT  (≥ md)
           Fluid scale-up preserving all Figma proportions
       ══════════════════════════════════════════════════════════════════════ */}
-      <div className="hidden md:block py-20 md:py-28 lg:py-36 px-4">
+      <div className="hidden md:block py-8 md:py-12 lg:py-20 px-4">
         <div
           className="
             relative mx-auto w-full max-w-[875px]
@@ -147,10 +147,10 @@ export default function MissionVisionSection() {
         >
 
           {/* ── MISIÓN ─────────────────────────────────────────────────────── */}
-          <div className="flex flex-col items-center text-center px-10 md:px-16 lg:px-20 pt-12 md:pt-16 lg:pt-20 pb-14 md:pb-16">
+          <div className="flex flex-col items-center text-center px-8 md:px-12 lg:px-20 pt-6 md:pt-10 lg:pt-14 pb-6 md:pb-10 lg:pb-12">
 
             {/* recurso-texto1 — MISIÓN heading */}
-            <div className="relative w-[clamp(118px,19vw,270px)] h-[clamp(27px,4.4vw,63px)] mb-8 md:mb-10">
+            <div className="relative w-[clamp(118px,19vw,270px)] h-[clamp(27px,4.4vw,63px)] mb-4 md:mb-6">
               <Image
                 src="/assets/landing/MisionSection/recurso-texto1.png"
                 alt="Misión"
@@ -163,8 +163,8 @@ export default function MissionVisionSection() {
             <p
               className="
                 font-sans font-light text-[#d3cbba]
-                text-base md:text-lg lg:text-xl
-                leading-[1.3] text-center max-w-xl
+                text-[clamp(14px,1.4vw,20px)]
+                leading-[1.3] text-center max-w-[593px]
               "
             >
               Formar barberos con nivel profesional, disciplina y mentalidad de crecimiento,
@@ -187,10 +187,10 @@ export default function MissionVisionSection() {
           </div>
 
           {/* ── VISIÓN ─────────────────────────────────────────────────────── */}
-          <div className="flex flex-col items-center text-center px-10 md:px-16 lg:px-20 pt-14 md:pt-16 pb-12 md:pb-16 lg:pb-20">
+          <div className="flex flex-col items-center text-center px-8 md:px-12 lg:px-20 pt-6 md:pt-10 lg:pt-12 pb-6 md:pb-10 lg:pb-14">
 
             {/* recurso-texto2 — VISIÓN heading */}
-            <div className="relative w-[clamp(116px,18.6vw,268px)] h-[clamp(27px,4.3vw,62px)] mb-8 md:mb-10">
+            <div className="relative w-[clamp(116px,18.6vw,268px)] h-[clamp(27px,4.3vw,62px)] mb-4 md:mb-6">
               <Image
                 src="/assets/landing/MisionSection/recurso-texto2.png"
                 alt="Visión"
@@ -203,8 +203,8 @@ export default function MissionVisionSection() {
             <p
               className="
                 font-sans font-light text-[#d3cbba]
-                text-base md:text-lg lg:text-xl
-                leading-[1.3] text-center max-w-xl
+                text-[clamp(14px,1.4vw,20px)]
+                leading-[1.3] text-center max-w-[593px]
               "
             >
               Construir una de las academias de barbería más sólidas para la comunidad latina en

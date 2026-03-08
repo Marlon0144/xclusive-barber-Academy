@@ -25,22 +25,22 @@ export default function DashboardGreenHeader({
   showDashboardLink,
 }: DashboardGreenHeaderProps) {
   return (
-    <header className="relative z-50 w-full h-[53px] mt-4">
+    <header className="relative z-50 w-full h-[53px] md:h-[64px] lg:h-[72px] mt-4 md:mt-5">
       {/* Fondo verde: cubre todo el header */}
       <div className="absolute inset-0 bg-[#1c3122] backdrop-blur-[2px] shadow-md" />
 
       {/* Contenedor principal: items-center centra contenido; el logo (67px) sobresale 7px arriba y abajo */}
-      <div className="relative mx-auto flex h-full w-full max-w-[1500px] items-center justify-between px-6">
+      <div className="relative mx-auto flex h-full w-full max-w-[1500px] items-center justify-between px-6 md:px-10 lg:px-16">
 
         {/* ---- LOGO: 67px en barra de 53px → sobresale 7px arriba y 7px abajo ---- */}
-        <Link href="/dashboard" className="relative flex-shrink-0" style={{ width: 55, height: 67 }}>
+        <Link href="/dashboard" className="relative flex-shrink-0" style={{ width: 'clamp(55px, 5.56vw, 80px)', height: 'clamp(67px, 6.74vw, 97px)' }}>
           <Image
             src="/assets/header_dash/logo-academia.png"
             alt="Xclusive Barber Academy"
             fill
             priority
             className="object-contain object-top"
-            sizes="55px"
+            sizes="(min-width: 768px) 133px, 55px"
           />
         </Link>
 

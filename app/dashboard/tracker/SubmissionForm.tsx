@@ -88,7 +88,7 @@ function SubmitButton() {
   const { pending } = useFormStatus()
 
   return (
-    <div className="relative w-[360px] mx-auto mt-2 h-[41px]">
+    <div className="relative w-[360px] md:w-full mx-auto mt-2 md:mt-4 h-[41px] md:h-[50px]">
       {/* Imagen del botón como fondo (gradiente dorado) */}
       <Image
         src="/assets/dashboard/tracker/SubmissionForm/bg-button.png"
@@ -99,7 +99,7 @@ function SubmitButton() {
       <button
         type="submit"
         disabled={pending}
-        className="relative z-10 w-full h-full font-montserrat font-bold text-[#161616] text-[clamp(11px,3.5vw,15px)] text-center tracking-[0.9px] disabled:opacity-70 flex items-center justify-center gap-2"
+        className="relative z-10 w-full h-full font-montserrat font-bold text-[#161616] text-[clamp(11px,3.5vw,15px)] md:text-base text-center tracking-[0.9px] disabled:opacity-70 flex items-center justify-center gap-2"
       >
         {pending ? (
           <>
@@ -182,7 +182,7 @@ export function SubmissionForm({ onSubmitSuccess }: SubmissionFormProps) {
             CARD — fondo beige (#d3cbba @ 60%) sobre oscuro
             Dimensiones Figma: 333px ancho × 466px alto en un frame de ~359px
         ═══════════════════════════════════════════════════════════════════ */}
-        <div className="relative w-[360px] mx-auto">
+        <div className="relative w-[360px] md:w-full mx-auto">
 
           {/* Capa beige — posicionada absolute para no alterar el flujo */}
           <div className="absolute inset-0 bg-[#d3cbba] opacity-60 pointer-events-none" />
@@ -192,13 +192,13 @@ export function SubmissionForm({ onSubmitSuccess }: SubmissionFormProps) {
 
             {/* ── TÍTULO ── */}
             {/* Figma: Poppins ExtraBold 24px, color #1e3a27 */}
-            <h2 className="font-montserrat font-extrabold !text-[#1e3a27] text-[22px] text-center leading-normal tracking-tight px-5">
+            <h2 className="font-montserrat font-extrabold !text-[#1e3a27] text-[22px] md:text-[28px] lg:text-[32px] text-center leading-normal tracking-tight px-5">
               ENTREGA DE EVIDENCIA
             </h2>
 
             {/* ── SUBTÍTULO ── */}
             {/* Figma: Poppins ExtraLight 9px, color #d3cbba, tracking 0.81px */}
-            <p className="mt-[10px] font-montserrat font-extralight text-[#d3cbba] text-[9px] text-center tracking-[0.81px]">
+            <p className="mt-[10px] md:mt-3 font-montserrat font-extralight text-[#d3cbba] text-[9px] md:text-xs text-center tracking-[0.81px]">
               REGISTRO VISUAL
             </p>
 
@@ -226,7 +226,7 @@ export function SubmissionForm({ onSubmitSuccess }: SubmissionFormProps) {
                     </div>
 
                     {/* Label "NUEVO CORTE" — Figma: Poppins Bold 14px, #161616 */}
-                    <p className="font-montserrat font-extrabold text-[#161616] text-[clamp(10px,3.2vw,14px)] text-center leading-none">
+                    <p className="font-montserrat font-extrabold text-[#161616] text-[clamp(10px,3.2vw,14px)] md:text-[16px] text-center leading-none">
                       NUEVO CORTE
                     </p>
 
@@ -248,7 +248,7 @@ export function SubmissionForm({ onSubmitSuccess }: SubmissionFormProps) {
                         className="h-full flex items-center px-3"
                         style={{ border: '0.2px solid #161616' }}
                       >
-                        <span className="font-montserrat text-[#161616] text-[8px] whitespace-nowrap">
+                        <span className="font-montserrat text-[#161616] text-[8px] md:text-[11px] whitespace-nowrap">
                           Subir archivo
                         </span>
                       </div>
@@ -316,7 +316,7 @@ export function SubmissionForm({ onSubmitSuccess }: SubmissionFormProps) {
                     boxShadow: '0px 4px 4px rgba(0,0,0,0.25)',
                   }}
                 >
-                  <p className="font-montserrat font-medium text-[#d3cbba] text-[11px] text-center leading-[1.3] tracking-tight">
+                  <p className="font-montserrat font-medium text-[#d3cbba] text-[11px] md:text-sm text-center leading-[1.3] tracking-tight">
                     TÉCNICA IMPLEMENTADA
                   </p>
                 </div>
@@ -328,7 +328,7 @@ export function SubmissionForm({ onSubmitSuccess }: SubmissionFormProps) {
                   style={{ backgroundColor: 'rgba(28,49,35,0.45)' }}
                 >
                   {/* Texto dinámico */}
-                  <span className="font-montserrat font-light text-[#d3cbba] text-[8px] pointer-events-none">
+                  <span className="font-montserrat font-light text-[#d3cbba] text-[8px] md:text-xs pointer-events-none">
                     {selectedCut
                       ? CUT_TYPES.find(c => c.value === selectedCut)?.label ?? 'Selecciona Tipo de Corte'
                       : 'Selecciona Tipo de Corte'}
@@ -369,7 +369,7 @@ export function SubmissionForm({ onSubmitSuccess }: SubmissionFormProps) {
                     boxShadow: '0px 4px 4px rgba(0,0,0,0.25)',
                   }}
                 >
-                  <p className="font-montserrat font-medium text-[#d3cbba] text-[11px] text-center leading-[1.3]">
+                  <p className="font-montserrat font-medium text-[#d3cbba] text-[11px] md:text-sm text-center leading-[1.3]">
                     NOTAS TÉCNICAS
                   </p>
                 </div>
@@ -381,7 +381,7 @@ export function SubmissionForm({ onSubmitSuccess }: SubmissionFormProps) {
                     name="description"
                     required
                     placeholder="Describe brevemente el proceso realizado, herramientas utilizadas y consideraciones profesionales aplicadas..."
-                    className="w-full min-h-[64px] bg-transparent text-[#1e3a27] text-[8px] font-montserrat font-normal p-2 focus:outline-none resize-none leading-relaxed placeholder:text-[#1e3a27]/50 text-justify tracking-[-0.4px]"
+                    className="w-full min-h-[64px] md:min-h-[90px] bg-transparent text-[#1e3a27] text-[8px] md:text-xs font-montserrat font-normal p-2 md:p-3 focus:outline-none resize-none leading-relaxed placeholder:text-[#1e3a27]/50 text-justify tracking-[-0.4px]"
                   />
                 </div>
               </div>

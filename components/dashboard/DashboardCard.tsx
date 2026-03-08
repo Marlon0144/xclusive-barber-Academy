@@ -23,6 +23,7 @@ export function DashboardCard({
     disabled = false,
     isInstructor = false,
     isAdmin = false,
+    tall = false,
     dimmed = false,
     className,
 }: DashboardCardProps) {
@@ -30,11 +31,18 @@ export function DashboardCard({
     const inner = (
         <div
             className={cn(
-                // Layout — Figma node 2065:14
-                'relative flex flex-col items-center justify-center w-full px-4',
+                // Layout — mobile-first, Tailwind breakpoints for tablet/desktop
+                'relative flex flex-col items-center justify-center w-full px-3 py-1.5',
+                'md:px-6 md:py-4 lg:py-5',
+                // Height — mobile preserves Figma pixel values; h-full lets grid stretch equalize rows
+                'h-full',
+                tall
+                    ? 'min-h-[88px] md:min-h-[100px] lg:min-h-[110px]'
+                    : 'min-h-[80px] md:min-h-[90px] lg:min-h-[100px]',
                 // Appearance
                 dimmed ? 'bg-[#d3cbba] opacity-45' : 'bg-[#d3cbba] opacity-60',
                 'shadow-[0px_4px_4px_rgba(0,0,0,0.25)]',
+                'rounded-sm',
                 // Interaction
                 disabled
                     ? 'cursor-not-allowed'
@@ -44,18 +52,26 @@ export function DashboardCard({
         >
             {/* Role badge */}
             {(isAdmin || isInstructor) && (
-                <span className="absolute top-2 right-2 px-2 py-0.5 bg-[#1E3A27] text-[#d3cbba] text-[8px] font-bold uppercase tracking-widest rounded">
+                <span className="absolute top-2 right-2 px-2 py-0.5 bg-[#1E3A27] text-[#d3cbba] text-[8px] md:text-[9px] font-bold uppercase tracking-widest rounded">
                     {isAdmin ? 'Admin' : 'Instructor'}
                 </span>
             )}
 
-            {/* Title — Poppins ExtraBold 17px */}
-            <h3 style= {{color: '#1E3A27'}} className="font-sans font-extrabold text-[17px] text-[#1E3A27] text-center uppercase leading-tight pt-1" >
+            {/* Title — 17px mobile → 24px desktop (controlled via breakpoints, not vw) */}
+            <h3
+                style={{ color: '#1E3A27' }}
+                className="font-sans font-extrabold text-center uppercase leading-tight pt-1
+                           text-[17px] md:text-xl lg:text-[22px] xl:text-2xl"
+            >
                 {title}
             </h3>
 
-            {/* Description — Poppins Light 7px */}
-            <p className="font-sans font-light text-[10px] text-[#1E3A27] text-center leading-[1.3] mt-1 max-w-[260px] pb-1">
+            {/* Description — 10px mobile → 14px desktop */}
+            <p
+                className="font-sans font-light text-[#1E3A27] text-center leading-[1.3] mt-1 pb-1
+                           text-[10px] md:text-xs lg:text-[13px] xl:text-sm
+                           max-w-[260px] md:max-w-full"
+            >
                 {description}
             </p>
         </div>
@@ -63,7 +79,7 @@ export function DashboardCard({
 
     if (href && !disabled) {
         return (
-            <Link href={href} className="block w-full">
+            <Link href={href} className="block w-full h-full">
                 {inner}
             </Link>
         );

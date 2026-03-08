@@ -151,14 +151,14 @@ export default function HeroSection() {
           DESKTOP LAYOUT  (≥ md)
           1440px Figma canvas
       ══════════════════════════════════════════════════════════════════════ */}
-      <div className="hidden md:block relative min-h-[900px] lg:min-h-[1100px]">
+      <div className="hidden md:block relative min-h-[420px] lg:min-h-[560px] xl:min-h-[780px] 2xl:min-h-[1000px]">
 
         {/* ── 1. Background image ──────────────────────────────────────────── */}
         {/*
          * Figma: y=246 from page top (header ≈158px) → ~88px into section.
          * Intrinsic region: 860px tall. Dual vignette fades into #161616.
          */}
-        <div className="absolute inset-x-0 top-[88px] h-[700px] lg:h-[860px] z-0 pointer-events-none">
+        <div className="absolute inset-x-0 top-[40px] lg:top-[60px] h-[340px] lg:h-[460px] xl:h-[680px] z-0 pointer-events-none">
           <Image
             src="/assets/landing/HeroSection/hero-bg.png"
             alt=""
@@ -171,18 +171,18 @@ export default function HeroSection() {
         </div>
 
         {/* Hard bottom fade so the section blends seamlessly below */}
-        <div className="absolute inset-x-0 bottom-0 h-[400px] lg:h-[500px] bg-gradient-to-t from-[#161616] to-transparent z-10 pointer-events-none" />
+        <div className="absolute inset-x-0 bottom-0 h-[120px] lg:h-[200px] xl:h-[350px] bg-gradient-to-t from-[#161616] to-transparent z-10 pointer-events-none" />
 
         {/* ── 2. Text block ────────────────────────────────────────────────── */}
         <div className="relative z-20 w-full max-w-[1440px] mx-auto px-4 md:px-12 lg:px-16">
-          <div className="pt-24 md:pt-28 lg:pt-36">
+          <div className="pt-6 md:pt-8 lg:pt-15">
 
             {/* Subtitle — Poppins ExtraLight 24px · tracking 2.16px · center */}
             <p
               className="
                 font-sans font-extralight uppercase text-center text-[#d3cbba]
                 text-sm md:text-base lg:text-lg xl:text-2xl
-                tracking-[0.09em] mb-4 md:mb-6
+                tracking-[0.09em] mb-2 md:mb-3
               "
             >
               Educación profesional en barbería para latinos
@@ -229,7 +229,7 @@ export default function HeroSection() {
             </div>
 
             {/* Paragraph — Poppins Regular 32px · text-right · right ~57% */}
-            <div className="mt-24 md:mt-40 lg:mt-52 flex justify-end">
+            <div className="mt-16 lg:mt-28 xl:mt-44 flex justify-end">
               <p
                 className="
                   font-sans font-normal text-[#d3cbba] text-right leading-[1.3]
@@ -243,7 +243,7 @@ export default function HeroSection() {
             </div>
 
             {/* Spacer so arm image doesn't overlap paragraph */}
-            <div className="h-24 md:h-48 lg:h-64" />
+            <div className="h-2 lg:h-4 xl:h-8" />
 
           </div>
         </div>
@@ -257,9 +257,9 @@ export default function HeroSection() {
         <div
           className="
             absolute z-0 pointer-events-none
-            bottom-0 left-[-30px] lg:left-[-62px]
-            w-[380px] lg:w-[500px] xl:w-[617px]
-            h-[570px] lg:h-[760px] xl:h-[924px]
+            bottom-0 left-[-10px] lg:left-[-24px] xl:left-[-50px]
+            w-[180px] lg:w-[300px] xl:w-[420px] 2xl:w-[540px]
+            h-[270px] lg:h-[440px] xl:h-[600px] 2xl:h-[780px]
           "
         >
           <Image

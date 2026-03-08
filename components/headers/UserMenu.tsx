@@ -44,10 +44,12 @@ export default function UserMenu({ userName, userEmail }: UserMenuProps) {
         aria-haspopup="true"
       >
         <div className="flex flex-col items-end justify-center">
-          <span className="font-sans text-[10px] md:text-xs font-bold tracking-wider text-[#d3cbba] uppercase whitespace-nowrap group-hover:text-white transition-colors">
+          <span
+            className="font-sans font-bold tracking-wider text-[#d3cbba] uppercase whitespace-nowrap group-hover:text-white transition-colors text-[10px] md:text-[13px] lg:text-[15px]"
+          >
             Bienvenido, {userName || "Estudiante"}
           </span>
-          <div className="mt-1 w-[130px] md:w-[175px]">
+          <div className="mt-1 w-[130px] md:w-[160px] lg:w-[200px] xl:w-[240px]">
             <Image
               src="/assets/header_dash/divider-dorado.png"
               alt=""
@@ -58,7 +60,7 @@ export default function UserMenu({ userName, userEmail }: UserMenuProps) {
           </div>
         </div>
 
-        <div className="relative h-[34px] w-[31px] md:h-[40px] md:w-[36px] flex-shrink-0">
+        <div className="relative h-[34px] w-[31px] md:h-[38px] md:w-[34px] lg:h-[44px] lg:w-[40px] flex-shrink-0">
           <Image
             src="/assets/header_dash/avatar-perfil.png"
             alt="Perfil"
