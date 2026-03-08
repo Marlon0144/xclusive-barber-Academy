@@ -34,9 +34,12 @@ const features = [
   {
     recurso: "/assets/landing/FeatureSection/recurso-texto1.png",
     alt: "Mentalidad Profesional",
-    /* Figma: w=240 h=11 on 506px canvas */
+    /* Figma mobile: w=240 h=11 on 506px canvas */
     figmaW: 240,
     figmaH: 11,
+    /* Figma desktop (1440px): Recurso 10 w=822 h=37.7 */
+    desktopW: 822,
+    desktopH: 37.7,
     desc: "Disciplina, puntualidad, trato al cliente y presentación personal como parte del proceso.",
     top: { title: 142, desc: 161 },
     descW: 240,
@@ -44,9 +47,12 @@ const features = [
   {
     recurso: "/assets/landing/FeatureSection/recurso-texto2.png",
     alt: "Formación Práctica Real",
-    /* Figma: w=247 h=13 on 506px canvas */
+    /* Figma mobile: w=247 h=13 on 506px canvas */
     figmaW: 247,
     figmaH: 13,
+    /* Figma desktop (1440px): Recurso 9 w=836 h=45.6 */
+    desktopW: 836,
+    desktopH: 45.6,
     desc: "Aprendes haciendo, con corrección constante y estándares reales del mercado australiano.",
     top: { title: 225, desc: 249 },
     descW: 247,
@@ -54,9 +60,12 @@ const features = [
   {
     recurso: "/assets/landing/FeatureSection/recurso-texto3.png",
     alt: "Enfoque en Carrera y Negocio",
-    /* Figma: w=288 h=12 on 506px canvas */
+    /* Figma mobile: w=288 h=12 on 506px canvas */
     figmaW: 288,
     figmaH: 12,
+    /* Figma desktop (1440px): Recurso 11 w=972 h=42.2 */
+    desktopW: 972,
+    desktopH: 42.2,
     desc: "No solo técnica: preparación para el mundo laboral y bases de mentalidad emprendedora.",
     top: { title: 313, desc: 333 },
     descW: 288,
@@ -203,14 +212,14 @@ export default function FeaturesSection() {
         </div>
 
         {/* ── 2. Content ───────────────────────────────────────────────────── */}
-        <div className="relative z-10 flex flex-col items-center text-center px-4 pt-16 md:pt-24 lg:pt-32 pb-20 md:pb-28 lg:pb-36">
+        <div className="relative z-10 flex flex-col items-center text-center px-4 pt-8 md:pt-14 lg:pt-24 pb-10 md:pb-16 lg:pb-24">
 
           {/* Heading */}
-          <div className="leading-none mb-16 md:mb-20 lg:mb-28 tracking-[0.033em]">
+          <div className="leading-none mb-8 md:mb-10 lg:mb-16 tracking-[0.033em]">
             <h2
               className="
                 font-sans font-bold uppercase text-[#d3cbba]
-                text-[clamp(56px,7.6vw,110px)] leading-none
+                text-[clamp(44px,7.5vw,130px)] leading-none
               "
             >
               FORMAMOS
@@ -218,42 +227,45 @@ export default function FeaturesSection() {
             <h2
               className="
                 font-sans font-bold uppercase text-[#d3cbba]
-                text-[clamp(40px,5.5vw,80px)] leading-none
+                text-[clamp(32px,5.5vw,96px)] leading-none
               "
             >
               PROFESIONALES
             </h2>
           </div>
 
-          {/* Features — recurso-texto images scale proportionally */}
-          <div className="w-full max-w-4xl flex flex-col gap-16 md:gap-20 lg:gap-24">
+          {/* Features — recurso-texto images scale proportionally to Figma desktop */}
+          <div className="w-full max-w-[1100px] flex flex-col gap-8 md:gap-10 lg:gap-16">
             {features.map((item, i) => {
-              /* Scale Figma widths (506px canvas) to desktop proportions.
-               * Desktop display width ≈ figmaW / 506 * min(viewport, 1440)
-               * We clamp between mobile equivalent and a comfortable max. */
-              const scaledW = Math.round((item.figmaW / 506) * 900);
-              const scaledH = Math.round((item.figmaH / item.figmaW) * scaledW);
+              /*
+               * Desktop: use Figma 1440px dimensions as max, scaled via vw.
+               * desktopW / 1440 * 100vw — clamped to avoid overflow.
+               */
+              const vwPct = ((item.desktopW / 1440) * 100).toFixed(2);
               return (
                 <div key={i} className="flex flex-col items-center">
                   {/* recurso-texto title image */}
                   <div
-                    className="relative mb-4 md:mb-5"
-                    style={{ width: scaledW, height: Math.max(scaledH, 22) }}
+                    className="relative mb-4 md:mb-5 w-full"
+                    style={{
+                      maxWidth: `${item.desktopW}px`,
+                      aspectRatio: `${item.desktopW} / ${item.desktopH}`,
+                    }}
                   >
                     <Image
                       src={item.recurso}
                       alt={item.alt}
                       fill
                       className="object-contain object-center"
-                      sizes={`${scaledW}px`}
+                      sizes={`(max-width: 1440px) ${vwPct}vw, ${item.desktopW}px`}
                     />
                   </div>
                   {/* Description */}
                   <p
                     className="
                       font-sans font-normal text-[#d3cbba]
-                      text-[clamp(14px,1.4vw,20px)] leading-[1.3]
-                      max-w-2xl
+                      text-[clamp(14px,1.67vw,24px)] leading-[1.3]
+                      max-w-3xl text-center
                     "
                   >
                     {item.desc}

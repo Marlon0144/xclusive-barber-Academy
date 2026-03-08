@@ -23,20 +23,21 @@ export function AdminToolsMenu({ isInstructor, isAdmin }: AdminToolsMenuProps) {
                 aria-expanded={open}
                 className="
                     w-full flex items-center justify-between
-                    px-4 h-[44px]
+                    px-4 md:px-6 h-[44px] md:h-[48px] lg:h-[52px]
                     bg-[#1e3a27]/30 hover:bg-[#1e3a27]/50
                     border border-[#1e3a27]/50
+                    rounded-sm
                     transition-colors duration-200
                     cursor-pointer
                 "
             >
-                <span className="font-sans font-extrabold text-[11px] uppercase tracking-[0.18em] text-[#d3cbba]">
+                <span className="font-sans font-extrabold text-[11px] md:text-xs lg:text-sm uppercase tracking-[0.18em] text-[#d3cbba]">
                     Panel de Gestión
                 </span>
                 <ChevronDown
                     size={14}
                     strokeWidth={2.5}
-                    className={`text-[#d3cbba] transition-transform duration-300 ${open ? "rotate-180" : "rotate-0"}`}
+                    className={`text-[#d3cbba] transition-transform duration-300 md:size-4 lg:size-5 ${open ? "rotate-180" : "rotate-0"}`}
                 />
             </button>
 
@@ -44,10 +45,10 @@ export function AdminToolsMenu({ isInstructor, isAdmin }: AdminToolsMenuProps) {
             <div
                 className={`
                     overflow-hidden transition-all duration-300 ease-in-out
-                    ${open ? "max-h-[300px] opacity-100 mt-3" : "max-h-0 opacity-0"}
+                    ${open ? "max-h-[500px] opacity-100 mt-3" : "max-h-0 opacity-0"}
                 `}
             >
-                <div className="flex flex-col gap-3">
+                <div className="flex flex-col md:flex-row gap-3 md:gap-5">
                     {isInstructor && (
                         <DashboardCard
                             title="Evaluar Estudiantes"

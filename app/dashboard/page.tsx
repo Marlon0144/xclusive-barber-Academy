@@ -28,42 +28,54 @@ export default async function DashboardPage() {
       {/* HERO Section — Figma node 136:377 */}
       <DashboardHeader />
 
-      {/* NAVIGATION CARDS — pulled up 45px to overlap the hero, matching Figma */}
-      <div className="relative z-10 flex flex-col items-center gap-[19px] w-full px-6 pb-6 -mt-[45px] max-w-[400px] mx-auto">
+      {/* NAVIGATION CARDS — responsive grid: 1 col mobile, 2 cols tablet+ */}
+      <div
+        className="relative z-10 w-full px-6 pb-6 mx-auto
+                   max-w-[400px] md:max-w-[720px] lg:max-w-[900px] xl:max-w-[960px]
+                   -mt-[90px] md:-mt-[45px] lg:-mt-[55px]"
+      >
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-[19px] md:gap-5 lg:gap-6">
 
-          {/* 1. PROGRAMA DE FORMACIÓN — tall variant h-[88px] per Figma */}
-          <DashboardCard
-            title="Programa de Formación"
-            description="Accede al contenido académico, módulos prácticos y estructura oficial del programa alineado a los estándares del mercado australiano."
-            href="/dashboard/courses"
-            tall
-          />
+          {/* 1. PROGRAMA DE FORMACIÓN — full width, tall variant */}
+          <div className="md:col-span-2">
+            <DashboardCard
+              title="Programa de Formación"
+              description="Accede al contenido académico, módulos prácticos y estructura oficial del programa alineado a los estándares del mercado australiano."
+              href="/dashboard/courses"
+              tall
+            />
+          </div>
 
-          {/* 2. SEGUIMIENTO Y EVALUACIÓN */}
+          {/* 2. SEGUIMIENTO Y EVALUACIÓN — half width on tablet+ */}
           <DashboardCard
             title="Seguimiento y Evaluación"
             description="Revisa observaciones, evaluaciones y retroalimentación profesional sobre tu desempeño y evolución dentro del programa."
             href="/dashboard/tracker"
           />
 
-          {/* 3. PROGRESO PROFESIONAL */}
+          {/* 3. PROGRESO PROFESIONAL — half width on tablet+ */}
           <DashboardCard
             title="Progreso Profesional"
             description="Consulta tu avance, cumplimiento de etapas y desarrollo dentro del proceso formativo."
             href="/dashboard/progreso_profesional"
           />
 
-          {/* 4. LA ACADEMIA — dimmed (opacity-45 in Figma) */}
-          <DashboardCard
-            title="La Academia"
-            description="Conoce nuestra metodología, fundamentos y estándares que rigen la formación profesional."
-            disabled={true}
-            dimmed
-          />
+          {/* 4. LA ACADEMIA — full width, dimmed (opacity-45 in Figma) */}
+          <div className="md:col-span-2">
+            <DashboardCard
+              title="La Academia"
+              description="Conoce nuestra metodología, fundamentos y estándares que rigen la formación profesional."
+              disabled={true}
+              dimmed
+            />
+          </div>
 
-          {/* PRIVILEGED ROLES: collapsible admin/instructor tools */}
-          <AdminToolsMenu isInstructor={isInstructor} isAdmin={isAdmin} />
+          {/* PRIVILEGED ROLES: collapsible admin/instructor tools — full width */}
+          <div className="md:col-span-2">
+            <AdminToolsMenu isInstructor={isInstructor} isAdmin={isAdmin} />
+          </div>
 
+        </div>
       </div>
 
       {/* FOOTER */}
