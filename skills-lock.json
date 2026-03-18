@@ -5,6 +5,21 @@
       "source": "am-will/codex-skills",
       "sourceType": "github",
       "computedHash": "e01516e24ba086a603fdf753f9b4e428a3684fbf3010b9295352202fd3461fa8"
+    },
+    "audit-docs": {
+      "source": "dthompson-jti/safety-check-app-concept",
+      "sourceType": "github",
+      "computedHash": "ed0273945e61c2581f0fa5221e2716d333d1ce173e8247344131502af8be49e8"
+    },
+    "docs-writer": {
+      "source": "google-gemini/gemini-cli",
+      "sourceType": "github",
+      "computedHash": "3910559dd53ebea1c3468d69537bf1d6a3ba23d6db0b1e0328c9758fe345da10"
+    },
+    "update-docs": {
+      "source": "vercel/next.js",
+      "sourceType": "github",
+      "computedHash": "b5f495ca63a08c70523ed59fbcf5b5665603d77299d8524ccddeacce024cbb33"
     }
   }
 }
