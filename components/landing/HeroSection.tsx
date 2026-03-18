@@ -118,7 +118,7 @@ export default function HeroSection() {
           className="absolute top-[230px] left-[195px] h-px w-[223px] z-20 shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)]"
         >
           <Image
-            src="/assets/landing/HeroSection/divider-dorado.png"
+            src="/assets/divider.svg"
             alt=""
             fill
             className="object-cover"
@@ -148,65 +148,66 @@ export default function HeroSection() {
       </div>
 
       {/* ══════════════════════════════════════════════════════════════════════
-          DESKTOP LAYOUT  (≥ md)
-          1440px Figma canvas
+          DESKTOP LAYOUT  (≥ md)  — REDESIGNED
+          Compact, CTA above the fold, BG more visible, centered composition
       ══════════════════════════════════════════════════════════════════════ */}
-      <div className="hidden md:block relative min-h-[420px] lg:min-h-[560px] xl:min-h-[780px] 2xl:min-h-[1000px]">
+      <div className="hidden md:block relative min-h-[480px] lg:min-h-[600px] xl:min-h-[780px] 2xl:min-h-[900px]">
 
-        {/* ── 1. Background image ──────────────────────────────────────────── */}
-        {/*
-         * Figma: y=246 from page top (header ≈158px) → ~88px into section.
-         * Intrinsic region: 860px tall. Dual vignette fades into #161616.
-         */}
-        <div className="absolute inset-x-0 top-[40px] lg:top-[60px] h-[340px] lg:h-[460px] xl:h-[680px] z-0 pointer-events-none">
+        {/* ── 1. Background image — MORE VISIBLE ───────────────────────────── */}
+        <div className="absolute inset-x-0 top-0 h-full z-0 pointer-events-none">
           <Image
             src="/assets/landing/HeroSection/hero-bg.png"
             alt=""
             fill
             priority
-            className="object-cover object-center opacity-55"
+            className="object-cover object-center opacity-70"
             sizes="100vw"
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-[#161616] via-transparent to-[#161616]" />
+          {/* Softer gradient — let the image breathe */}
+          <div className="absolute inset-0 bg-gradient-to-b from-[#161616]/80 via-[#161616]/20 to-[#161616]/90" />
         </div>
 
         {/* Hard bottom fade so the section blends seamlessly below */}
-        <div className="absolute inset-x-0 bottom-0 h-[120px] lg:h-[200px] xl:h-[350px] bg-gradient-to-t from-[#161616] to-transparent z-10 pointer-events-none" />
+        <div className="absolute inset-x-0 bottom-0 h-[100px] lg:h-[160px] xl:h-[250px] bg-gradient-to-t from-[#161616] to-transparent z-10 pointer-events-none" />
 
-        {/* ── 2. Text block ────────────────────────────────────────────────── */}
+        {/* ── 2. Text block — CENTERED & COMPACT ───────────────────────────── */}
         <div className="relative z-20 w-full max-w-[1440px] mx-auto px-4 md:px-12 lg:px-16">
-          <div className="pt-6 md:pt-8 lg:pt-15">
+          <div className="pt-8 md:pt-12 lg:pt-20 xl:pt-28 flex flex-col items-center">
 
-            {/* Subtitle — Poppins ExtraLight 24px · tracking 2.16px · center */}
+            {/* Subtitle — Poppins ExtraLight · center · hero-reveal animation */}
             <p
               className="
-                font-sans font-extralight uppercase text-center text-[#d3cbba]
-                text-sm md:text-base lg:text-lg xl:text-2xl
-                tracking-[0.09em] mb-2 md:mb-3
+                hero-reveal font-sans font-extralight uppercase text-center text-[#d3cbba]
+                text-xs md:text-sm lg:text-base xl:text-lg
+                tracking-[0.09em] mb-3 md:mb-4
               "
+              style={{ '--reveal-delay': '0.1s' } as React.CSSProperties}
             >
               Educación profesional en barbería para latinos
             </p>
 
-            {/* H1 block — Poppins ExtraBold · center */}
-            <div className="text-center">
-              {/* Lines 1-2: 64px Figma → clamp 22px→64px */}
+            {/* H1 block — Poppins ExtraBold · center · hero-reveal */}
+            <div
+              className="text-center hero-reveal"
+              style={{ '--reveal-delay': '0.25s' } as React.CSSProperties}
+            >
+              {/* Lines 1-2 */}
               <h1
                 className="
                   font-sans font-extrabold uppercase text-[#d3cbba]
                   leading-[1.1] tracking-tight
-                  text-[clamp(22px,4.45vw,64px)]
+                  text-[clamp(18px,3.6vw,52px)]
                 "
               >
                 Formación orientada a los estándares reales del
               </h1>
 
-              {/* Line 3: 96px Figma → clamp 34px→96px */}
+              {/* Line 3 */}
               <h2
                 className="
                   font-sans font-extrabold uppercase text-[#d3cbba]
                   leading-none tracking-tight
-                  text-[clamp(34px,6.67vw,96px)]
+                  text-[clamp(28px,5.2vw,76px)]
                   mt-1 md:mt-3
                 "
               >
@@ -214,11 +215,14 @@ export default function HeroSection() {
               </h2>
             </div>
 
-            {/* Gold divider — right-aligned, width 56.4% (812/1440) */}
-            <div className="mt-4 md:mt-6 flex justify-end">
+            {/* Gold divider — centered, width 56% */}
+            <div
+              className="mt-4 md:mt-6 hero-reveal flex justify-center w-full"
+              style={{ '--reveal-delay': '0.4s' } as React.CSSProperties}
+            >
               <div className="relative h-[3px] md:h-[5px] w-[56%] overflow-hidden">
                 <Image
-                  src="/assets/landing/HeroSection/divider-dorado.png"
+                  src="/assets/divider.svg"
                   alt=""
                   fill
                   className="object-cover"
@@ -228,13 +232,16 @@ export default function HeroSection() {
               </div>
             </div>
 
-            {/* Paragraph — Poppins Regular 32px · text-right · right ~57% */}
-            <div className="mt-16 lg:mt-28 xl:mt-44 flex justify-end">
+            {/* Paragraph — CENTERED instead of right-aligned, closer to heading */}
+            <div
+              className="mt-6 lg:mt-10 xl:mt-14 hero-reveal"
+              style={{ '--reveal-delay': '0.55s' } as React.CSSProperties}
+            >
               <p
                 className="
-                  font-sans font-normal text-[#d3cbba] text-right leading-[1.3]
-                  text-sm md:text-lg lg:text-xl xl:text-[32px]
-                  w-full md:w-[60%]
+                  font-sans font-normal text-[#d3cbba] text-center leading-[1.3]
+                  text-sm md:text-base lg:text-lg xl:text-xl
+                  max-w-3xl
                 "
               >
                 Sistema de aprendizaje práctico y estructurado para construir una
@@ -242,18 +249,13 @@ export default function HeroSection() {
               </p>
             </div>
 
-            {/* Spacer so arm image doesn't overlap paragraph */}
-            <div className="h-2 lg:h-4 xl:h-8" />
+            {/* Spacer */}
+            <div className="h-6 lg:h-12 xl:h-16" />
 
           </div>
         </div>
 
-        {/* ── 3. Tattoo arm ────────────────────────────────────────────────── */}
-        {/*
-         * Figma: x=-62 (left overflow)  y=808  w=617  h=924
-         * Anchored bottom-left; slight left overflow mirrors Figma's x=-62.
-         * z-0: TargetAudienceSection (z-10) sits on top, covering any overflow.
-         */}
+        {/* ── 3. Tattoo arm — same positioning ─────────────────────────────── */}
         <div
           className="
             absolute z-0 pointer-events-none

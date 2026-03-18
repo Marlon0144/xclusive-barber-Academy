@@ -1,0 +1,339 @@
+# Route map
+
+This document maps every route in the application, including data
+dependencies, auth requirements, rendering strategy, and the
+components each page uses. Use it as a reference when adding new
+routes or modifying existing ones.
+
+## Route summary
+
+| Route | Auth | Role | Rendering | First Load JS |
+|-------|------|------|-----------|---------------|
+| `/` | No | Any | RSC | Standard |
+| `/apply` | No | Any | RSC + Client | Standard |
+| `/login` | No | Any | RSC | Standard |
+| `/signup` | No | Any | Client | Standard |
+| `/dashboard` | Yes | Any | RSC | Standard |
+| `/dashboard/courses` | Yes | Any | RSC | Standard |
+| `/dashboard/courses/[courseId]/[lessonId]` | Yes | Any | RSC + Client | Standard |
+| `/dashboard/tracker` | Yes | Any | Client | Standard |
+| `/dashboard/grading` | Yes | instructor/admin | RSC + Client | Standard |
+| `/dashboard/admin/courses` | Yes | admin | RSC + Client | Standard |
+| `/dashboard/admin/lessons/[lessonId]/edit` | Yes | admin | RSC + Client | Standard |
+| `/dashboard/progreso_profesional` | Yes | Any | RSC | 139 B |
+
+## Public routes
+
+### `/` — Landing page
+
+**File:** `app/page.tsx`
+**Rendering:** Async RSC (zero client JS from page itself)
+**Auth:** None
+
+**Components used:**
+- `HeroSection` — Hero banner with CTA
+- `TargetAudienceSection` — Target audience messaging
+- `FeaturesSection` — Three-column methodology
+- `MissionVisionSection` — Mission and Vision cards
+- `InstructorSection` — Founder introduction
+- `FinalCtaSection` — Final CTA with contact info
+
+**Data fetching:** None (static content)
+
+---
+
+### `/apply` — Student registration
+
+**File:** `app/apply/page.tsx`
+**Rendering:** RSC wrapper + Client form
+**Auth:** None (public)
+
+**Components used:**
+- `AuthCard`, `AuthCardContent` — Form container
+- `ApplyForm` (co-located) — Client form component
+- `DashboardFooter` — Shared footer
+
+**Server Action:** `applyAccess(prevState, formData)`
+- Validates invite code against `invitations` table
+- Creates auth user via Supabase Auth
+- Creates profile record via Admin client
+- Increments invite code usage counter
+
+**Data flow:**
+```
+ApplyForm (client)
+  └─ useActionState(applyAccess)
+       ├─ Validate invite code (normal client)
+       ├─ Create auth user (normal client)
+       ├─ Create profile (Admin client)
+       ├─ Increment invite usage (Admin client)
+       └─ Return { success, error }
+```
+
+---
+
+### `/login` — Login page
+
+**File:** `app/login/page.tsx`
+**Rendering:** Async RSC
+**Auth:** None (redirects to `/dashboard` if already logged in via
+middleware)
+
+**Server Action:** `login(formData)`
+- Authenticates with `signInWithPassword()`
+- On error, redirects to `/login?error=...`
+- On success, revalidates and redirects to `/dashboard`
+
+**Error handling:** Error message passed via URL search param,
+displayed as red banner.
+
+---
+
+### `/signup` — Signup page (legacy)
+
+**File:** `app/signup/page.tsx`
+**Rendering:** Client Component
+**Auth:** None
+
+**Server Action:** `signup(prevState, formData)`
+
+> **Note:** This is a legacy route. The `/apply` page is the current
+> registration flow with a more polished UI.
+
+---
+
+## Protected routes (require authentication)
+
+All routes under `/dashboard/*` are protected by middleware. An
+unauthenticated user is redirected to `/login`.
+
+### `/dashboard` — Dashboard hub
+
+**File:** `app/dashboard/page.tsx`
+**Rendering:** Async RSC
+**Auth:** Yes (any role)
+
+**Data fetching:**
+```typescript
+const user = await getUser()         // React.cache()
+const profile = await getProfile(user.id) // React.cache()
+```
+
+**Components used:**
+- `DashboardGreenHeader` — Green header with user menu
+- `DashboardHeader` — Hero section with background image
+- `DashboardCard` — Navigation cards (4 total)
+- `AdminToolsMenu` — Collapsible menu (instructor/admin only)
+- `DashboardFooter` — Shared footer
+
+**Role-based rendering:**
+- Students see: Courses, Tracker, Progress cards
+- Instructors add: Grading option in AdminToolsMenu
+- Admins add: Course Management option in AdminToolsMenu
+
+---
+
+### `/dashboard/courses` — Course list
+
+**File:** `app/dashboard/courses/page.tsx`
+**Rendering:** Async RSC
+**Auth:** Yes (any role)
+
+**Data fetching:**
+```typescript
+const modules = await supabase.from('modules').select('*').order('order_index')
+// Parallel fetch: first lesson ID per module
+const firstLessonMap = await Promise.all(
+  modules.map(m => supabase.from('lessons')...)
+)
+```
+
+**Components used:**
+- `CourseListView` (Client) — Grid of module cards
+
+**Performance:** `Promise.all()` parallelizes N lesson queries.
+
+---
+
+### `/dashboard/courses/[courseId]/[lessonId]` — Lesson viewer
+
+**File:** `app/dashboard/courses/[courseId]/[lessonId]/page.tsx`
+**Layout:** `app/dashboard/courses/[courseId]/layout.tsx`
+**Rendering:** Async RSC + Client children
+**Auth:** Yes (any role)
+
+**Data fetching:**
+```typescript
+const [supabase, user, lessonResult] = await Promise.all([...])
+// Parallel: auth + lesson data
+const allLessons = await supabase.from('lessons').select(...)
+```
+
+**Components used:**
+- `VideoPlayer` (Client, dynamic import) — YouTube embed, marks
+  lesson complete on video end
+- `LessonContent` (Client) — Sanitized HTML from Tiptap editor
+
+**Navigation:** Previous/Next lesson links derived from
+`allLessons` array index.
+
+---
+
+### `/dashboard/tracker` — Evidence submission
+
+**File:** `app/dashboard/tracker/page.tsx`
+**Rendering:** Client Component
+**Auth:** Yes (any role)
+
+**Server Actions:**
+- `uploadSubmission(formData)` — Validates image (MIME, size,
+  extension), uploads to Storage, creates DB record
+- `deleteSubmission(submissionId)` — Verifies ownership, deletes
+  Storage file + DB record
+
+**Components used (co-located):**
+- `SubmissionForm` — Upload form with image preview
+- `SubmissionCard` — History card with status badge
+- `FeedbackModal` — Inline feedback panel with score bars
+
+**Data flow:**
+```
+TrackerPage (client)
+  ├─ useEffect → fetch submissions history
+  ├─ SubmissionForm
+  │    └─ uploadSubmission() → Supabase Storage + DB
+  └─ SubmissionCard[]
+       └─ FeedbackModal (scores + AI feedback)
+```
+
+---
+
+### `/dashboard/grading` — Instructor grading panel
+
+**File:** `app/dashboard/grading/page.tsx`
+**Rendering:** Async RSC + Client children
+**Auth:** Yes (instructor or admin only)
+
+**Role guard (in-page):**
+```typescript
+if (profile?.role !== 'admin' && profile?.role !== 'instructor') {
+  return <AccessDenied />
+}
+```
+
+**Data fetching:**
+```typescript
+const submissions = await supabase
+  .from('submissions')
+  .select('*')
+  .eq('status', 'pending')
+```
+
+**Server Action:** `submitGrade(submissionId, grades)`
+- Verifies instructor role
+- Calls OpenAI for AI feedback
+- Updates submission with scores, feedback, status, grader info
+
+**Components used:**
+- `GradingCard` (Client) — Two-column grading interface with
+  sliders (0-10) for fade, cleanliness, technique, symmetry
+
+---
+
+### `/dashboard/admin/courses` — Admin course management
+
+**File:** `app/dashboard/admin/courses/page.tsx`
+**Rendering:** Async RSC + Client children
+**Auth:** Yes (admin only)
+
+**Data fetching:**
+```typescript
+const modules = await supabase.from('modules').select(`
+  id, title, order_index, competency,
+  lessons(id, title, order_index)
+`).order('created_at')
+```
+
+**Server Actions:**
+- `createModule(title)` — Create new module
+- `deleteModule(moduleId)` — Delete module (cascades lessons)
+- `updateModuleTitle(moduleId, newTitle)` — Inline title edit
+- `updateModuleCompetency(moduleId, competency)` — Assign
+  competency to module
+- `createLesson(moduleId, title)` — Create lesson in module
+- `deleteLesson(lessonId)` — Delete individual lesson
+- `updateLessonTitle(lessonId, newTitle)` — Inline title edit
+
+**Components used (co-located):**
+- `AdminCourseList` (Client) — Interactive CRUD UI
+- `EditableText` (Client) — Double-click inline editor
+
+---
+
+### `/dashboard/admin/lessons/[lessonId]/edit` — Lesson editor
+
+**File:**
+`app/dashboard/admin/lessons/[lessonId]/edit/page.tsx`
+**Rendering:** Async RSC + Client editor
+**Auth:** Yes (admin only)
+
+**Server Action:** `updateLessonContent(lessonId, htmlContent,
+videoUrl)`
+- Dual-client pattern (verify auth + Admin write)
+- Revalidates both course and edit paths
+
+**Components used:**
+- `EditLessonForm` (Client) — Two-column layout
+  - Left: `RichTextEditor` (Tiptap, dynamic import)
+  - Right: YouTube URL input + video preview
+
+**Rich text capabilities:**
+- Bold, italic, headings (H1, H2), lists
+- Image upload to Supabase Storage
+- YouTube video embed
+- Link management
+- Undo/Redo
+
+---
+
+### `/dashboard/progreso_profesional` — Progress tracker
+
+**File:** `app/dashboard/progreso_profesional/page.tsx`
+**Rendering:** Pure RSC (139 B first load JS)
+**Auth:** Yes (any role)
+
+**Server Action:** `fetchProgressPageData()`
+- Delegates to `getStudentProgress()` (React.cache)
+- 4 parallel queries + single computation loop
+
+**Data contract returned:**
+```typescript
+{
+  student: { name, email, enrolledAt, status }
+  competencies: CompetencyProgress[]
+  metrics: { totalLessons, completedLessons, progressPercentage,
+             totalModules, completedModules, submittedPractices }
+  currentLevel: ProfessionalLevel
+  nextLevel: ProfessionalLevel | null
+}
+```
+
+**Business logic:**
+- 4 competencies derived from module completion
+- Professional level: 0-24% Talento, 25-49% Tecnico,
+  50-74% Avanzado, 75-100% Profesional
+
+## Middleware behavior
+
+**File:** `middleware.ts` + `utils/supabase/middleware.ts`
+
+**Runs on:** All routes except static assets (`_next/static`,
+`_next/image`, `favicon.ico`, image files)
+
+**Logic:**
+1. Refresh Supabase auth session (token rotation)
+2. If unauthenticated and path starts with `/dashboard` → redirect
+   to `/login`
+3. If authenticated and path is `/login` or `/signup` → redirect
+   to `/dashboard`
+4. Otherwise, allow the request through

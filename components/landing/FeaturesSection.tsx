@@ -1,4 +1,5 @@
 import Image from "next/image";
+import ScrollReveal from "./ScrollReveal";
 
 /**
  * FeaturesSection
@@ -32,7 +33,7 @@ import Image from "next/image";
 
 const features = [
   {
-    recurso: "/assets/landing/FeatureSection/recurso-texto1.png",
+    recurso: "/assets/landing/landing_mentalidad.svg",
     alt: "Mentalidad Profesional",
     /* Figma mobile: w=240 h=11 on 506px canvas */
     figmaW: 240,
@@ -45,7 +46,7 @@ const features = [
     descW: 240,
   },
   {
-    recurso: "/assets/landing/FeatureSection/recurso-texto2.png",
+    recurso: "/assets/landing/landing_formacion.svg",
     alt: "Formación Práctica Real",
     /* Figma mobile: w=247 h=13 on 506px canvas */
     figmaW: 247,
@@ -58,7 +59,7 @@ const features = [
     descW: 247,
   },
   {
-    recurso: "/assets/landing/FeatureSection/recurso-texto3.png",
+    recurso: "/assets/landing/landing_enfoque.svg",
     alt: "Enfoque en Carrera y Negocio",
     /* Figma mobile: w=288 h=12 on 506px canvas */
     figmaW: 288,
@@ -122,7 +123,7 @@ export default function FeaturesSection() {
           className="absolute top-[142px] left-1/2 -translate-x-1/2 z-10 w-[240px] h-[11px]"
         >
           <Image
-            src="/assets/landing/FeatureSection/recurso-texto1.png"
+            src="/assets/landing/landing_mentalidad.svg"
             alt="Mentalidad Profesional"
             fill
             className="object-contain object-center"
@@ -148,7 +149,7 @@ export default function FeaturesSection() {
           className="absolute top-[225px] left-1/2 -translate-x-1/2 z-10 w-[247px] h-[13px]"
         >
           <Image
-            src="/assets/landing/FeatureSection/recurso-texto2.png"
+            src="/assets/landing/landing_formacion.svg"
             alt="Formación Práctica Real"
             fill
             className="object-contain object-center"
@@ -174,7 +175,7 @@ export default function FeaturesSection() {
           className="absolute top-[313px] left-1/2 -translate-x-1/2 z-10 w-[288px] h-[12px]"
         >
           <Image
-            src="/assets/landing/FeatureSection/recurso-texto3.png"
+            src="/assets/landing/landing_enfoque.svg"
             alt="Enfoque en Carrera y Negocio"
             fill
             className="object-contain object-center"
@@ -212,65 +213,65 @@ export default function FeaturesSection() {
         </div>
 
         {/* ── 2. Content ───────────────────────────────────────────────────── */}
-        <div className="relative z-10 flex flex-col items-center text-center px-4 pt-8 md:pt-14 lg:pt-24 pb-10 md:pb-16 lg:pb-24">
+        <div className="relative z-10 flex flex-col items-center text-center px-4 pt-8 md:pt-12 lg:pt-18 pb-8 md:pb-12 lg:pb-18">
 
           {/* Heading */}
-          <div className="leading-none mb-8 md:mb-10 lg:mb-16 tracking-[0.033em]">
-            <h2
-              className="
-                font-sans font-bold uppercase text-[#d3cbba]
-                text-[clamp(44px,7.5vw,130px)] leading-none
-              "
-            >
-              FORMAMOS
-            </h2>
-            <h2
-              className="
-                font-sans font-bold uppercase text-[#d3cbba]
-                text-[clamp(32px,5.5vw,96px)] leading-none
-              "
-            >
-              PROFESIONALES
-            </h2>
-          </div>
+          <ScrollReveal>
+            <div className="leading-none mb-6 md:mb-8 lg:mb-12 tracking-[0.033em]">
+              <h2
+                className="
+                  font-sans font-bold uppercase text-[#d3cbba]
+                  text-[clamp(44px,7.5vw,130px)] leading-none
+                "
+              >
+                FORMAMOS
+              </h2>
+              <h2
+                className="
+                  font-sans font-bold uppercase text-[#d3cbba]
+                  text-[clamp(32px,5.5vw,96px)] leading-none
+                "
+              >
+                PROFESIONALES
+              </h2>
+            </div>
+          </ScrollReveal>
 
-          {/* Features — recurso-texto images scale proportionally to Figma desktop */}
-          <div className="w-full max-w-[1100px] flex flex-col gap-8 md:gap-10 lg:gap-16">
+          {/* Features — staggered scroll-reveal */}
+          <div className="w-full max-w-[1100px] flex flex-col gap-6 md:gap-8 lg:gap-12">
             {features.map((item, i) => {
-              /*
-               * Desktop: use Figma 1440px dimensions as max, scaled via vw.
-               * desktopW / 1440 * 100vw — clamped to avoid overflow.
-               */
               const vwPct = ((item.desktopW / 1440) * 100).toFixed(2);
               return (
-                <div key={i} className="flex flex-col items-center">
-                  {/* recurso-texto title image */}
-                  <div
-                    className="relative mb-4 md:mb-5 w-full"
-                    style={{
-                      maxWidth: `${item.desktopW}px`,
-                      aspectRatio: `${item.desktopW} / ${item.desktopH}`,
-                    }}
-                  >
-                    <Image
-                      src={item.recurso}
-                      alt={item.alt}
-                      fill
-                      className="object-contain object-center"
-                      sizes={`(max-width: 1440px) ${vwPct}vw, ${item.desktopW}px`}
-                    />
+                <ScrollReveal key={i} delay={0.1 * (i + 1)}>
+                  <div className="flex flex-col items-center">
+                    {/* recurso-texto title image */}
+                    <div
+                      className="relative mb-4 md:mb-5 w-full"
+                      style={{
+                        maxWidth: `${item.desktopW}px`,
+                        aspectRatio: `${item.desktopW} / ${item.desktopH}`,
+                      }}
+                    >
+                      <Image
+                        src={item.recurso}
+                        alt={item.alt}
+                        fill
+                        className="object-contain object-center"
+                        sizes={`(max-width: 1440px) ${vwPct}vw, ${item.desktopW}px`}
+                      />
+                    </div>
+                    {/* Description */}
+                    <p
+                      className="
+                        font-sans font-normal text-[#d3cbba]
+                        text-[clamp(14px,1.67vw,24px)] leading-[1.3]
+                        max-w-3xl text-center
+                      "
+                    >
+                      {item.desc}
+                    </p>
                   </div>
-                  {/* Description */}
-                  <p
-                    className="
-                      font-sans font-normal text-[#d3cbba]
-                      text-[clamp(14px,1.67vw,24px)] leading-[1.3]
-                      max-w-3xl text-center
-                    "
-                  >
-                    {item.desc}
-                  </p>
-                </div>
+                </ScrollReveal>
               );
             })}
           </div>

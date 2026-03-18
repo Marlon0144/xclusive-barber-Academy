@@ -87,17 +87,17 @@ export default function TrackerPage() {
              Figma: top 135px → 135-87-~10=38px gap after back nav
              bg rgba(30,58,39,0.51)  h-65px  w-333px  shadow        */}
         <div
-          className="flex flex-col items-center justify-center w-[360px] md:w-full shadow-[0px_4px_4px_rgba(0,0,0,0.25)] mt-[38px] md:mt-12 h-[65px] md:h-[80px] lg:h-[90px] md:rounded-lg"
+          className="flex flex-col items-center justify-center w-[360px] md:w-full shadow-[0px_4px_4px_rgba(0,0,0,0.25)] mt-[38px] md:mt-12 h-[90px] md:h-[105px] lg:h-[115px] md:rounded-lg"
           style={{ backgroundColor: 'rgba(30,58,39,0.51)' }}
         >
-          {/* Course name image → text-nombreDelCurso.png (231px wide) */}
-          <div className="relative w-[231px] md:w-[300px] lg:w-[350px] h-[15px] md:h-[20px]">
+          {/* Decorative title: XCLUSIVE BARBER ACADEMY (SVG 2.6:1 ratio) */}
+          <div className="relative w-[260px] md:w-[300px] lg:w-[350px] h-[38px] md:h-[46px] lg:h-[52px]">
             <Image
-              src="/assets/dashboard/tracker/text-nombreDelCurso.png"
-              alt="Nombre del Curso"
+              src="/assets/nombre-del-curso-text-resource.svg"
+              alt="Xclusive Barber Academy"
               fill
               className="object-contain"
-              sizes="231px"
+              sizes="(max-width: 768px) 260px, 350px"
             />
           </div>
           {/* Subtitle — Poppins ExtraLight 11px tracking-[0.99px] */}
@@ -119,10 +119,10 @@ export default function TrackerPage() {
 
         {/* ── GOLD DIVIDER LINE ──
              Figma: top 275px (title top 237 + h ~28 = 265 → gap 10px)
-             Uses divider-dorado.png asset (333px wide)                 */}
+             Uses divider.svg asset (333px wide)                        */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="/assets/dashboard/tracker/divider-dorado%20.png"
+          src="/assets/divider.svg"
           alt=""
           className="block mt-[10px] md:mt-4 w-[333px] md:w-[460px] lg:w-[550px] max-w-[90vw]"
         />
@@ -161,7 +161,7 @@ export default function TrackerPage() {
           {/* Top divider line — w-269px (Figma: 209:431) */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="/assets/dashboard/tracker/divider-dorado%20.png"
+            src="/assets/divider.svg"
             alt=""
             className="block w-[269px] md:w-[400px] lg:w-[500px] max-w-[80vw]"
           />
@@ -176,7 +176,7 @@ export default function TrackerPage() {
           {/* Bottom divider line — w-269px (Figma: 209:429) */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="/assets/dashboard/tracker/divider-dorado%20.png"
+            src="/assets/divider.svg"
             alt=""
             className="block w-[269px] md:w-[400px] lg:w-[500px] max-w-[80vw]"
           />
@@ -212,10 +212,10 @@ export default function TrackerPage() {
 
         </section>
 
-        {/* ── FOOTER ────────────────────────────────────────────────────── */}
-        <DashboardFooter />
-
       </div>
+
+      {/* ── FOOTER — outside constrained container for full-width desktop layout ── */}
+      <DashboardFooter />
     </div>
   )
 }

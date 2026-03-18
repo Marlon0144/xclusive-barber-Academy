@@ -1,4 +1,5 @@
 import Image from "next/image";
+import ScrollReveal from "./ScrollReveal";
 
 /**
  * MissionVisionSection
@@ -56,7 +57,7 @@ export default function MissionVisionSection() {
           className="absolute top-[144px] inset-x-0 h-[3px] z-10 shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)]"
         >
           <Image
-            src="/assets/landing/MisionSection/divider (2).png"
+            src="/assets/divider.svg"
             alt=""
             fill
             className="object-fill"
@@ -75,7 +76,7 @@ export default function MissionVisionSection() {
           className="absolute top-[30px] left-1/2 -translate-x-1/2 z-10 w-[118px] h-[27px]"
         >
           <Image
-            src="/assets/landing/MisionSection/recurso-texto1.png"
+            src="/assets/landing/landing_mision.svg"
             alt="Misión"
             fill
             className="object-contain object-center"
@@ -107,7 +108,7 @@ export default function MissionVisionSection() {
           className="absolute top-[175px] left-1/2 -translate-x-1/2 z-10 w-[116px] h-[27px]"
         >
           <Image
-            src="/assets/landing/MisionSection/recurso-texto2.png"
+            src="/assets/landing/landing_vision.svg"
             alt="Visión"
             fill
             className="object-contain object-center"
@@ -139,6 +140,7 @@ export default function MissionVisionSection() {
           Fluid scale-up preserving all Figma proportions
       ══════════════════════════════════════════════════════════════════════ */}
       <div className="hidden md:block py-8 md:py-12 lg:py-20 px-4">
+        <ScrollReveal>
         <div
           className="
             relative mx-auto w-full max-w-[875px]
@@ -152,7 +154,7 @@ export default function MissionVisionSection() {
             {/* recurso-texto1 — MISIÓN heading */}
             <div className="relative w-[clamp(118px,19vw,270px)] h-[clamp(27px,4.4vw,63px)] mb-4 md:mb-6">
               <Image
-                src="/assets/landing/MisionSection/recurso-texto1.png"
+                src="/assets/landing/landing_mision.svg"
                 alt="Misión"
                 fill
                 className="object-contain object-center"
@@ -177,7 +179,7 @@ export default function MissionVisionSection() {
           {/* Gold divider */}
           <div className="relative w-full h-[3px] shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)]">
             <Image
-              src="/assets/landing/MisionSection/divider (2).png"
+              src="/assets/divider.svg"
               alt=""
               fill
               className="object-fill"
@@ -192,7 +194,7 @@ export default function MissionVisionSection() {
             {/* recurso-texto2 — VISIÓN heading */}
             <div className="relative w-[clamp(116px,18.6vw,268px)] h-[clamp(27px,4.3vw,62px)] mb-4 md:mb-6">
               <Image
-                src="/assets/landing/MisionSection/recurso-texto2.png"
+                src="/assets/landing/landing_vision.svg"
                 alt="Visión"
                 fill
                 className="object-contain object-center"
@@ -214,6 +216,7 @@ export default function MissionVisionSection() {
           </div>
 
         </div>
+        </ScrollReveal>
       </div>
 
     </section>

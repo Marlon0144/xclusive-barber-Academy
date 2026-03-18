@@ -44,22 +44,22 @@ export default async function AdminCoursesPage() {
   return (
     <>
       <DashboardPageHeader title="Administración" />
-      <div className="min-h-screen p-8 max-w-5xl mx-auto space-y-12">
+      <div className="min-h-screen px-4 py-6 md:p-8 max-w-5xl mx-auto space-y-8 md:space-y-12">
 
       {/* HEADER DE LA PÁGINA */}
-      <header className="relative border-b border-white/10 pb-8">
+      <header className="relative border-b border-white/10 pb-6 md:pb-8">
         <div className="absolute top-0 right-0 opacity-10 hidden md:block">
           <Settings className="w-32 h-32 text-red-500" />
         </div>
         <div className="relative z-10">
-          <div className="flex items-center gap-3 mb-2">
-            <Star className="w-5 h-5 text-red-500 fill-red-500" />
-            <h2 className="text-red-500 text-xs tracking-[0.3em] uppercase font-bold">Panel de Administración</h2>
+          <div className="flex items-center gap-2 md:gap-3 mb-2">
+            <Star className="w-4 h-4 md:w-5 md:h-5 text-red-500 fill-red-500" />
+            <h2 className="text-red-500 text-[10px] md:text-xs tracking-[0.3em] uppercase font-bold">Panel de Administración</h2>
           </div>
-          <h1 className="text-4xl md:text-5xl font-serif text-white mb-4">
+          <h1 className="text-3xl md:text-5xl font-serif text-white mb-3 md:mb-4">
             Gestión del Curso
           </h1>
-          <p className="text-zinc-400 max-w-xl text-lg font-light">
+          <p className="text-zinc-400 max-w-xl text-sm md:text-lg font-light">
             Estructura el contenido de la academia. Crea módulos, organiza lecciones y mantén el plan de estudios actualizado.
           </p>
         </div>

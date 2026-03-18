@@ -67,9 +67,9 @@ export default async function LessonPage({ params }: LessonPageProps) {
 
   // ── Asset paths (all from /assets/dashboard/courses/lessons/) ────────────────
   const A = {
-    textRecurso: '/assets/dashboard/courses/lessons/text-recurso.png',
+    textRecurso: '/assets/nombre-del-curso-text-resource.svg',
     marcoVideo:  '/assets/dashboard/courses/lessons/marco-video.png',
-    dividerDorado: '/assets/dashboard/courses/lessons/divider-dorado.png',
+    dividerDorado: '/assets/divider.svg',
     backRow:     '/assets/dashboard/courses/lessons/back-row.png',
     nextRow:     '/assets/dashboard/courses/lessons/next-row.png',
   } as const
@@ -103,9 +103,9 @@ export default async function LessonPage({ params }: LessonPageProps) {
           className="flex flex-col items-center justify-center gap-[5px] w-[83%] max-w-[333px] md:max-w-[450px] lg:max-w-[550px] h-[82px] md:h-[95px] lg:h-[105px]"
           style={{ background: 'rgba(30,58,39,0.51)', boxShadow: '0px 4px 4px rgba(0,0,0,0.25)' }}
         >
-          {/* text-recurso.png: decorative title element */}
-          <div className="w-[231px] md:w-[280px] lg:w-[320px] h-[15px] md:h-[18px] lg:h-[20px] relative">
-            <Image src={A.textRecurso} alt="" fill className="object-contain" priority />
+          {/* Decorative title: XCLUSIVE BARBER ACADEMY (SVG 2.6:1 ratio) */}
+          <div className="w-[260px] md:w-[300px] lg:w-[340px] h-[38px] md:h-[46px] lg:h-[52px] relative">
+            <Image src={A.textRecurso} alt="Xclusive Barber Academy" fill className="object-contain" priority />
           </div>
 
           {/* "FORMACIÓN PROFESIONAL EN BARBERÍA" subtitle */}

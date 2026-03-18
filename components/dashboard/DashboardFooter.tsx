@@ -49,7 +49,7 @@ export function DashboardFooter({
 
           {/* Center: Logo */}
           <Image
-            src="/assets/header_dash/logo-academia.png"
+            src="/assets/logo-academia.svg"
             alt="Xclusive Barber Academy"
             width={31}
             height={38}
@@ -80,7 +80,7 @@ export function DashboardFooter({
           Figma node 21:604 bottom section — properly contained for desktop
       ============================================================ */}
       <footer
-        className="hidden md:flex flex-col items-center px-6 mx-auto
+        className="hidden md:flex flex-col items-center w-full px-6 mx-auto
                    pt-6 lg:pt-10 xl:pt-14
                    pb-8 lg:pb-10 xl:pb-14
                    max-w-[700px] lg:max-w-[900px] xl:max-w-[1000px]"
@@ -121,7 +121,7 @@ export function DashboardFooter({
 
           {/* Center: Logo */}
           <Image
-            src="/assets/header_dash/logo-academia.png"
+            src="/assets/logo-academia.svg"
             alt="Xclusive Barber Academy"
             width={110}
             height={133}

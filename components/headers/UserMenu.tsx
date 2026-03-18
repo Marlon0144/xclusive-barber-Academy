@@ -51,7 +51,7 @@ export default function UserMenu({ userName, userEmail }: UserMenuProps) {
           </span>
           <div className="mt-1 w-[130px] md:w-[160px] lg:w-[200px] xl:w-[240px]">
             <Image
-              src="/assets/header_dash/divider-dorado.png"
+              src="/assets/divider.svg"
               alt=""
               width={183}
               height={9}

@@ -35,7 +35,7 @@ export default function DashboardGreenHeader({
         {/* ---- LOGO: 67px en barra de 53px → sobresale 7px arriba y 7px abajo ---- */}
         <Link href="/dashboard" className="relative flex-shrink-0" style={{ width: 'clamp(55px, 5.56vw, 80px)', height: 'clamp(67px, 6.74vw, 97px)' }}>
           <Image
-            src="/assets/header_dash/logo-academia.png"
+            src="/assets/logo-academia.svg"
             alt="Xclusive Barber Academy"
             fill
             priority

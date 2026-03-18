@@ -60,7 +60,7 @@ export default function CourseListView({ modules, firstLessonMap }: CourseListPr
           {/* Separator - Centered below title */}
           <div className="relative w-full max-w-[333px] md:max-w-[420px] lg:max-w-[520px] h-[1px] mt-4 mb-4">
              <Image 
-               src="/assets/dashboard/courses/separator.png" 
+               src="/assets/divider.svg" 
                alt="separator" 
                fill 
                className="object-cover opacity-80"
@@ -76,12 +76,12 @@ export default function CourseListView({ modules, firstLessonMap }: CourseListPr
       </header>
 
       {/* --- COURSE NAME BANNER — Figma node 2070:13 --- */}
-      <div className="relative w-full max-w-[333px] md:max-w-[420px] lg:max-w-[520px] h-[65px] md:h-[75px] lg:h-[85px] mx-auto mt-8 md:mt-12 shadow-[0px_4px_4px_rgba(0,0,0,0.25)] bg-[rgba(30,58,39,0.51)] flex flex-col items-center justify-center z-10">
+      <div className="relative w-full max-w-[333px] md:max-w-[420px] lg:max-w-[520px] h-[90px] md:h-[105px] lg:h-[115px] mx-auto mt-8 md:mt-12 shadow-[0px_4px_4px_rgba(0,0,0,0.25)] bg-[rgba(30,58,39,0.51)] flex flex-col items-center justify-center z-10">
         {/* "NOMBRE DEL CURSO" gold asset */}
-        <div className="relative w-[231px] md:w-[280px] lg:w-[320px] h-[15px] md:h-[18px] lg:h-[20px]">
+        <div className="relative w-[260px] md:w-[300px] lg:w-[340px] h-[38px] md:h-[46px] lg:h-[52px]">
           <Image
-            src="/assets/dashboard/courses/nombre-curso.png"
-            alt="Nombre del curso"
+            src="/assets/nombre-del-curso-text-resource.svg"
+            alt="Xclusive Barber Academy"
             fill
             className="object-contain"
           />
@@ -177,9 +177,10 @@ export default function CourseListView({ modules, firstLessonMap }: CourseListPr
                 </span>
              </div>
          </Link>
-
-         <DashboardFooter />
       </div>
+
+      {/* FOOTER — outside constrained containers for full-width desktop layout */}
+      <DashboardFooter />
     </div>
   )
 }
