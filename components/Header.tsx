@@ -50,7 +50,7 @@ export default async function Header() {
             {/* Mark icon */}
             <div className="relative h-[55px] w-[55px] shrink-0 md:h-[67px] md:w-[67px]">
               <Image
-                src="/assets/header/logo-academia.png"
+                src="/assets/logo-academia.svg"
                 alt="Xclusive Barber Academy Logo"
                 fill
                 priority
@@ -59,14 +59,14 @@ export default async function Header() {
               />
             </div>
             {/* Wordmark — "XCLUSIVE / BARBER ACADEMY" decorative text asset */}
-            <div className="relative h-[32px] w-[58px] shrink-0 sm:h-[38px] sm:w-[72px] md:h-[50px] md:w-[90px]">
+            <div className="relative h-[30px] w-[78px] shrink-0 sm:h-[36px] sm:w-[94px] md:h-[46px] md:w-[120px]">
               <Image
-                src="/assets/header/texto-decorativo.png"
+                src="/assets/xclusive-barber-academy-text.svg"
                 alt="Xclusive Barber Academy"
                 fill
                 priority
                 className="object-contain object-left"
-                sizes="(max-width: 768px) 72px, 84px"
+                sizes="(max-width: 768px) 94px, 120px"
               />
             </div>
           </Link>
@@ -118,10 +118,10 @@ export default async function Header() {
                 <span className="text-[0.55rem] font-extrabold uppercase tracking-widest text-[#d3cbba] transition-colors group-hover:text-white sm:text-[0.65rem] md:text-[0.75rem] lg:text-sm">
                   Aplicar
                 </span>
-                {/* Golden line divider — asset from public/assets/header/divider.png */}
+                {/* Golden line divider */}
                 <span className="relative block h-[3px] w-full overflow-hidden">
                   <Image
-                    src="/assets/header/divider.png"
+                    src="/assets/divider.svg"
                     alt=""
                     fill
                     className="object-cover"

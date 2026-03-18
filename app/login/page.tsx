@@ -38,7 +38,7 @@ export default async function LoginPage({
           {/* Logo - Centered at top, overflowing if needed or just padding top */}
           <div className="mb-6 relative w-30 h-30 flex items-center justify-center mt-[-58px]">
             <Image
-              src="/assets/login/logo-footer.png"
+              src="/assets/logo-academia.svg"
               alt="Xclusive Barber Academy"
               fill
               className="object-contain"
@@ -67,7 +67,7 @@ export default async function LoginPage({
              
              {/* Separator Image */}
             <div className="w-full h-[1px] relative opacity-40">
-               <Image src="/assets/login/divider.png" alt="divider" fill className="object-cover" />
+               <Image src="/assets/divider.svg" alt="divider" fill className="object-cover" />
             </div>
           </div>
         </div>

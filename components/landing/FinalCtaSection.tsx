@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
+import ScrollReveal from "./ScrollReveal";
 
 export default function FinalCtaSection() {
   return (
@@ -76,7 +77,7 @@ export default function FinalCtaSection() {
           {/* Logo — centro */}
           <div className="relative shrink-0" style={{ width: "33px", height: "39px" }}>
             <Image
-              src="/assets/landing/FinalSection/logo-academy.png"
+              src="/assets/logo-academia.svg"
               alt="Xclusive Barber Academy"
               fill
               className="object-contain"
@@ -105,7 +106,7 @@ export default function FinalCtaSection() {
           style={{ top: "338px", width: "407px", height: "2px" }}
         >
           <Image
-            src="/assets/landing/FinalSection/divide-dorado.png"
+            src="/assets/divider.svg"
             alt=""
             fill
             className="object-cover"
@@ -117,6 +118,7 @@ export default function FinalCtaSection() {
       {/* ─────────────────────────────────────────────
           DESKTOP  (md+) — Layout expandido
       ───────────────────────────────────────────── */}
+      <ScrollReveal>
       <div className="hidden md:flex md:flex-col md:items-center w-full overflow-hidden">
 
         {/* Panel crema superior — full width, Figma: h=276px, bg-[rgba(211,203,186,0.7)] */}
@@ -157,7 +159,7 @@ export default function FinalCtaSection() {
         {/* Logo / ícono — Figma: w=110px, h=133px */}
         <div className="relative mb-5" style={{ width: "clamp(44px,6vw,100px)", height: "clamp(52px,7.2vw,120px)" }}>
           <Image
-            src="/assets/landing/FinalSection/logo-academy.png"
+            src="/assets/logo-academia.svg"
             alt="Xclusive Barber Academy"
             fill
             className="object-contain"
@@ -200,7 +202,7 @@ export default function FinalCtaSection() {
         {/* Separador dorado inferior */}
         <div className="relative w-full" style={{ height: "4px" }}>
           <Image
-            src="/assets/landing/FinalSection/divide-dorado.png"
+            src="/assets/divider.svg"
             alt=""
             fill
             className="object-cover"
@@ -208,6 +210,7 @@ export default function FinalCtaSection() {
         </div>
 
       </div>
+      </ScrollReveal>
 
     </section>
   );

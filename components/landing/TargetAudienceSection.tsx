@@ -1,4 +1,5 @@
 import Image from "next/image";
+import ScrollReveal from "./ScrollReveal";
 
 /**
  * TargetAudienceSection
@@ -130,7 +131,7 @@ export default function TargetAudienceSection() {
           "
         >
           <Image
-            src="/assets/landing/TargetAudience/logo-academia.png"
+            src="/assets/logo-academia.svg"
             alt="Xclusive Barber Academy"
             fill
             className="object-contain"
@@ -148,86 +149,94 @@ export default function TargetAudienceSection() {
       <div className="hidden md:block md:-mt-[60px] lg:-mt-[120px] xl:-mt-[180px] 2xl:-mt-[220px]">
 
         {/* ── 1. Green CTA bar ─────────────────────────────────────────────── */}
-        <div
-          className="
-            w-full bg-[#1c3123] shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)]
-            flex items-center justify-center
-            py-3 md:py-4 lg:py-8
-          "
-        >
-          <h2
-            className="
-              font-sans font-extrabold uppercase text-[#d3cbba]
-              text-[clamp(26px,5.8vw,96px)] leading-tight text-center
-              max-w-[1270px] px-6
-            "
-          >
-            ¿LISTO PARA DAR EL SIGUIENTE PASO?
-          </h2>
-        </div>
-
-        {/* ── 2. Subtitle ──────────────────────────────────────────────────── */}
-        <div className="flex justify-center py-3 md:py-5 lg:py-10 px-4">
-          <p
-            className="
-              font-sans font-normal text-[#d3cbba] text-center
-              text-[clamp(14px,1.4vw,20px)]
-              max-w-3xl leading-relaxed
-            "
-          >
-            Entrenamos barberos con disciplina y visión de negocio para el mercado australiano.
-          </p>
-        </div>
-
-        {/* ── 3. Dark card (heading + list) ────────────────────────────────── */}
-        <div className="flex justify-center px-4 pb-6 md:pb-8 lg:pb-14">
+        <ScrollReveal>
           <div
             className="
-              w-full max-w-[1259px]
-              bg-[#1d1d1d] shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)]
-              flex flex-col items-center text-center
-              py-6 md:py-8 lg:py-12 px-6
+              w-full bg-[#1c3123] shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)]
+              flex items-center justify-center
+              py-3 md:py-4 lg:py-6
             "
           >
-            <h3
+            <h2
               className="
                 font-sans font-extrabold uppercase text-[#d3cbba]
-                text-[clamp(20px,3.8vw,60px)] leading-tight
-                mb-4 md:mb-6 lg:mb-10
+                text-[clamp(26px,4.2vw,72px)] leading-tight text-center
+                max-w-[1270px] px-6
               "
             >
-              XCLUSIVE BARBER ACADEMY ES PARA
-            </h3>
+              ¿LISTO PARA DAR EL SIGUIENTE PASO?
+            </h2>
+          </div>
+        </ScrollReveal>
 
-            <div className="flex flex-col items-center gap-3 md:gap-4 w-full max-w-3xl">
-              {items.map((item, i) => (
-                <p
-                  key={i}
-                  className="
-                    font-sans font-light text-[#d3cbba]
-                    text-[clamp(14px,1.67vw,24px)]
-                    leading-[1.3] text-center
-                  "
-                >
-                  {item}
-                </p>
-              ))}
+        {/* ── 2. Subtitle ──────────────────────────────────────────────────── */}
+        <ScrollReveal delay={0.1}>
+          <div className="flex justify-center py-3 md:py-5 lg:py-8 px-4">
+            <p
+              className="
+                font-sans font-normal text-[#d3cbba] text-center
+                text-[clamp(14px,1.4vw,20px)]
+                max-w-3xl leading-relaxed
+              "
+            >
+              Entrenamos barberos con disciplina y visión de negocio para el mercado australiano.
+            </p>
+          </div>
+        </ScrollReveal>
+
+        {/* ── 3. Dark card (heading + list) ────────────────────────────────── */}
+        <ScrollReveal delay={0.15}>
+          <div className="flex justify-center px-4 pb-6 md:pb-8 lg:pb-14">
+            <div
+              className="
+                w-full max-w-[1259px]
+                bg-[#1d1d1d] shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)]
+                flex flex-col items-center text-center
+                py-6 md:py-8 lg:py-12 px-6
+              "
+            >
+              <h3
+                className="
+                  font-sans font-extrabold uppercase text-[#d3cbba]
+                  text-[clamp(20px,3.8vw,60px)] leading-tight
+                  mb-4 md:mb-6 lg:mb-10
+                "
+              >
+                XCLUSIVE BARBER ACADEMY ES PARA
+              </h3>
+
+              <div className="flex flex-col items-center gap-3 md:gap-4 w-full max-w-3xl">
+                {items.map((item, i) => (
+                  <p
+                    key={i}
+                    className="
+                      font-sans font-light text-[#d3cbba]
+                      text-[clamp(14px,1.67vw,24px)]
+                      leading-[1.3] text-center
+                    "
+                  >
+                    {item}
+                  </p>
+                ))}
+              </div>
             </div>
           </div>
-        </div>
+        </ScrollReveal>
 
         {/* ── 4. Academy logo icon ─────────────────────────────────────────── */}
+        <ScrollReveal delay={0.2}>
           <div className="flex justify-center pb-6 md:pb-10 lg:pb-20">
-          <div className="relative w-[clamp(110px,11.7vw,168px)] h-[clamp(133px,14.2vw,204px)]">
-            <Image
-              src="/assets/landing/TargetAudience/logo-academia.png"
-              alt="Xclusive Barber Academy"
-              fill
-              className="object-contain"
-              sizes="180px"
-            />
+            <div className="relative w-[clamp(110px,11.7vw,168px)] h-[clamp(133px,14.2vw,204px)]">
+              <Image
+                src="/assets/logo-academia.svg"
+                alt="Xclusive Barber Academy"
+                fill
+                className="object-contain"
+                sizes="180px"
+              />
+            </div>
           </div>
-        </div>
+        </ScrollReveal>
 
       </div>
 

@@ -29,7 +29,7 @@ export default function ApplyPage() {
           {/* Logo */}
           <div className="mb-6 relative w-30 h-30 flex items-center justify-center mt-[-58px]">
             <Image
-              src="/assets/apply/logo-footer.png"
+              src="/assets/logo-academia.svg"
               alt="Xclusive Barber Academy"
               fill
               className="object-contain"
@@ -43,7 +43,7 @@ export default function ApplyPage() {
               ACTIVA TU ACCESO
             </h1>
             <div className="flex items-center justify-center pt-1">
-              <Image src="/assets/apply/header-logo.png" alt="A la academia" width={200} height={200} />
+              <Image src="/assets/logo-academia.svg" alt="A la academia" width={200} height={200} />
             </div>
           </div>
 
@@ -59,7 +59,7 @@ export default function ApplyPage() {
              
              {/* Separator Image */}
             <div className="w-full h-[1px] relative opacity-40">
-               <Image src="/assets/apply/divider.png" alt="divider" fill className="object-cover" />
+               <Image src="/assets/divider.svg" alt="divider" fill className="object-cover" />
             </div>
           </div>
         </div>

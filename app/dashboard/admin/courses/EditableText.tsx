@@ -55,7 +55,7 @@ export default function EditableText({ initialText, onSave, className = '' }: Ed
           onChange={(e) => setText(e.target.value)}
           onKeyDown={handleKeyDown}
           disabled={isSaving}
-          className="bg-black/50 text-white px-3 py-1.5 rounded-sm border border-gold-500 focus:outline-none focus:ring-1 focus:ring-gold-500/50 min-w-[200px] text-sm font-serif placeholder:text-zinc-600"
+          className="bg-black/50 text-white px-3 py-1.5 rounded-sm border border-gold-500 focus:outline-none focus:ring-1 focus:ring-gold-500/50 w-full max-w-xs text-sm font-serif placeholder:text-zinc-600"
         />
         <button
           onClick={handleSave}
@@ -83,7 +83,7 @@ export default function EditableText({ initialText, onSave, className = '' }: Ed
           e.stopPropagation() // Evita abrir el acordeón
           setIsEditing(true)
         }}
-        className="opacity-0 group-hover/edit:opacity-100 p-1 text-zinc-500 hover:text-gold-500 transition-all duration-300"
+        className="opacity-60 md:opacity-0 group-hover/edit:opacity-100 p-1.5 md:p-1 text-zinc-500 hover:text-gold-500 transition-all duration-300 min-w-[28px] min-h-[28px] md:min-w-0 md:min-h-0 flex items-center justify-center"
         title="Renombrar"
       >
         <Edit2 size={12} />

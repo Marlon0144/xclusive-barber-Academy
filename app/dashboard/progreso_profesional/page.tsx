@@ -197,7 +197,7 @@ export default async function ProgressPage() {
                 {/* Divider dorado — asset real del diseño Figma */}
                 <div className="relative w-full h-[4px] md:h-[6px] my-2 md:my-3">
                   <Image
-                    src="/assets/progreso_profesional/divider-dorado.png"
+                    src="/assets/divider.svg"
                     alt=""
                     fill
                     className="object-contain object-left"
@@ -284,7 +284,7 @@ export default async function ProgressPage() {
             {/* Logo */}
             <div className="relative w-[55px] h-[87px] md:w-[75px] md:h-[118px] lg:w-[90px] lg:h-[142px] mb-4 md:mb-6">
               <Image
-                src="/assets/progreso_profesional/logo-xclusive.png"
+                src="/assets/logo-academia.svg"
                 alt="Xclusive Barber Academy" fill
                 className="object-contain" sizes="(max-width: 767px) 55px, (max-width: 1023px) 75px, 90px"
               />

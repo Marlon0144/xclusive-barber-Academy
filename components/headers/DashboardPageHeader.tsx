@@ -33,7 +33,7 @@ export default function DashboardPageHeader({
           {/* Logo 67px en barra de 53px → centrado, sobresale 7px arriba y 7px abajo simétricamente */}
           <div className="absolute top-[-7px] left-0 h-[67px] w-[55px] z-10">
             <Image
-              src="/assets/header_pages/logo-academia.png"
+              src="/assets/logo-academia.svg"
               alt="Xclusive Barber Academy"
               fill
               priority
@@ -63,7 +63,7 @@ export default function DashboardPageHeader({
             {/* Divider: explicit size preserves natural aspect ratio (183×9) */}
             <div className="mt-1 w-[77px] md:w-[100px]">
               <Image
-                src="/assets/header_pages/divider.png"
+                src="/assets/divider.svg"
                 alt="Línea divisora"
                 width={183}
                 height={9}

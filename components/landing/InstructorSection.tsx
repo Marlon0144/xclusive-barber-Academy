@@ -1,4 +1,5 @@
 import Image from "next/image";
+import ScrollReveal from "./ScrollReveal";
 
 export default function InstructorSection() {
   return (
@@ -41,7 +42,7 @@ export default function InstructorSection() {
           style={{ left: "calc(50% - 60px)", width: "322px", height: "497px" }}
         >
           <Image
-            src="/assets/landing/InstructorSection/tutor_julian.png"
+            src="/assets/imagen-julian.svg"
             alt="Julian Giraldo — Fundador de Xclusive Barber Academy"
             fill
             className="object-contain object-top"
@@ -67,6 +68,7 @@ export default function InstructorSection() {
           All children absolutely positioned to match Figma coords.
           Coordinates expressed as vw-clamp for fluid scaling.
       ───────────────────────────────────────────── */}
+      <ScrollReveal>
       <div
         className="hidden md:block relative w-full overflow-hidden"
         style={{ height: "clamp(380px, 55vw, 960px)" }}
@@ -83,7 +85,7 @@ export default function InstructorSection() {
           }}
         >
           <Image
-            src="/assets/landing/InstructorSection/tutor_julian.png"
+            src="/assets/imagen-julian.svg"
             alt="Julian Giraldo — Fundador de Xclusive Barber Academy"
             fill
             className="object-contain object-top"
@@ -157,6 +159,7 @@ export default function InstructorSection() {
         </div>
 
       </div>
+      </ScrollReveal>
 
     </section>
   );
