@@ -42,8 +42,14 @@ export default function ApplyPage() {
             <h1 className="text-[#d3cbba] font-sans font-extrabold text-2xl leading-none tracking-widest">
               ACTIVA TU ACCESO
             </h1>
-            <div className="flex items-center justify-center pt-1">
-              <Image src="/assets/logo-academia.svg" alt="A la academia" width={200} height={200} />
+            <div className="flex items-center justify-center pt-2">
+              <Image
+                src="/assets/recurso_academia.svg"
+                alt="Recurso academia"
+                width={174}
+                height={14}
+                className="w-[174px] h-[14px]"
+              />
             </div>
           </div>
 
