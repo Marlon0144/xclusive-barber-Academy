@@ -187,14 +187,20 @@ Controls student onboarding through invite codes.
 
 | Column | Type | Constraints | Description |
 |--------|------|-------------|-------------|
-| `invite_code` | `text` | PK | Unique invite code |
+| `id` | `uuid` | PK, DEFAULT `gen_random_uuid()` | Invitation row ID |
+| `code` | `text` | UNIQUE | Invitation code used in `/apply` and `/signup` |
+| `is_active` | `boolean` | DEFAULT `true` | Whether the code can be used |
 | `used_count` | `integer` | DEFAULT `0` | Times used |
 | `max_uses` | `integer` | NOT NULL | Usage limit |
+| `role_to_assign` | `user_role` | NOT NULL | Role assigned on successful signup |
 
 **Access patterns:**
 - Validated during registration (`applyAccess`, `signup`)
 - `used_count` incremented via Admin client on successful
   registration
+- Managed by admins from `/dashboard/admin/gestion_users`
+  (create random codes with configurable `max_uses`,
+  activate/deactivate existing codes, and delete invitation rows)
 
 ## Row-Level Security (RLS)
 
@@ -338,6 +344,36 @@ Student                    Instructor                 AI
   │                           ├─ generateAIFeedback()──┤
   │                           │                   ├─ GPT-4o-mini
   │                           │                   └─ Return feedback
+
+### Admin invitation and role management flow
+
+```
+Admin user
+  │
+  ├─ Opens /dashboard/admin/gestion_users (admin-only guard)
+  │
+  ├─ createInviteCodeAction()
+  │   ├─ Verify session + admin role (normal client)
+  │   ├─ Generate random code (XBA-XXXXXXXX)
+  │   ├─ Validate max_uses range (1..50)
+  │   └─ INSERT invitation with selected max_uses (Admin client)
+  │
+  ├─ toggleInviteStatusAction()
+  │   ├─ Verify session + admin role
+  │   └─ UPDATE invitations.is_active (Admin client)
+  │
+  └─ updateUserRoleAction()
+      ├─ Verify session + admin role
+      ├─ Prevent demoting the last admin
+      └─ UPDATE profiles.role (Admin client)
+
+    └─ deleteUserAction()
+      ├─ Verify session + admin role
+      ├─ Prevent deleting current admin user
+      ├─ Prevent deleting the last admin account
+      ├─ SET submissions.grader_id = null for target user
+      └─ DELETE auth user via Supabase Admin API
+```
   │                           │                        │
   │                     └─ UPDATE submission            │
   │                         (scores, feedback_ai,      │

@@ -57,11 +57,18 @@ export function AdminToolsMenu({ isInstructor, isAdmin }: AdminToolsMenuProps) {
                         />
                     )}
                     {isAdmin && (
-                        <DashboardCard
-                            title="Gestión de Cursos"
-                            description="Administrar catálogo, editar lecciones y configurar módulos de aprendizaje."
-                            href="/dashboard/admin/courses"
-                        />
+                        <>
+                            <DashboardCard
+                                title="Gestión de Cursos"
+                                description="Administrar catálogo, editar lecciones y configurar módulos de aprendizaje."
+                                href="/dashboard/admin/courses"
+                            />
+                            <DashboardCard
+                                title="Gestión de Usuarios"
+                                description="Crear codigos de acceso de un solo uso y administrar roles de usuarios."
+                                href="/dashboard/admin/gestion_users"
+                            />
+                        </>
                     )}
                 </div>
             </div>
