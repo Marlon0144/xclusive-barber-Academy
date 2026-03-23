@@ -94,6 +94,53 @@ export async function updateLessonTitle(lessonId: string, newTitle: string): Pro
   return { success: true }
 }
 
+export async function reorderLessonsInModule(
+  moduleId: string,
+  orderedLessonIds: string[],
+): Promise<ActionState> {
+  if (!moduleId || orderedLessonIds.length === 0) {
+    return { error: 'Datos inválidos para reordenar lecciones.' }
+  }
+
+  const uniqueIds = new Set(orderedLessonIds)
+  if (uniqueIds.size !== orderedLessonIds.length) {
+    return { error: 'Hay lecciones duplicadas en el nuevo orden.' }
+  }
+
+  const { data: moduleLessons, error: fetchError } = await supabaseAdmin
+    .from('lessons')
+    .select('id')
+    .eq('module_id', moduleId)
+
+  if (fetchError) return { error: fetchError.message }
+
+  const moduleLessonIds = new Set((moduleLessons ?? []).map((lesson) => lesson.id))
+
+  // Validar que el array recibido represente exactamente las lecciones de ese módulo.
+  if (
+    moduleLessonIds.size !== orderedLessonIds.length ||
+    orderedLessonIds.some((id) => !moduleLessonIds.has(id))
+  ) {
+    return { error: 'El orden recibido no coincide con el módulo seleccionado.' }
+  }
+
+  const updates = orderedLessonIds.map((lessonId, index) =>
+    supabaseAdmin
+      .from('lessons')
+      .update({ order_index: index + 1 })
+      .eq('id', lessonId)
+      .eq('module_id', moduleId),
+  )
+
+  const results = await Promise.all(updates)
+  const failed = results.find((result) => result.error)
+
+  if (failed?.error) return { error: failed.error.message }
+
+  revalidatePath('/dashboard/admin/courses')
+  return { success: true }
+}
+
 /**
  * Asigna o desasigna la competencia de un módulo.
  * Al cambiar la competencia, el progreso del estudiante se recalcula

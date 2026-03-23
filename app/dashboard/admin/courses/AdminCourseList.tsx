@@ -1,10 +1,10 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Plus, Trash2, Edit, ChevronRight, BookOpen, Video, GripVertical, FolderOpen } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 // Importamos las actions (asegúrate de que updateModuleTitle y updateLessonTitle estén en actions.ts)
-import { createModule, deleteModule, createLesson, deleteLesson, updateModuleTitle, updateLessonTitle, updateModuleCompetency } from './actions'
+import { createModule, deleteModule, createLesson, deleteLesson, updateModuleTitle, updateLessonTitle, updateModuleCompetency, reorderLessonsInModule } from './actions'
 import { COMPETENCY_LABELS, type CompetencyKey } from '@/types/progress'
 import EditableText from './EditableText'
 import { Button } from "@/components/ui/button"
@@ -28,7 +28,22 @@ type Module = {
 export default function AdminCourseList({ initialModules }: { initialModules: Module[] }) {
   // Estado local para saber qué módulos están abiertos (expandidos)
   const [expandedModules, setExpandedModules] = useState<Record<string, boolean>>({})
+  const [modules, setModules] = useState<Module[]>(initialModules)
+  const [draggingLessonId, setDraggingLessonId] = useState<string | null>(null)
+  const [draggingModuleId, setDraggingModuleId] = useState<string | null>(null)
+  const [dropTargetLessonId, setDropTargetLessonId] = useState<string | null>(null)
+  const [isReordering, setIsReordering] = useState(false)
   const router = useRouter()
+
+  useEffect(() => {
+    setModules(initialModules)
+  }, [initialModules])
+
+  const moduleById = useMemo(() => {
+    const map = new Map<string, Module>()
+    modules.forEach((module) => map.set(module.id, module))
+    return map
+  }, [modules])
 
   const toggleModule = (moduleId: string) => {
     setExpandedModules(prev => ({ ...prev, [moduleId]: !prev[moduleId] }))
@@ -61,6 +76,90 @@ export default function AdminCourseList({ initialModules }: { initialModules: Mo
   const handleDeleteLesson = async (id: string) => {
     if (!confirm('¿Borrar esta lección permanentemente?')) return
     await deleteLesson(id)
+    router.refresh()
+  }
+
+  const reorderLessons = (lessons: Lesson[], sourceId: string, targetId: string): Lesson[] => {
+    const sourceIndex = lessons.findIndex((lesson) => lesson.id === sourceId)
+    const targetIndex = lessons.findIndex((lesson) => lesson.id === targetId)
+
+    if (sourceIndex < 0 || targetIndex < 0 || sourceIndex === targetIndex) {
+      return lessons
+    }
+
+    const nextLessons = [...lessons]
+    const [moved] = nextLessons.splice(sourceIndex, 1)
+    nextLessons.splice(targetIndex, 0, moved)
+
+    return nextLessons.map((lesson, index) => ({
+      ...lesson,
+      order_index: index + 1,
+    }))
+  }
+
+  const handleDragStart = (moduleId: string, lessonId: string) => {
+    if (isReordering) return
+    setDraggingModuleId(moduleId)
+    setDraggingLessonId(lessonId)
+  }
+
+  const handleDragOver = (event: React.DragEvent<HTMLDivElement>, moduleId: string, lessonId: string) => {
+    if (!draggingLessonId || !draggingModuleId) return
+    if (draggingModuleId !== moduleId || draggingLessonId === lessonId) return
+
+    event.preventDefault()
+    setDropTargetLessonId(lessonId)
+  }
+
+  const handleDragEnd = () => {
+    setDraggingLessonId(null)
+    setDraggingModuleId(null)
+    setDropTargetLessonId(null)
+  }
+
+  const handleDrop = async (event: React.DragEvent<HTMLDivElement>, moduleId: string, targetLessonId: string) => {
+    event.preventDefault()
+
+    if (!draggingLessonId || draggingModuleId !== moduleId || draggingLessonId === targetLessonId) {
+      handleDragEnd()
+      return
+    }
+
+    const currentModule = moduleById.get(moduleId)
+    if (!currentModule) {
+      handleDragEnd()
+      return
+    }
+
+    const reorderedLessons = reorderLessons(currentModule.lessons, draggingLessonId, targetLessonId)
+    if (reorderedLessons === currentModule.lessons) {
+      handleDragEnd()
+      return
+    }
+
+    setModules((prevModules) =>
+      prevModules.map((module) =>
+        module.id === moduleId
+          ? { ...module, lessons: reorderedLessons }
+          : module,
+      ),
+    )
+
+    setIsReordering(true)
+    const result = await reorderLessonsInModule(
+      moduleId,
+      reorderedLessons.map((lesson) => lesson.id),
+    )
+
+    setIsReordering(false)
+    handleDragEnd()
+
+    if (result.error) {
+      alert(result.error)
+      router.refresh()
+      return
+    }
+
     router.refresh()
   }
 
@@ -97,7 +196,7 @@ export default function AdminCourseList({ initialModules }: { initialModules: Mo
 
       {/* LISTA DE MÓDULOS */}
       <div className="space-y-4 md:space-y-6">
-        {initialModules.map((module, index) => (
+        {modules.map((module, index) => (
           <div key={module.id} className="group border border-white/5 rounded-sm overflow-hidden bg-surface transition-all hover:border-white/10">
 
             {/* CABECERA DEL MÓDULO */}
@@ -174,13 +273,26 @@ export default function AdminCourseList({ initialModules }: { initialModules: Mo
                 {module.lessons?.length > 0 ? (
                   <div className="space-y-1">
                     {module.lessons.map((lesson, lIndex) => (
-                      <div key={lesson.id} className="flex items-center justify-between p-2.5 md:p-3 pl-3 md:pl-4 rounded-sm hover:bg-white/5 group/lesson transition-colors border border-transparent hover:border-white/5 ml-3 md:ml-8 relative">
+                      <div
+                        key={lesson.id}
+                        draggable={!isReordering}
+                        onDragStart={() => handleDragStart(module.id, lesson.id)}
+                        onDragOver={(event) => handleDragOver(event, module.id, lesson.id)}
+                        onDrop={(event) => handleDrop(event, module.id, lesson.id)}
+                        onDragEnd={handleDragEnd}
+                        className={cn(
+                          "flex items-center justify-between p-2.5 md:p-3 pl-3 md:pl-4 rounded-sm hover:bg-white/5 group/lesson transition-colors border border-transparent hover:border-white/5 ml-3 md:ml-8 relative",
+                          draggingLessonId === lesson.id && "opacity-50",
+                          dropTargetLessonId === lesson.id && draggingModuleId === module.id && "border-blue-500/60 bg-blue-900/10",
+                          isReordering && "pointer-events-none",
+                        )}
+                      >
                         {/* Connecting Line — hidden on mobile for space */}
                         <div className="absolute -left-3 md:-left-6 top-1/2 w-2 md:w-4 h-[1px] bg-zinc-800"></div>
                         <div className="absolute -left-3 md:-left-6 top-0 bottom-1/2 w-[1px] bg-zinc-800"></div>
 
                         <div className="flex items-center gap-2.5 md:gap-4 flex-1 min-w-0">
-                          <GripVertical size={14} className="text-zinc-700 cursor-move hover:text-zinc-500 hidden md:block shrink-0" />
+                          <GripVertical size={14} className="text-zinc-700 cursor-grab hover:text-zinc-500 hidden md:block shrink-0" />
 
                           <div className={cn("text-zinc-600 group-hover/lesson:text-blue-400 transition-colors shrink-0")}>
                             <Video size={14} className="md:w-4 md:h-4" />
@@ -242,7 +354,7 @@ export default function AdminCourseList({ initialModules }: { initialModules: Mo
           </div>
         ))}
 
-        {initialModules.length === 0 && (
+        {modules.length === 0 && (
           <div className="text-center py-24 border border-dashed border-zinc-800 rounded-sm bg-surface/30 flex flex-col items-center">
             <div className="bg-black/50 w-20 h-20 rounded-full flex items-center justify-center mb-6 text-zinc-700 border border-white/5">
               <BookOpen size={32} />
