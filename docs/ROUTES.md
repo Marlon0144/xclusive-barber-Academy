@@ -264,10 +264,18 @@ const modules = await supabase.from('modules').select(`
 - `createLesson(moduleId, title)` — Create lesson in module
 - `deleteLesson(lessonId)` — Delete individual lesson
 - `updateLessonTitle(lessonId, newTitle)` — Inline title edit
+- `reorderLessonsInModule(moduleId, orderedLessonIds)` — Persist
+  drag-and-drop lesson order within one module
 
 **Components used (co-located):**
 - `AdminCourseList` (Client) — Interactive CRUD UI
 - `EditableText` (Client) — Double-click inline editor
+
+**Reordering behavior:**
+- Admin can drag lessons to reorder inside the same module
+- Cross-module dragging is blocked by design
+- On drop, UI updates optimistically and persists new
+  `order_index` sequence (1..N)
 
 ---
 

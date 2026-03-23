@@ -204,6 +204,23 @@ Cursos" + "Gestion de Usuarios" links (for admins).
 
 ---
 
+### AdminCourseList
+
+**File:** `app/dashboard/admin/courses/AdminCourseList.tsx`
+**Type:** Client Component
+
+**Behavior:**
+- CRUD for modules and lessons (create, rename, delete)
+- Competency assignment per module
+- Drag-and-drop lesson ordering inside each module only
+
+**Data mutation hooks:**
+- Uses Server Actions in `app/dashboard/admin/courses/actions.ts`
+- Persists reorder via `reorderLessonsInModule(moduleId,
+  orderedLessonIds)`
+
+---
+
 ## Header variants (`components/headers/`)
 
 ### DashboardGreenHeader
