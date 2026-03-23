@@ -19,6 +19,7 @@ routes or modifying existing ones.
 | `/dashboard/tracker` | Yes | Any | Client | Standard |
 | `/dashboard/grading` | Yes | instructor/admin | RSC + Client | Standard |
 | `/dashboard/admin/courses` | Yes | admin | RSC + Client | Standard |
+| `/dashboard/admin/gestion_users` | Yes | admin | RSC + Server Actions | Standard |
 | `/dashboard/admin/lessons/[lessonId]/edit` | Yes | admin | RSC + Client | Standard |
 | `/dashboard/progreso_profesional` | Yes | Any | RSC | 139 B |
 
@@ -267,6 +268,47 @@ const modules = await supabase.from('modules').select(`
 **Components used (co-located):**
 - `AdminCourseList` (Client) — Interactive CRUD UI
 - `EditableText` (Client) — Double-click inline editor
+
+---
+
+### `/dashboard/admin/gestion_users` — User and invitation management
+
+**File:** `app/dashboard/admin/gestion_users/page.tsx`
+**Rendering:** Async RSC + native forms with Server Actions
+**Auth:** Yes (admin only)
+
+**Data fetching (parallel):**
+```typescript
+const [invitationsResult, usersResult, authUsersResult] = await Promise.all([
+  supabaseAdmin
+    .from('invitations')
+    .select('id, code, is_active, used_count, max_uses, role_to_assign'),
+  supabaseAdmin
+    .from('profiles')
+    .select('id, full_name, role, created_at'),
+  supabaseAdmin.auth.admin.listUsers({ page: 1, perPage: 1000 }),
+])
+```
+
+**Server Actions:**
+- `createInviteCodeAction(formData)` — Generates random invite code
+  (`XBA-XXXXXXXX`) with configurable `max_uses` selected by admin
+- `toggleInviteStatusAction(formData)` — Activates/deactivates
+  invitation codes
+- `deleteInvitationAction(formData)` — Permanently deletes an
+  invitation code row
+- `updateUserRoleAction(formData)` — Updates `profiles.role`
+  with admin authorization guard
+- `deleteUserAction(formData)` — Permanently deletes an auth user
+  account from Supabase Auth (and cascades profile cleanup)
+
+**Business rules implemented:**
+- Invite codes are random and support configurable usage limits
+  (`max_uses` between 1 and 50)
+- Only admins can access the page and actions
+- Role update guard prevents removing the last admin account
+- User deletion clears `submissions.grader_id` references first to
+  avoid FK violations on auth user delete
 
 ---
 

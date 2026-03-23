@@ -200,7 +200,7 @@ number. Optional tagline text.
 
 **Behavior:** Collapsible menu toggled by gold-accented button.
 Shows "Evaluar Estudiantes" link (for instructors) and "Gestion de
-Cursos" link (for admins).
+Cursos" + "Gestion de Usuarios" links (for admins).
 
 ---
 
