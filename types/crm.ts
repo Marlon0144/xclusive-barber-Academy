@@ -1,5 +1,3 @@
-export type LeadSegment = 'curioso' | 'interesado' | 'muy_interesado'
-
 export type FinancialPreparedness = 'yes' | 'payment_plan' | 'not_yet'
 export type CareerStartWindow = 'immediately' | 'within_3_months' | 'within_6_months' | 'just_researching'
 export type IncomeGoal = '50k_70k' | '70k_100k' | '100k_plus' | 'own_shop'
@@ -28,6 +26,10 @@ export type LeadAnswers = {
 
 export type LeadScoringResult = {
   score: number
-  segment: LeadSegment
   rationale: string[]
+}
+
+export type PhoneLeadCapturePayload = {
+  phone: string
+  source: 'landing_phone_capture'
 }

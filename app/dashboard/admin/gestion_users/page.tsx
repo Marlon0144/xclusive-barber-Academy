@@ -31,7 +31,14 @@ type ProfileRow = {
   created_at: string
 }
 
+type GestionUsersPageProps = {
+  searchParams: Promise<{
+    invite_error?: string
+  }>
+}
+
 const ROLE_OPTIONS: UserRole[] = ['student', 'instructor', 'admin']
+const COUNTRY_CODE_OPTIONS = ['+61', '+57', '+52', '+34', '+1', '+54', '+56']
 
 function formatDate(dateValue: string) {
   const parsed = new Date(dateValue)
@@ -43,7 +50,9 @@ function formatDate(dateValue: string) {
   }).format(parsed)
 }
 
-export default async function GestionUsersPage() {
+export default async function GestionUsersPage({ searchParams }: GestionUsersPageProps) {
+  const params = await searchParams
+
   const supabase = await createClient()
 
   const {
@@ -120,6 +129,13 @@ export default async function GestionUsersPage() {
             <KeyRound className="w-4 h-4 text-gold-500" />
             Crear codigo de invitacion
           </div>
+
+          {params.invite_error ? (
+            <div className="rounded-sm border border-red-700/60 bg-red-950/30 px-3 py-2 text-xs text-red-200">
+              {params.invite_error}
+            </div>
+          ) : null}
+
           <LockedActionForm action={createInviteCodeAction} className="flex flex-col md:flex-row md:items-end gap-3 md:gap-4">
             <label className="flex flex-col gap-2 text-xs uppercase tracking-[0.14em] text-zinc-400">
               Rol a asignar
@@ -149,6 +165,30 @@ export default async function GestionUsersPage() {
               />
             </label>
 
+            <div className="flex flex-col gap-2 text-xs uppercase tracking-[0.14em] text-zinc-400">
+              <span>Telefono lead (opcional)</span>
+              <div className="flex items-center gap-2">
+                <select
+                  name="lead_country_code"
+                  defaultValue="+61"
+                  className="h-10 w-[95px] rounded-sm border border-white/15 bg-black px-2 text-sm text-zinc-100"
+                >
+                  {COUNTRY_CODE_OPTIONS.map((code) => (
+                    <option key={code} value={code}>
+                      {code}
+                    </option>
+                  ))}
+                </select>
+
+                <input
+                  name="lead_phone"
+                  type="tel"
+                  placeholder="413 891 977"
+                  className="h-10 w-full md:w-[170px] rounded-sm border border-white/15 bg-black px-3 text-sm text-zinc-100"
+                />
+              </div>
+            </div>
+
             <button
               type="submit"
               className="h-10 px-4 md:px-6 rounded-sm bg-gold-500 text-black font-bold uppercase tracking-[0.14em] text-xs hover:bg-gold-300 transition-colors"
@@ -157,7 +197,7 @@ export default async function GestionUsersPage() {
             </button>
           </LockedActionForm>
           <p className="text-xs text-zinc-500">
-            Define cuantos usos tendra cada codigo (minimo 1, maximo 50).
+            Define cuantos usos tendra cada codigo (minimo 1, maximo 50). Si agregas telefono, el codigo quedara ligado a ese lead especifico.
           </p>
         </section>
 

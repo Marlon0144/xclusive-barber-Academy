@@ -12,7 +12,6 @@ export type QualifyState = {
 }
 
 const qualifySchema = z.object({
-  phoneNumber: z.string().trim().min(6).max(30),
   citySuburb: z.string().trim().min(2).max(120),
   hasCutHairBefore: z.enum(['yes', 'no']),
   mainGoal: z.string().trim().min(3).max(250),
@@ -56,7 +55,6 @@ export async function submitLeadQualification(
   }
 
   const parsed = qualifySchema.safeParse({
-    phoneNumber: formData.get('phoneNumber'),
     citySuburb: formData.get('citySuburb'),
     hasCutHairBefore: formData.get('hasCutHairBefore'),
     mainGoal: formData.get('mainGoal'),
@@ -101,23 +99,29 @@ export async function submitLeadQualification(
   const supabaseAdmin = createAdminClient()
   const now = new Date().toISOString()
 
+  const { data: existingLeadByProfile } = await supabaseAdmin
+    .from('crm_leads')
+    .select('id, phone_number, stage3_entered_at')
+    .eq('profile_id', user.id)
+    .maybeSingle()
+
+  const payload = {
+    profile_id: user.id,
+    full_name: fullName,
+    email,
+    phone_number: existingLeadByProfile?.phone_number ?? null,
+    city_suburb: parsed.data.citySuburb,
+    auto_score: scoring.score,
+    source: 'apply_wizard',
+    status: 'contacted',
+    stage3_entered_at: existingLeadByProfile?.stage3_entered_at ?? now,
+    qualification_completed_at: now,
+    updated_at: now,
+  }
+
   const { data: upsertedLead, error: leadError } = await supabaseAdmin
     .from('crm_leads')
-    .upsert(
-      {
-        profile_id: user.id,
-        full_name: fullName,
-        email,
-        phone_number: parsed.data.phoneNumber,
-        city_suburb: parsed.data.citySuburb,
-        auto_score: scoring.score,
-        auto_segment: scoring.segment,
-        source: 'apply_wizard',
-        qualification_completed_at: now,
-        updated_at: now,
-      },
-      { onConflict: 'email' },
-    )
+    .upsert(payload, { onConflict: 'profile_id' })
     .select('id')
     .single()
 
@@ -139,14 +143,14 @@ export async function submitLeadQualification(
     { question_key: 'call_willingness', answer_choice: answers.callWillingness },
   ]
 
-  const payload = answersRows.map((row) => ({
+  const answersPayload = answersRows.map((row) => ({
     lead_id: upsertedLead.id,
     ...row,
   }))
 
   const { error: answersError } = await supabaseAdmin
     .from('crm_lead_answers')
-    .upsert(payload, { onConflict: 'lead_id,question_key' })
+    .upsert(answersPayload, { onConflict: 'lead_id,question_key' })
 
   if (answersError) {
     return { error: 'Guardamos parte de tu informacion, pero hubo un error en respuestas.' }

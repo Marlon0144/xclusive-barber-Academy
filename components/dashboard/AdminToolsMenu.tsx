@@ -70,7 +70,7 @@ export function AdminToolsMenu({ isInstructor, isAdmin }: AdminToolsMenuProps) {
                             />
                             <DashboardCard
                                 title="Gestión de Leads"
-                                description="Revisar score automatico, segmentar interesados y dar seguimiento comercial."
+                                description="Revisar score automatico, gestionar etapas CRM y dar seguimiento comercial."
                                 href="/dashboard/admin/leads"
                             />
                         </>

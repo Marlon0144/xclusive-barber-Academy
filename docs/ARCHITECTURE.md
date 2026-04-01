@@ -212,13 +212,13 @@ Student onboarding now has two steps:
 
 1. `/apply` creates auth user, profile, and a seed `crm_leads` row.
 2. User is redirected to `/dashboard/qualify`.
-3. Qualification action computes auto score and segment, stores
+3. Qualification action computes auto score, stores
    questionnaire answers, and marks `qualification_completed_at`.
 4. `/dashboard` gate redirects only students with an existing CRM lead row
    that is still incomplete.
 
-Admins review leads in `/dashboard/admin/leads` and can apply manual segment
-overrides without changing the original automatic segment.
+Admins review leads in `/dashboard/admin/leads` and prioritize
+follow-up using CRM stage and commercial status.
 
 ## Performance patterns
 

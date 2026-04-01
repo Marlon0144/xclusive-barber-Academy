@@ -2,7 +2,9 @@
 
 import { randomBytes } from 'node:crypto'
 import { revalidatePath } from 'next/cache'
+import { redirect } from 'next/navigation'
 import { createAdminClient, createClient } from '@/utils/supabase/server'
+import { normalizePhoneNumber } from '@/utils/phone'
 
 type UserRole = 'admin' | 'instructor' | 'student'
 const MIN_INVITE_USES = 1
@@ -76,7 +78,39 @@ export async function createInviteCodeAction(formData: FormData): Promise<void> 
     return
   }
 
+  const rawLeadPhone = formData.get('lead_phone')
+  const leadPhoneInput = typeof rawLeadPhone === 'string' ? rawLeadPhone.trim() : ''
+  const rawCountryCode = formData.get('lead_country_code')
+  const leadCountryCode = typeof rawCountryCode === 'string' ? rawCountryCode.trim() : '+61'
+
   const supabaseAdmin = createAdminClient()
+
+  let leadIdToLink: string | null = null
+
+  if (leadPhoneInput.length > 0) {
+    const phoneWithCountryCode = leadPhoneInput.startsWith('+')
+      ? leadPhoneInput
+      : `${leadCountryCode} ${leadPhoneInput}`
+
+    const normalizedPhone = normalizePhoneNumber(phoneWithCountryCode)
+    if (!normalizedPhone.isValid) {
+      redirect('/dashboard/admin/gestion_users?invite_error=Telefono%20de%20lead%20invalido.')
+    }
+
+    const { data: leadByPhone } = await supabaseAdmin
+      .from('crm_leads')
+      .select('id')
+      .eq('phone_number', normalizedPhone.value)
+      .order('created_at', { ascending: true })
+      .limit(1)
+      .maybeSingle()
+
+    if (!leadByPhone?.id) {
+      redirect('/dashboard/admin/gestion_users?invite_error=No%20existe%20telefono%20asociado%20a%20ese%20lead.')
+    }
+
+    leadIdToLink = leadByPhone.id
+  }
 
   for (let attempt = 0; attempt < 6; attempt += 1) {
     const code = generateInviteCode(8)
@@ -87,6 +121,7 @@ export async function createInviteCodeAction(formData: FormData): Promise<void> 
       used_count: 0,
       max_uses: maxUses,
       role_to_assign: role,
+      lead_id: leadIdToLink,
     })
 
     if (!error) {

@@ -3,10 +3,16 @@ import { Filter, Users } from 'lucide-react'
 import DashboardPageHeader from '@/components/headers/DashboardPageHeader'
 import { DashboardFooter } from '@/components/dashboard/DashboardFooter'
 import { createAdminClient, createClient } from '@/utils/supabase/server'
-import { updateLeadReviewAction } from './actions'
+import { deleteLeadAction, updateLeadReviewAction } from './actions'
 
 type LeadStatus = 'new' | 'contacted' | 'qualified' | 'lost' | 'converted'
-type LeadSegment = 'curioso' | 'interesado' | 'muy_interesado'
+type LeadStageValue = '1' | '2' | '3' | '4'
+
+type LeadStage = {
+  value: LeadStageValue
+  title: string
+  label: string
+}
 type LeadAnswer = {
   question_key: string
   answer_text: string | null
@@ -16,13 +22,18 @@ type LeadAnswer = {
 
 type LeadRow = {
   id: string
-  full_name: string
-  email: string
+  full_name: string | null
+  email: string | null
   phone_number: string | null
+  profile_id: string | null
+  stage1_entered_at: string | null
+  stage2_entered_at: string | null
+  stage3_entered_at: string | null
+  stage4_entered_at: string | null
   auto_score: number
-  auto_segment: LeadSegment
-  admin_segment_override: LeadSegment | null
   status: LeadStatus
+  source: string
+  qualification_completed_at: string | null
   review_notes: string | null
   created_at: string
   crm_lead_answers?: LeadAnswer[]
@@ -32,8 +43,35 @@ type LeadsPageProps = {
   searchParams: Promise<{
     q?: string
     status?: LeadStatus | 'all'
-    segment?: LeadSegment | 'all'
+    stage?: LeadStageValue | 'all'
   }>
+}
+
+function resolveLeadStage(lead: LeadRow): LeadStage {
+  if (Boolean(lead.profile_id) && Boolean(lead.qualification_completed_at)) {
+    return { value: '4', title: 'Cuenta creada', label: 'Etapa 4' }
+  }
+
+  if (
+    Boolean(lead.qualification_completed_at) ||
+    lead.status === 'contacted' ||
+    lead.status === 'qualified'
+  ) {
+    return { value: '3', title: 'Muy interesado', label: 'Etapa 3' }
+  }
+
+  if (lead.source === 'apply_page_visit') {
+    return { value: '2', title: 'Interesado', label: 'Etapa 2' }
+  }
+
+  return { value: '1', title: 'Curioso', label: 'Etapa 1' }
+}
+
+function resolveCurrentStageEnteredAt(lead: LeadRow, stage: LeadStage): string | null {
+  if (stage.value === '1') return lead.stage1_entered_at
+  if (stage.value === '2') return lead.stage2_entered_at
+  if (stage.value === '3') return lead.stage3_entered_at
+  return lead.stage4_entered_at
 }
 
 function formatDate(dateValue: string) {
@@ -54,10 +92,11 @@ const STATUS_OPTIONS: Array<{ value: LeadStatus; label: string }> = [
   { value: 'converted', label: 'Convertido' },
 ]
 
-const SEGMENT_OPTIONS: Array<{ value: LeadSegment; label: string }> = [
-  { value: 'curioso', label: 'Curioso' },
-  { value: 'interesado', label: 'Interesado' },
-  { value: 'muy_interesado', label: 'Muy interesado' },
+const STAGE_OPTIONS: Array<{ value: LeadStageValue; label: string }> = [
+  { value: '1', label: 'Etapa 1 - Curioso' },
+  { value: '2', label: 'Etapa 2 - Interesado' },
+  { value: '3', label: 'Etapa 3 - Muy interesado' },
+  { value: '4', label: 'Etapa 4 - Cuenta creada' },
 ]
 
 const QUESTION_LABELS: Record<string, string> = {
@@ -127,7 +166,7 @@ export default async function AdminLeadsPage({ searchParams }: LeadsPageProps) {
   }
 
   const selectedStatus = params.status ?? 'all'
-  const selectedSegment = params.segment ?? 'all'
+  const selectedStage = params.stage ?? 'all'
   const search = (params.q ?? '').trim().toLowerCase()
 
   const supabaseAdmin = createAdminClient()
@@ -135,7 +174,7 @@ export default async function AdminLeadsPage({ searchParams }: LeadsPageProps) {
   const query = supabaseAdmin
     .from('crm_leads')
     .select(
-      'id, full_name, email, phone_number, auto_score, auto_segment, admin_segment_override, status, review_notes, created_at, crm_lead_answers(question_key, answer_text, answer_number, answer_choice)',
+      'id, full_name, email, phone_number, profile_id, stage1_entered_at, stage2_entered_at, stage3_entered_at, stage4_entered_at, auto_score, status, source, qualification_completed_at, review_notes, created_at, crm_lead_answers(question_key, answer_text, answer_number, answer_choice)',
     )
     .order('created_at', { ascending: false })
     .limit(300)
@@ -149,17 +188,21 @@ export default async function AdminLeadsPage({ searchParams }: LeadsPageProps) {
   const leadsRaw = (data ?? []) as LeadRow[]
 
   const leads = leadsRaw.filter((lead) => {
-    const effectiveSegment = lead.admin_segment_override ?? lead.auto_segment
-    const segmentMatch = selectedSegment === 'all' || effectiveSegment === selectedSegment
+    const stage = resolveLeadStage(lead)
+    const stageMatch = selectedStage === 'all' || stage.value === selectedStage
 
-    if (!segmentMatch) return false
+    if (!stageMatch) return false
 
     if (!search) return true
 
+    const name = lead.full_name?.toLowerCase() ?? ''
+    const email = lead.email?.toLowerCase() ?? ''
+    const phone = lead.phone_number?.toLowerCase() ?? ''
+
     return (
-      lead.full_name.toLowerCase().includes(search) ||
-      lead.email.toLowerCase().includes(search) ||
-      (lead.phone_number ?? '').toLowerCase().includes(search)
+      name.includes(search) ||
+      email.includes(search) ||
+      phone.includes(search)
     )
   })
 
@@ -175,7 +218,7 @@ export default async function AdminLeadsPage({ searchParams }: LeadsPageProps) {
           </div>
           <h1 className="text-3xl md:text-5xl font-serif text-white mb-3">Pipeline de interesados</h1>
           <p className="text-zinc-400 max-w-3xl text-sm md:text-lg font-light">
-            Revisa score automatico, aplica override manual y filtra rapidamente a los curiosos de los realmente interesados.
+            Revisa score automatico, actualiza estado comercial y prioriza seguimiento por etapa CRM.
           </p>
         </header>
 
@@ -208,12 +251,12 @@ export default async function AdminLeadsPage({ searchParams }: LeadsPageProps) {
             </select>
 
             <select
-              name="segment"
-              defaultValue={selectedSegment}
+              name="stage"
+              defaultValue={selectedStage}
               className="h-10 rounded-sm border border-white/15 bg-black px-3 text-sm text-zinc-100"
             >
-              <option value="all">Todos los segmentos</option>
-              {SEGMENT_OPTIONS.map((option) => (
+              <option value="all">Todas las etapas</option>
+              {STAGE_OPTIONS.map((option) => (
                 <option key={option.value} value={option.value}>
                   {option.label}
                 </option>
@@ -238,8 +281,9 @@ export default async function AdminLeadsPage({ searchParams }: LeadsPageProps) {
             <thead>
               <tr className="border-b border-white/10 text-zinc-400 uppercase tracking-[0.12em] text-xs">
                 <th className="py-3 pr-3">Lead</th>
+                <th className="py-3 pr-3">Etapa CRM</th>
+                <th className="py-3 pr-3">Entrada etapa</th>
                 <th className="py-3 pr-3">Score auto</th>
-                <th className="py-3 pr-3">Segmento</th>
                 <th className="py-3 pr-3">Estado</th>
                 <th className="py-3 pr-3">Notas</th>
                 <th className="py-3">Acciones</th>
@@ -255,7 +299,8 @@ export default async function AdminLeadsPage({ searchParams }: LeadsPageProps) {
                 </tr>
               ) : (
                 leads.map((lead) => {
-                  const effectiveSegment = lead.admin_segment_override ?? lead.auto_segment
+                  const stage = resolveLeadStage(lead)
+                  const stageEnteredAt = resolveCurrentStageEnteredAt(lead, stage)
                   const answers = [...(lead.crm_lead_answers ?? [])].sort((a, b) => {
                     const aIndex = QUESTION_ORDER.indexOf(a.question_key)
                     const bIndex = QUESTION_ORDER.indexOf(b.question_key)
@@ -265,8 +310,8 @@ export default async function AdminLeadsPage({ searchParams }: LeadsPageProps) {
                   return (
                     <tr key={lead.id} className="border-b border-white/5 align-top">
                       <td className="py-3 pr-3">
-                        <p className="text-zinc-200 font-medium">{lead.full_name}</p>
-                        <p className="text-zinc-400 text-xs">{lead.email}</p>
+                        <p className="text-zinc-200 font-medium">{lead.full_name ?? 'Sin nombre'}</p>
+                        <p className="text-zinc-400 text-xs">{lead.email ?? 'Sin correo'}</p>
                         <p className="text-zinc-500 text-xs">{lead.phone_number ?? 'Sin telefono'}</p>
                         <p className="text-zinc-600 text-[10px] mt-1">{formatDate(lead.created_at)}</p>
 
@@ -291,16 +336,16 @@ export default async function AdminLeadsPage({ searchParams }: LeadsPageProps) {
                         </details>
                       </td>
 
-                      <td className="py-3 pr-3 text-zinc-100 font-bold">{lead.auto_score}</td>
-
                       <td className="py-3 pr-3">
-                        <p className="text-zinc-100 uppercase text-xs tracking-[0.08em]">{effectiveSegment.replace('_', ' ')}</p>
-                        {lead.admin_segment_override && (
-                          <p className="text-zinc-500 text-[10px] uppercase tracking-[0.08em] mt-1">
-                            Override manual
-                          </p>
-                        )}
+                        <div className="inline-flex flex-col items-start gap-1 rounded-sm border border-[#d4af37]/25 bg-[#1c3123]/35 px-3 py-2">
+                          <p className="text-[10px] uppercase tracking-[0.12em] text-[#d4af37]">{stage.label}</p>
+                          <p className="text-xs font-semibold text-zinc-100 uppercase tracking-[0.08em]">{stage.title}</p>
+                        </div>
                       </td>
+
+                      <td className="py-3 pr-3 text-zinc-400 text-xs">{stageEnteredAt ? formatDate(stageEnteredAt) : '-'}</td>
+
+                      <td className="py-3 pr-3 text-zinc-100 font-bold">{lead.auto_score}</td>
 
                       <td className="py-3 pr-3 uppercase text-zinc-300 text-xs tracking-[0.08em]">{lead.status}</td>
 
@@ -309,7 +354,11 @@ export default async function AdminLeadsPage({ searchParams }: LeadsPageProps) {
                       </td>
 
                       <td className="py-3">
-                        <form action={updateLeadReviewAction} className="space-y-2 min-w-[300px]">
+                        <form
+                          id={`lead-review-${lead.id}`}
+                          action={updateLeadReviewAction}
+                          className="space-y-2 min-w-[300px]"
+                        >
                           <input type="hidden" name="leadId" value={lead.id} />
 
                           <select
@@ -324,19 +373,6 @@ export default async function AdminLeadsPage({ searchParams }: LeadsPageProps) {
                             ))}
                           </select>
 
-                          <select
-                            name="overrideSegment"
-                            defaultValue={lead.admin_segment_override ?? ''}
-                            className="h-9 w-full rounded-sm border border-white/15 bg-black px-2 text-xs uppercase tracking-[0.08em] text-zinc-100"
-                          >
-                            <option value="">Sin override (usar auto)</option>
-                            {SEGMENT_OPTIONS.map((option) => (
-                              <option key={option.value} value={option.value}>
-                                {option.label}
-                              </option>
-                            ))}
-                          </select>
-
                           <input
                             type="text"
                             name="reviewNotes"
@@ -344,14 +380,27 @@ export default async function AdminLeadsPage({ searchParams }: LeadsPageProps) {
                             placeholder="Nota breve de seguimiento"
                             className="h-9 w-full rounded-sm border border-white/15 bg-black px-2 text-xs text-zinc-100"
                           />
+                        </form>
 
+                        <div className="mt-2 flex items-center gap-2">
                           <button
                             type="submit"
+                            form={`lead-review-${lead.id}`}
                             className="h-9 px-3 rounded-sm bg-[#1f3b2f] text-zinc-100 border border-[#2d5b45] text-xs uppercase tracking-[0.12em] hover:bg-[#28513d]"
                           >
                             Guardar revision
                           </button>
-                        </form>
+
+                          <form action={deleteLeadAction}>
+                            <input type="hidden" name="leadId" value={lead.id} />
+                            <button
+                              type="submit"
+                              className="h-9 px-3 rounded-sm bg-[#3a1f1f] text-zinc-100 border border-[#5b2d2d] text-xs uppercase tracking-[0.12em] hover:bg-[#512828]"
+                            >
+                              Borrar lead
+                            </button>
+                          </form>
+                        </div>
                       </td>
                     </tr>
                   )

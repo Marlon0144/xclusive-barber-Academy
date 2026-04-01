@@ -343,7 +343,9 @@ content).
 
 | Component | File | Content |
 |-----------|------|---------|
-| `HeroSection` | `landing/HeroSection.tsx` | Hero banner, tattoo arm graphic, CTA |
+| `HeroSection` | `landing/HeroSection.tsx` | Hero banner and tattoo arm graphic |
+| `PhoneLeadCaptureForm` | `landing/PhoneLeadCaptureForm.tsx` | Public phone form with country code selector and Server Action submit |
+| `LandingFlowGate` | `landing/LandingFlowGate.tsx` | Client-side progressive lock with floating phone form and blurred content behind |
 | `TargetAudienceSection` | `landing/TargetAudienceSection.tsx` | Green CTA bar + 3 audience bullets |
 | `FeaturesSection` | `landing/FeaturesSection.tsx` | Three-column: Mentalidad, Practica, Carrera |
 | `MissionVisionSection` | `landing/MissionVisionSection.tsx` | Mission + Vision dark cards |

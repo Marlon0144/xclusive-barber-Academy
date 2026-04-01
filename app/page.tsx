@@ -4,6 +4,7 @@ import FeaturesSection from "@/components/landing/FeaturesSection";
 import MissionVisionSection from "@/components/landing/MissionVisionSection";
 import InstructorSection from "@/components/landing/InstructorSection";
 import FinalCtaSection from "@/components/landing/FinalCtaSection";
+import LandingFlowGate from "@/components/landing/LandingFlowGate";
 
 export default async function Home() {
   // no server data needed on landing page
@@ -12,21 +13,25 @@ export default async function Home() {
 
       {/* 1. HERO & INTRO */}
       <HeroSection />
-      
+
       {/* 2. TARGET AUDIENCE (Para quién es) */}
       <TargetAudienceSection />
 
-      {/* 3. CORE FEATURES (Metodología) */}
-      <FeaturesSection />
+      <LandingFlowGate>
+        <div id="landing-features-start">
+          {/* 3. CORE FEATURES (Metodología) */}
+          <FeaturesSection />
+        </div>
 
-      {/* 4. MISION & VISION */}
-      <MissionVisionSection />
+        {/* 4. MISION & VISION */}
+        <MissionVisionSection />
 
-      {/* 5. INSTRUCTOR & CREDIBILITY */}
-      <InstructorSection />
+        {/* 5. INSTRUCTOR & CREDIBILITY */}
+        <InstructorSection />
 
-      {/* 6. FINAL CTA */}
-      <FinalCtaSection />
+        {/* 6. FINAL CTA */}
+        <FinalCtaSection />
+      </LandingFlowGate>
 
     </div>
   );

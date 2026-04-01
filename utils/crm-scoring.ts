@@ -6,7 +6,6 @@ import type {
   IncomeGoal,
   LeadAnswers,
   LeadScoringResult,
-  LeadSegment,
   LongTermAmbition,
 } from '@/types/crm'
 
@@ -51,12 +50,6 @@ const YES_NO_POINTS: Record<DiscoverySource, number> = {
 
 const MAX_POINTS = 125
 
-function resolveSegment(score: number): LeadSegment {
-  if (score >= 70) return 'muy_interesado'
-  if (score >= 40) return 'interesado'
-  return 'curioso'
-}
-
 export function computeLeadScore(answers: LeadAnswers): LeadScoringResult {
   const seriousnessPoints = Math.max(0, Math.min(10, answers.seriousness)) * 3
 
@@ -72,7 +65,6 @@ export function computeLeadScore(answers: LeadAnswers): LeadScoringResult {
     YES_NO_POINTS[answers.followsBarberPages]
 
   const score = Math.round((rawPoints / MAX_POINTS) * 100)
-  const segment = resolveSegment(score)
 
   const rationale: string[] = []
   if (answers.financialPreparedness === 'yes') rationale.push('Listo para invertir en su formacion')
@@ -80,5 +72,5 @@ export function computeLeadScore(answers: LeadAnswers): LeadScoringResult {
   if (answers.callWillingness === 'yes') rationale.push('Disponible para llamada de admision')
   if (answers.longTermAmbition === 'open_shop') rationale.push('Meta de abrir su propio negocio')
 
-  return { score, segment, rationale }
+  return { score, rationale }
 }

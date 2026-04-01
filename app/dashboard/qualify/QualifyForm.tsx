@@ -10,7 +10,6 @@ const initialState: QualifyState = {
 }
 
 type AnswerKey =
-  | 'phoneNumber'
   | 'citySuburb'
   | 'hasCutHairBefore'
   | 'mainGoal'
@@ -30,27 +29,20 @@ type Step = {
   indexLabel: string
   title: string
   hint?: string
-  type: 'text' | 'tel' | 'choice' | 'scale'
+  type: 'text' | 'choice' | 'scale'
   options?: Array<{ value: string; label: string; badge?: string }>
 }
 
 const steps: Step[] = [
   {
-    key: 'phoneNumber',
-    indexLabel: '1',
-    title: 'Phone Number*',
-    hint: 'Usaremos este numero para coordinar la llamada de admision.',
-    type: 'tel',
-  },
-  {
     key: 'citySuburb',
-    indexLabel: '2',
+    indexLabel: '1',
     title: 'City/Suburb you currently live in?*',
     type: 'text',
   },
   {
     key: 'hasCutHairBefore',
-    indexLabel: '3',
+    indexLabel: '2',
     title: 'Have you ever cut hair before?*',
     type: 'choice',
     options: [
@@ -60,13 +52,13 @@ const steps: Step[] = [
   },
   {
     key: 'mainGoal',
-    indexLabel: '4',
+    indexLabel: '3',
     title: 'What is your main goal after completing the academy?*',
     type: 'text',
   },
   {
     key: 'consideredOtherPrograms',
-    indexLabel: '5',
+    indexLabel: '4',
     title: 'Have you considered other barber programs before applying?*',
     type: 'choice',
     options: [
@@ -76,14 +68,14 @@ const steps: Step[] = [
   },
   {
     key: 'seriousness',
-    indexLabel: '6',
+    indexLabel: '5',
     title: 'How serious are you about becoming a barber?*',
     hint: 'Selecciona un numero del 1 al 10.',
     type: 'scale',
   },
   {
     key: 'incomeGoal',
-    indexLabel: '7',
+    indexLabel: '6',
     title: 'What income would you like to be earning as a barber?*',
     type: 'choice',
     options: [
@@ -95,7 +87,7 @@ const steps: Step[] = [
   },
   {
     key: 'followsBarberPages',
-    indexLabel: '8',
+    indexLabel: '7',
     title: 'Do you currently follow barbers or barbering pages online?*',
     type: 'choice',
     options: [
@@ -105,7 +97,7 @@ const steps: Step[] = [
   },
   {
     key: 'financialPreparedness',
-    indexLabel: '9',
+    indexLabel: '8',
     title: 'Are you financially prepared to invest in your education?*',
     type: 'choice',
     options: [
@@ -116,7 +108,7 @@ const steps: Step[] = [
   },
   {
     key: 'careerStartWindow',
-    indexLabel: '10',
+    indexLabel: '9',
     title: 'When are you looking to start your barber career?*',
     type: 'choice',
     options: [
@@ -128,7 +120,7 @@ const steps: Step[] = [
   },
   {
     key: 'longTermAmbition',
-    indexLabel: '11',
+    indexLabel: '10',
     title: 'Do you have long-term ambitions in the barber industry?*',
     type: 'choice',
     options: [
@@ -141,7 +133,7 @@ const steps: Step[] = [
   },
   {
     key: 'callWillingness',
-    indexLabel: '12',
+    indexLabel: '11',
     title: 'If accepted, are you willing to jump on a short call with our team?*',
     type: 'choice',
     options: [
@@ -171,10 +163,6 @@ function validateStep(step: Step, value: string): string | null {
 
   if (!clean) return 'Esta pregunta es obligatoria.'
 
-  if (step.key === 'phoneNumber' && clean.length < 6) {
-    return 'Ingresa un numero de telefono valido.'
-  }
-
   if (step.key === 'seriousness') {
     const numeric = Number(clean)
     if (!Number.isInteger(numeric) || numeric < 1 || numeric > 10) {
@@ -186,7 +174,6 @@ function validateStep(step: Step, value: string): string | null {
 }
 
 const INITIAL_ANSWERS: Answers = {
-  phoneNumber: '',
   citySuburb: '',
   hasCutHairBefore: '',
   mainGoal: '',
@@ -239,13 +226,13 @@ export default function QualifyForm() {
   }
 
   function renderStepControl() {
-    if (currentStep.type === 'text' || currentStep.type === 'tel') {
+    if (currentStep.type === 'text') {
       return (
         <input
           value={currentValue}
           onChange={(event) => updateAnswer(currentStep.key, event.target.value)}
-          type={currentStep.type}
-          autoComplete={currentStep.type === 'tel' ? 'tel' : 'off'}
+          type="text"
+          autoComplete="off"
           placeholder="Type your answer here..."
           className="h-14 w-full rounded-sm border border-white/20 bg-black/50 px-4 text-xl md:text-2xl text-zinc-100 placeholder:text-zinc-500 focus:border-[#d3cbba] focus:ring-2 focus:ring-[#d3cbba]/20 focus:outline-none transition-all"
         />
@@ -307,7 +294,6 @@ export default function QualifyForm() {
 
   return (
     <form action={action} className="space-y-6">
-      <input type="hidden" name="phoneNumber" value={answers.phoneNumber} />
       <input type="hidden" name="citySuburb" value={answers.citySuburb} />
       <input type="hidden" name="hasCutHairBefore" value={answers.hasCutHairBefore} />
       <input type="hidden" name="mainGoal" value={answers.mainGoal} />

@@ -43,7 +43,7 @@ export default async function QualifyPage() {
             Queremos conocer tu nivel de compromiso
           </h1>
           <p className="text-zinc-400 text-sm md:text-base max-w-2xl font-light">
-            Este formulario toma menos de 3 minutos. Nos ayuda a segmentar tu perfil y darte
+            Este formulario toma menos de 3 minutos. Nos ayuda a evaluar tu perfil y darte
             seguimiento personalizado dentro del proceso de admision.
           </p>
         </header>
