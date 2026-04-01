@@ -1,10 +1,12 @@
 
+import { redirect } from 'next/navigation'
 import { getUser, getProfile } from '@/utils/cache-helpers'
 import { DashboardHeader } from '@/components/dashboard/DashboardHeader'
 import { DashboardCard } from '@/components/dashboard/DashboardCard'
 import { AdminToolsMenu } from '@/components/dashboard/AdminToolsMenu'
 import { DashboardFooter } from '@/components/dashboard/DashboardFooter'
 import DashboardGreenHeader from '@/components/headers/DashboardGreenHeader'
+import { createClient } from '@/utils/supabase/server'
 
 export default async function DashboardPage() {
   const user = await getUser()
@@ -18,6 +20,19 @@ export default async function DashboardPage() {
 
   const isInstructor = userRole === 'admin' || userRole === 'instructor'
   const isAdmin = userRole === 'admin'
+
+  if (user && userRole === 'student') {
+    const supabase = await createClient()
+    const { data: lead } = await supabase
+      .from('crm_leads')
+      .select('id, qualification_completed_at')
+      .eq('profile_id', user.id)
+      .maybeSingle()
+
+    if (lead && !lead.qualification_completed_at) {
+      redirect('/dashboard/qualify')
+    }
+  }
 
   return (
     <div className="min-h-screen bg-[#161616] text-white">

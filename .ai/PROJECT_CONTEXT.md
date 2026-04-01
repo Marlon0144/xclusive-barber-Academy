@@ -1,5 +1,5 @@
 # PROJECT_CONTEXT.md
-> **Última actualización:** 2026-02-25 — Sprint 6 Backend (Progreso Profesional)
+> **Última actualización:** 2026-04-01 — CRM Básico (Leads + Scoring)
 
 ## 1. Project Identity
 **Nombre:** Xclusive Barber Academy (LMS)
@@ -124,6 +124,46 @@ ADD COLUMN IF NOT EXISTS competency TEXT
 (Sin cambios recientes - Ver versión anterior para inventario de policies)
 
 ## 5. Estado del Sprint 6 (Progreso Profesional — Backend)
+
+### ✅ CRM Básico V1 Implementado (2026-04-01)
+
+**Objetivo:** Segmentar automaticamente leads en Curioso / Interesado /
+Muy interesado con revisión manual admin.
+
+#### Cambios de base de datos (Supabase MCP)
+- Tabla nueva: `crm_leads`
+- Tabla nueva: `crm_lead_answers`
+- RLS: admin full CRUD para CRM, y lectura del propio lead por `profile_id`
+
+#### Nuevas rutas
+- `app/dashboard/qualify/page.tsx` — Wizard post-registro (step 2)
+- `app/dashboard/admin/leads/page.tsx` — Panel CRM de revisión admin
+
+#### Nuevas Server Actions
+- `submitLeadQualification` (`app/dashboard/qualify/actions.ts`)
+   - Zod validation
+   - Scoring server-side
+   - Upsert `crm_leads` + `crm_lead_answers`
+- `updateLeadReviewAction` (`app/dashboard/admin/leads/actions.ts`)
+   - Admin-only
+   - Estado comercial + override de segmento + notas de revisión
+
+#### Flujo actualizado de onboarding
+1. `/apply` crea auth user + profile + seed lead (`crm_leads`)
+2. Redirección a `/dashboard/qualify`
+3. Submit de wizard guarda score/segmento y marca completitud
+4. `/dashboard` fuerza wizard solo si existe lead incompleto
+
+#### Segmentación V1
+- Curioso: `0-39`
+- Interesado: `40-69`
+- Muy interesado: `70-100`
+
+#### Notas importantes
+- No se creó otra DB: todo vive en la misma instancia Supabase.
+- Se mantiene el estilo visual Premium Dark y los patrones de layout existentes.
+- Deuda técnica vigente: validar consolidación total de reglas RLS y migración
+   de validaciones manuales legacy restantes a Zod.
 
 ### ✅ Sprint 6 — Backend Completo (2026-02-21)
 

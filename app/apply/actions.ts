@@ -4,29 +4,36 @@ import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/utils/supabase/server'
 import { createClient as createSupabaseClient } from '@supabase/supabase-js'
+import { z } from 'zod'
 
 export type ApplyState = {
   error?: string | null
   success?: boolean
 }
 
+const applySchema = z.object({
+  email: z.string().email('Correo electronico invalido.'),
+  password: z.string().min(6, 'La contraseña debe tener al menos 6 caracteres.'),
+  fullName: z.string().trim().min(2, 'Nombre invalido.').max(120, 'Nombre demasiado largo.'),
+  inviteCode: z.string().trim().min(3, 'Codigo de acceso invalido.').max(80, 'Codigo de acceso invalido.'),
+})
+
 export async function applyAccess(prevState: ApplyState, formData: FormData): Promise<ApplyState> {
   // Cliente NORMAL (para validar invitación y crear auth user)
   const supabase = await createClient()
 
-  const email = formData.get('email') as string
-  const password = formData.get('password') as string
-  const fullName = formData.get('fullName') as string
-  const inviteCode = formData.get('inviteCode') as string
+  const parsed = applySchema.safeParse({
+    email: formData.get('email'),
+    password: formData.get('password'),
+    fullName: formData.get('fullName'),
+    inviteCode: formData.get('inviteCode'),
+  })
 
-  // Validaciones básicas
-  if (!email || !password || !fullName || !inviteCode) {
-    return { error: 'Por favor completa todos los campos.', success: false }
+  if (!parsed.success) {
+    return { error: parsed.error.issues[0]?.message ?? 'Datos del formulario invalidos.', success: false }
   }
 
-  if (password.length < 6) {
-    return { error: 'La contraseña debe tener al menos 6 caracteres.', success: false }
-  }
+  const { email, password, fullName, inviteCode } = parsed.data
 
   // 1. VALIDAR CÓDIGO DE INVITACIÓN
   const { data: invitation, error: inviteError } = await supabase
@@ -80,6 +87,20 @@ export async function applyAccess(prevState: ApplyState, formData: FormData): Pr
       return { error: 'Error al activar tu cuenta. Por favor intenta nuevamente.', success: false }
     }
 
+    const { error: crmSeedError } = await supabaseAdmin.from('crm_leads').upsert(
+      {
+        profile_id: authData.user.id,
+        full_name: fullName,
+        email,
+        source: 'apply_registration',
+      },
+      { onConflict: 'email' },
+    )
+
+    if (crmSeedError) {
+      console.error('Error creando lead inicial:', crmSeedError)
+    }
+
     // 4. QUEMAR EL CÓDIGO (incrementar used_count)
     await supabaseAdmin.from('invitations').update({
       used_count: invitation.used_count + 1
@@ -87,7 +108,7 @@ export async function applyAccess(prevState: ApplyState, formData: FormData): Pr
   }
 
   revalidatePath('/', 'layout')
-  redirect('/dashboard')
+  redirect('/dashboard/qualify')
 
   return { success: true, error: null }
 }

@@ -18,8 +18,10 @@ routes or modifying existing ones.
 | `/dashboard/courses/[courseId]/[lessonId]` | Yes | Any | RSC + Client | Standard |
 | `/dashboard/tracker` | Yes | Any | Client | Standard |
 | `/dashboard/grading` | Yes | instructor/admin | RSC + Client | Standard |
+| `/dashboard/qualify` | Yes | student | RSC + Client | Standard |
 | `/dashboard/admin/courses` | Yes | admin | RSC + Client | Standard |
 | `/dashboard/admin/gestion_users` | Yes | admin | RSC + Server Actions | Standard |
+| `/dashboard/admin/leads` | Yes | admin | RSC + Server Actions | Standard |
 | `/dashboard/admin/lessons/[lessonId]/edit` | Yes | admin | RSC + Client | Standard |
 | `/dashboard/progreso_profesional` | Yes | Any | RSC | 139 B |
 
@@ -58,7 +60,9 @@ routes or modifying existing ones.
 - Validates invite code against `invitations` table
 - Creates auth user via Supabase Auth
 - Creates profile record via Admin client
+- Seeds `crm_leads` row linked to the new profile
 - Increments invite code usage counter
+- Redirects to `/dashboard/qualify` (step 2 onboarding)
 
 **Data flow:**
 ```
@@ -241,6 +245,26 @@ const submissions = await supabase
 
 ---
 
+### `/dashboard/qualify` — Lead qualification wizard
+
+**File:** `app/dashboard/qualify/page.tsx`
+**Rendering:** Async RSC + Client form
+**Auth:** Yes (student only)
+
+**Guard behavior:**
+- Redirects to `/login` when no session
+- Redirects to `/dashboard` when role is not `student`
+- Redirects to `/dashboard` when `qualification_completed_at` already exists
+
+**Server Action:** `submitLeadQualification(prevState, formData)`
+- Validates inputs with Zod
+- Computes automatic lead score (`utils/crm-scoring.ts`)
+- Upserts `crm_leads` with `auto_score`, `auto_segment`, and completion timestamp
+- Upserts `crm_lead_answers` by `lead_id + question_key`
+- Revalidates dashboard/admin leads and redirects to `/dashboard`
+
+---
+
 ### `/dashboard/admin/courses` — Admin course management
 
 **File:** `app/dashboard/admin/courses/page.tsx`
@@ -317,6 +341,29 @@ const [invitationsResult, usersResult, authUsersResult] = await Promise.all([
 - Role update guard prevents removing the last admin account
 - User deletion clears `submissions.grader_id` references first to
   avoid FK violations on auth user delete
+
+---
+
+### `/dashboard/admin/leads` — CRM lead review panel
+
+**File:** `app/dashboard/admin/leads/page.tsx`
+**Rendering:** Async RSC + native forms with Server Actions
+**Auth:** Yes (admin only)
+
+**Data fetching:**
+- Reads up to 300 leads from `crm_leads` (desc by `created_at`)
+- Supports filter by query text, status, and effective segment
+
+**Server Action:** `updateLeadReviewAction(formData)`
+- Verifies admin role
+- Updates `status`
+- Applies or clears `admin_segment_override`
+- Persists `review_notes`, `reviewed_by`, and `reviewed_at`
+
+**Business behavior:**
+- Keeps automatic segment and manual override as separate values
+- Exposes a compact review workflow directly from each table row
+- Shows full questionnaire answers for each lead in an expandable section
 
 ---
 

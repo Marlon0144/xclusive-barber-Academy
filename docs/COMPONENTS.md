@@ -200,7 +200,8 @@ number. Optional tagline text.
 
 **Behavior:** Collapsible menu toggled by gold-accented button.
 Shows "Evaluar Estudiantes" link (for instructors) and "Gestion de
-Cursos" + "Gestion de Usuarios" links (for admins).
+Cursos" + "Gestion de Usuarios" + "Gestion de Leads" links (for
+admins).
 
 ---
 
@@ -425,6 +426,18 @@ a single route.
 |-----------|------|-------|
 | `ApplyForm` | Client | None (uses action directly) |
 
+### Qualification route (`app/dashboard/qualify/`)
+
+| Component | Type | Props |
+|-----------|------|-------|
+| `QualifyForm` | Client | None (uses action directly) |
+
+### Admin leads route (`app/dashboard/admin/leads/`)
+
+| Component | Type | Props |
+|-----------|------|-------|
+| `page.tsx` table + native forms | RSC | `searchParams` filters |
+
 ## Component dependency graph
 
 ```
@@ -470,6 +483,7 @@ Root Layout
     ├── Admin
     │   ├── AdminCourseList (client)
     │   ├── EditableText (client)
+    │   ├── Leads review table (RSC)
     │   ├── EditLessonForm (client)
     │   ├── RichTextEditor (client, dynamic)
     │   └── EditorToolbar (client)

@@ -68,6 +68,11 @@ export function AdminToolsMenu({ isInstructor, isAdmin }: AdminToolsMenuProps) {
                                 description="Crear codigos de acceso de un solo uso y administrar roles de usuarios."
                                 href="/dashboard/admin/gestion_users"
                             />
+                            <DashboardCard
+                                title="Gestión de Leads"
+                                description="Revisar score automatico, segmentar interesados y dar seguimiento comercial."
+                                href="/dashboard/admin/leads"
+                            />
                         </>
                     )}
                 </div>
