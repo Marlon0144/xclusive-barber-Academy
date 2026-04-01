@@ -432,6 +432,12 @@ a single route.
 |-----------|------|-------|
 | `QualifyForm` | Client | None (uses action directly) |
 
+**Behavior:**
+- Typeform-like wizard with one question per screen
+- Local per-step validation before moving forward
+- Hidden full payload inputs for final server submit
+- Progress indicator and mobile-first navigation controls
+
 ### Admin leads route (`app/dashboard/admin/leads/`)
 
 | Component | Type | Props |

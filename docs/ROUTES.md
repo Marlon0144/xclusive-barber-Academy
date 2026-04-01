@@ -251,6 +251,11 @@ const submissions = await supabase
 **Rendering:** Async RSC + Client form
 **Auth:** Yes (student only)
 
+**UX pattern:**
+- One-question-per-screen wizard (Typeform-like)
+- Mobile-first controls with step navigation (back/continue)
+- Visible progress bar and step counter
+
 **Guard behavior:**
 - Redirects to `/login` when no session
 - Redirects to `/dashboard` when role is not `student`
