@@ -193,14 +193,84 @@ Controls student onboarding through invite codes.
 | `used_count` | `integer` | DEFAULT `0` | Times used |
 | `max_uses` | `integer` | NOT NULL | Usage limit |
 | `role_to_assign` | `user_role` | NOT NULL | Role assigned on successful signup |
+| `lead_id` | `uuid` | nullable, FK -> `crm_leads.id` | Optional direct link to a specific CRM lead |
 
 **Access patterns:**
 - Validated during registration (`applyAccess`, `signup`)
 - `used_count` incremented via Admin client on successful
   registration
+- If `lead_id` is present, account activation links directly to that
+  CRM lead (deterministic merge, no cookie dependency)
 - Managed by admins from `/dashboard/admin/gestion_users`
   (create random codes with configurable `max_uses`,
   activate/deactivate existing codes, and delete invitation rows)
+
+---
+
+### crm_leads
+
+Stores the lead qualification profile used by the internal CRM workflow.
+This table is linked to `profiles` when the lead corresponds to a registered
+student.
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `id` | `uuid` | PK, DEFAULT `gen_random_uuid()` | Lead ID |
+| `profile_id` | `uuid` | UNIQUE, FK -> `profiles.id` | Optional link to registered user |
+| `full_name` | `text` | nullable | Lead display name (optional at pre-lead stage) |
+| `email` | `text` | UNIQUE, nullable | Lead contact email (captured later in flow) |
+| `phone_number` | `text` | nullable | Lead phone |
+| `city_suburb` | `text` | nullable | Lead location |
+| `auto_score` | `integer` | CHECK `0..100`, DEFAULT `0` | Automatic score from questionnaire |
+| `status` | `text` | CHECK (`new`, `contacted`, `qualified`, `lost`, `converted`) | Commercial funnel status |
+| `source` | `text` | NOT NULL, DEFAULT `apply_wizard` | Lead acquisition source |
+| `reviewed_by` | `uuid` | FK -> `profiles.id`, nullable | Admin reviewer |
+| `reviewed_at` | `timestamptz` | nullable | Review timestamp |
+| `review_notes` | `text` | nullable | Internal admin notes |
+| `qualification_completed_at` | `timestamptz` | nullable | Wizard completion timestamp |
+| `stage1_entered_at` | `timestamptz` | nullable | Fecha de entrada a etapa 1 (captura telefono) |
+| `stage2_entered_at` | `timestamptz` | nullable | Fecha de entrada a etapa 2 (visita `/apply`) |
+| `stage3_entered_at` | `timestamptz` | nullable | Fecha de entrada a etapa 3 (wizard completado) |
+| `stage4_entered_at` | `timestamptz` | nullable | Fecha de entrada a etapa 4 (cuenta activada con codigo) |
+| `created_at` | `timestamptz` | NOT NULL, DEFAULT `now()` | Creation timestamp |
+| `updated_at` | `timestamptz` | NOT NULL, DEFAULT `now()` | Last update timestamp |
+
+**Access patterns:**
+- Created from `/` landing capture (phone-first pre-lead)
+- Linked and enriched from `/apply` registration flow using tracked phone context
+- Updated/merged from `/dashboard/qualify` on questionnaire submit
+- Reviewed by admins in `/dashboard/admin/leads`
+
+**Pre-lead notes:**
+- A pre-lead can start with phone only (`source = landing_phone_capture`).
+- Visiting `/apply` marks intent with `source = apply_page_visit`
+  when tracked pre-lead context exists.
+- Email and full name are completed later when the user progresses through
+  registration and qualification.
+- The wizard no longer requests phone again; the same lead is updated by
+  `profile_id` after registration.
+- Apply the migration script in
+  `scripts/2026-04-01-prelead-phone-capture.sql` before enabling the feature.
+
+---
+
+### crm_lead_answers
+
+Stores each questionnaire response keyed by lead and question.
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `id` | `uuid` | PK, DEFAULT `gen_random_uuid()` | Answer row ID |
+| `lead_id` | `uuid` | FK -> `crm_leads.id`, ON DELETE CASCADE | Parent lead |
+| `question_key` | `text` | UNIQUE with `lead_id` | Stable question identifier |
+| `answer_text` | `text` | nullable | Text answer |
+| `answer_number` | `numeric` | nullable | Numeric answer |
+| `answer_choice` | `text` | nullable | Choice answer |
+| `created_at` | `timestamptz` | NOT NULL, DEFAULT `now()` | Creation timestamp |
+
+**Access patterns:**
+- Upserted from qualification action to persist latest questionnaire
+- Read by admin workflows for deeper lead context
 
 ## Row-Level Security (RLS)
 
@@ -215,6 +285,16 @@ between users.
 - Students can read/write their own data
 - Instructors can read student submissions for grading
 - Admins have elevated access via Admin client (bypasses RLS)
+
+**CRM policies:**
+- `crm_leads`: admin full CRUD, plus owner read (`profile_id = auth.uid()`)
+- `crm_lead_answers`: admin full CRUD
+
+**Delete hardening (April 1, 2026):**
+- `crm_leads_admin_delete` enforces delete only when
+  `profiles.role = 'admin'` for `auth.uid()`.
+- `crm_lead_answers_admin_delete` enforces the same admin-only delete rule.
+- Migration file: `scripts/2026-04-01-crm-admin-delete-policies.sql`.
 
 ## TypeScript type contracts
 
@@ -449,6 +529,18 @@ is removed (prevents orphaned files).
 | `updateLessonTitle` | `app/dashboard/admin/courses/actions.ts` | Yes | admin | Edit lesson title |
 | `updateLessonContent` | `app/dashboard/admin/lessons/.../actions.ts` | Yes | admin | Update lesson HTML + video |
 | `fetchProgressPageData` | `app/dashboard/progreso_profesional/actions.ts` | Yes | Any | Compute progress data |
+| `submitLeadQualification` | `app/dashboard/qualify/actions.ts` | Yes | student | Save answers + auto score |
+| `updateLeadReviewAction` | `app/dashboard/admin/leads/actions.ts` | Yes | admin | Manual review and override |
+
+## Lead scoring
+
+Lead scoring runs server-side in `utils/crm-scoring.ts`.
+
+- Input: questionnaire answers from `/dashboard/qualify`
+- Output: `auto_score` (0-100) and rationale tags.
+
+Lead prioritization in operations now uses CRM stage and commercial
+status instead of segment columns.
 
 ## Known technical debt
 

@@ -8,8 +8,6 @@ interface ScrollRevealProps {
   className?: string
   /** Delay in seconds before the animation starts once visible */
   delay?: number
-  /** Extra classes applied to the wrapper */
-  as?: keyof HTMLElementTagNameMap
 }
 
 /**
@@ -21,7 +19,6 @@ export default function ScrollReveal({
   children,
   className,
   delay = 0,
-  as: Tag = 'div',
 }: ScrollRevealProps) {
   const ref = useRef<HTMLDivElement>(null)
 

@@ -96,10 +96,10 @@ export default async function Header() {
             <nav className="flex items-center gap-2 sm:gap-4 md:gap-6 lg:gap-8">
               {/* SER MODELO — visible en todos los tamaños (Figma lo muestra a ~400px) */}
               <Link
-                href="/models"
+                href="/qualify"
                 className="text-[0.5rem] font-light uppercase tracking-widest text-[#d3cbba] transition-colors hover:text-white sm:text-[0.6rem] md:text-[0.7rem] lg:text-xs"
               >
-                Ser modelo
+                Aplicar
               </Link>
 
               {/* ACCEDER — Poppins Light */}
@@ -116,10 +116,10 @@ export default async function Header() {
                 className="group relative flex flex-col items-center gap-0.5"
               >
                 <span className="text-[0.55rem] font-extrabold uppercase tracking-widest text-[#d3cbba] transition-colors group-hover:text-white sm:text-[0.65rem] md:text-[0.75rem] lg:text-sm">
-                  Aplicar
+                  Crear cuenta
                 </span>
                 {/* Golden line divider */}
-                <span className="relative block h-[3px] w-full overflow-hidden">
+                <span className="relative block h-[5px] w-full overflow-hidden">
                   <Image
                     src="/assets/divider.svg"
                     alt=""

@@ -1,5 +1,5 @@
 # PROJECT_CONTEXT.md
-> **Última actualización:** 2026-02-25 — Sprint 6 Backend (Progreso Profesional)
+> **Última actualización:** 2026-04-01 — Captura pre-lead por telefono (Fase inicial)
 
 ## 1. Project Identity
 **Nombre:** Xclusive Barber Academy (LMS)
@@ -124,6 +124,123 @@ ADD COLUMN IF NOT EXISTS competency TEXT
 (Sin cambios recientes - Ver versión anterior para inventario de policies)
 
 ## 5. Estado del Sprint 6 (Progreso Profesional — Backend)
+
+### ✅ CRM Básico V1 Implementado (2026-04-01)
+
+**Objetivo:** Capturar y priorizar leads por etapa CRM + estado comercial.
+
+#### Cambios de base de datos (Supabase MCP)
+- Tabla nueva: `crm_leads`
+- Tabla nueva: `crm_lead_answers`
+- RLS: admin full CRUD para CRM, y lectura del propio lead por `profile_id`
+
+#### Nuevas rutas
+- `app/dashboard/qualify/page.tsx` — Wizard post-registro (step 2)
+- `app/dashboard/admin/leads/page.tsx` — Panel CRM de revisión admin
+
+#### Nuevas Server Actions
+- `submitLeadQualification` (`app/dashboard/qualify/actions.ts`)
+   - Zod validation
+   - Scoring server-side
+   - Upsert `crm_leads` + `crm_lead_answers` (sin columnas de segmento)
+- `updateLeadReviewAction` (`app/dashboard/admin/leads/actions.ts`)
+   - Admin-only
+   - Estado comercial + notas de revisión
+
+#### Flujo actualizado de onboarding
+1. `/apply` crea auth user + profile + seed lead (`crm_leads`)
+2. Redirección a `/dashboard/qualify`
+3. Submit de wizard guarda score y marca completitud
+4. `/dashboard` fuerza wizard solo si existe lead incompleto
+
+#### Flujo comercial publico (pre-compra)
+1. Landing (`Header` y `Final CTA`) envia a `/qualify`.
+2. `/qualify` (publico) guarda respuestas del wizard en CRM por telefono tracked.
+3. Al finalizar wizard publico, redirige a WhatsApp de la empresa para cierre comercial.
+4. Despues de compra/codigo, el usuario activa cuenta en `/apply` y entra al dashboard.
+
+#### Notas importantes
+- No se creó otra DB: todo vive en la misma instancia Supabase.
+- Se mantiene el estilo visual Premium Dark y los patrones de layout existentes.
+- Deuda técnica vigente: validar consolidación total de reglas RLS y migración
+   de validaciones manuales legacy restantes a Zod.
+
+### ✅ Captura pre-lead por telefono iniciada (2026-04-01)
+
+**Objetivo:** capturar interesados desde landing antes del registro,
+con un formulario de un solo campo (telefono) y continuidad de navegacion.
+
+#### Cambios de aplicacion
+- Nueva Server Action publica: `capturePhoneLead`
+   (`app/landing/actions.ts`)
+   - Zod validation
+   - Normalizacion de telefono (`utils/phone.ts`)
+   - Inserta/actualiza `crm_leads` con source
+      `landing_phone_capture`
+- Nuevo componente cliente:
+   `components/landing/PhoneLeadCaptureForm.tsx`
+- Nuevo wrapper premium:
+   `components/landing/PremiumPhoneCaptureSection.tsx`
+- Integracion debajo del mensaje "¿Listo para dar el siguiente paso?":
+   `components/landing/TargetAudienceSection.tsx`
+- Nuevo gate progresivo de navegacion:
+   `components/landing/LandingFlowGate.tsx`
+   - Bloquea interaccion de secciones inferiores con blur/overlay
+   - Se desbloquea al capturar telefono con evento
+      `lead-capture:success`
+
+#### Conversion y merge
+- `capturePhoneLead` guarda telefono normalizado en contexto de tracking.
+- `/apply` enlaza pre-lead existente por telefono tracked cuando el usuario
+   completa registro, evitando lead duplicado.
+- El wizard `/dashboard/qualify` elimina la pregunta de telefono y actualiza
+   el lead del usuario por `profile_id`.
+
+#### Etapas CRM (admin visibility)
+- Etapa 1: Curioso (solo telefono capturado)
+- Etapa 2: Interesado (visita `/apply` sin completar calificacion)
+- Etapa 3: Muy interesado (calificacion completada / seguimiento activo)
+- Etapa 4: Cuenta creada (calificacion completada + cuenta activada con codigo, `profile_id` enlazado)
+
+Cada lead ahora registra fecha de entrada por etapa en columnas dedicadas:
+`stage1_entered_at`, `stage2_entered_at`, `stage3_entered_at`,
+`stage4_entered_at`.
+
+El panel `admin/leads` ahora muestra la etapa actual y permite filtrar por
+etapa para priorizacion comercial.
+
+#### Ajustes de panel admin
+- `app/dashboard/admin/leads/page.tsx` ahora es null-safe para
+   `full_name` y `email`, soportando pre-leads incompletos.
+- Admin leads ahora incluye opcion de borrado por fila:
+   - UI: `app/dashboard/admin/leads/page.tsx`
+   - Action: `deleteLeadAction` en
+      `app/dashboard/admin/leads/actions.ts`
+
+#### Hardening de seguridad (RLS)
+- Migration aplicada en Supabase:
+   `crm_admin_delete_policies_2026_04_01`
+- Archivo local:
+   `scripts/2026-04-01-crm-admin-delete-policies.sql`
+   - Reafirma DELETE admin-only para `crm_leads` y
+      `crm_lead_answers` basado en `profiles.role`.
+
+#### Invitaciones ligadas a lead (gestion_users)
+- El formulario de crear codigo en `/dashboard/admin/gestion_users`
+   ahora incluye `lead_phone` opcional.
+- Si `lead_phone` se deja vacio: se crea codigo general (flujo actual).
+- Si `lead_phone` se completa: debe existir un lead en CRM con ese
+   telefono; si no existe, se bloquea la generacion con mensaje claro.
+- Migracion aplicada: `invitations_lead_link_2026_04_01`
+   (columna `invitations.lead_id` nullable FK a `crm_leads`).
+- En `/apply`, cuando se usa un codigo con `lead_id`, el merge del lead
+   se hace de forma deterministica contra ese registro.
+
+#### Script de migracion pendiente de aplicar
+- `scripts/2026-04-01-prelead-phone-capture.sql`
+   - `crm_leads.full_name` -> nullable
+   - `crm_leads.email` -> nullable
+   - unique index parcial para `phone_number`
 
 ### ✅ Sprint 6 — Backend Completo (2026-02-21)
 

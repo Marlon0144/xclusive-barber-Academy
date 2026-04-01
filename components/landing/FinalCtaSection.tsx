@@ -35,7 +35,7 @@ export default function FinalCtaSection() {
 
         {/* Botón CTA */}
         <Link
-          href="/apply"
+          href="/qualify"
           className="absolute z-10 hover:brightness-110 transition-all duration-300"
           style={{ top: "192px", left: "81px", width: "250px", height: "38px" }}
         >
@@ -137,7 +137,7 @@ export default function FinalCtaSection() {
         </p>
 
         {/* Botón CTA — Figma: w=932px, h=135px, text-[64px] ExtraBold */}
-        <Link href="/apply" className="relative hover:brightness-110 transition-all duration-300 mb-6 lg:mb-10">
+        <Link href="/qualify" className="relative hover:brightness-110 transition-all duration-300 mb-6 lg:mb-10">
           <div
             className="relative shadow-[inset_0px_4px_4px_0px_rgba(0,0,0,0.25)]"
             style={{ width: "clamp(380px,58vw,932px)", height: "clamp(56px,8vw,135px)" }}

@@ -18,8 +18,10 @@ routes or modifying existing ones.
 | `/dashboard/courses/[courseId]/[lessonId]` | Yes | Any | RSC + Client | Standard |
 | `/dashboard/tracker` | Yes | Any | Client | Standard |
 | `/dashboard/grading` | Yes | instructor/admin | RSC + Client | Standard |
+| `/dashboard/qualify` | Yes | student | RSC + Client | Standard |
 | `/dashboard/admin/courses` | Yes | admin | RSC + Client | Standard |
 | `/dashboard/admin/gestion_users` | Yes | admin | RSC + Server Actions | Standard |
+| `/dashboard/admin/leads` | Yes | admin | RSC + Server Actions | Standard |
 | `/dashboard/admin/lessons/[lessonId]/edit` | Yes | admin | RSC + Client | Standard |
 | `/dashboard/progreso_profesional` | Yes | Any | RSC | 139 B |
 
@@ -31,15 +33,46 @@ routes or modifying existing ones.
 **Rendering:** Async RSC (zero client JS from page itself)
 **Auth:** None
 
+**Server Action:** `capturePhoneLead(prevState, formData)`
+- Publica (sin auth) y ejecutada en servidor
+- Valida telefono con Zod y normaliza formato de contacto
+- Crea o actualiza pre-lead en `crm_leads` con
+  `source = 'landing_phone_capture'`
+- Devuelve feedback no bloqueante para que el usuario continue navegando
+
 **Components used:**
-- `HeroSection` — Hero banner with CTA
+- `HeroSection` — Hero banner principal
 - `TargetAudienceSection` — Target audience messaging
 - `FeaturesSection` — Three-column methodology
 - `MissionVisionSection` — Mission and Vision cards
 - `InstructorSection` — Founder introduction
 - `FinalCtaSection` — Final CTA with contact info
 
-**Data fetching:** None (static content)
+**Data flow:**
+```
+TargetAudienceSection (RSC)
+LandingFlowGate (client)
+  ├─ Renders floating locked overlay with PhoneLeadCaptureForm
+  └─ Keeps lower sections blurred until capture succeeds
+
+PhoneLeadCaptureForm (client)
+  └─ useActionState(capturePhoneLead)
+       ├─ Validate + normalize phone
+       ├─ Upsert pre-lead in crm_leads
+       └─ Return { success, error }
+
+LandingFlowGate (client)
+  ├─ Unlocks on lead-capture:success event
+  └─ Auto-scrolls to Features section anchor
+```
+
+**Progressive reveal behavior:**
+- Users can read the hero immediately.
+- Users can read target audience immediately.
+- Sections below target audience stay visible but blurred until phone
+  capture succeeds.
+- While locked, the floating form appears over the blocked section area.
+- After success, the page unlocks and scrolls smoothly to Features.
 
 ---
 
@@ -58,7 +91,9 @@ routes or modifying existing ones.
 - Validates invite code against `invitations` table
 - Creates auth user via Supabase Auth
 - Creates profile record via Admin client
+- Seeds `crm_leads` row linked to the new profile
 - Increments invite code usage counter
+- Redirects to `/dashboard` after successful account activation
 
 **Data flow:**
 ```
@@ -72,6 +107,24 @@ ApplyForm (client)
 ```
 
 ---
+
+### `/qualify` — Public pre-sales wizard
+
+**File:** `app/qualify/page.tsx`
+**Rendering:** RSC wrapper + Client form
+**Auth:** None (public)
+
+**Server Action:** `submitPublicLeadQualification(prevState, formData)`
+- Validates inputs with Zod
+- Requires tracked phone context (`tracked_lead_phone` cookie)
+- Upserts `crm_leads` by `phone_number` with `auto_score`,
+  `status = contacted`, and completion timestamp
+- Upserts `crm_lead_answers` by `lead_id + question_key`
+- Redirects to WhatsApp deal chat (`https://wa.me/61413891977`) with prefilled message
+
+**Business behavior:**
+- Landing CTA buttons (`Header` + `FinalCtaSection`) point to this route.
+- This route is the first conversion step before purchase and invite code.
 
 ### `/login` — Login page
 
@@ -241,6 +294,37 @@ const submissions = await supabase
 
 ---
 
+### `/dashboard/qualify` — Lead qualification wizard
+
+**File:** `app/dashboard/qualify/page.tsx`
+**Rendering:** Async RSC + Client form
+**Auth:** Yes (student only)
+
+**UX pattern:**
+- One-question-per-screen wizard (Typeform-like)
+- Mobile-first controls with step navigation (back/continue)
+- Visible progress bar and step counter
+
+**Pre-lead conversion behavior:**
+- Phone capture from landing is linked during `/apply` using tracked
+  phone context (cookie), so the wizard no longer asks for phone number.
+- On submit, qualification upserts by `profile_id` only, updating the
+  same lead row without creating duplicates for the same user profile.
+
+**Guard behavior:**
+- Redirects to `/login` when no session
+- Redirects to `/dashboard` when role is not `student`
+- Redirects to `/dashboard` when `qualification_completed_at` already exists
+
+**Server Action:** `submitLeadQualification(prevState, formData)`
+- Validates inputs with Zod
+- Computes automatic lead score (`utils/crm-scoring.ts`)
+- Upserts `crm_leads` by `profile_id` with `auto_score` and completion timestamp
+- Upserts `crm_lead_answers` by `lead_id + question_key`
+- Revalidates dashboard/admin leads and redirects to `/dashboard`
+
+---
+
 ### `/dashboard/admin/courses` — Admin course management
 
 **File:** `app/dashboard/admin/courses/page.tsx`
@@ -300,7 +384,10 @@ const [invitationsResult, usersResult, authUsersResult] = await Promise.all([
 
 **Server Actions:**
 - `createInviteCodeAction(formData)` — Generates random invite code
-  (`XBA-XXXXXXXX`) with configurable `max_uses` selected by admin
+  (`XBA-XXXXXXXX`) with configurable `max_uses` selected by admin.
+  Supports optional `lead_phone` input to link invite to a specific lead.
+  If phone is provided and no lead exists, invite creation is blocked with
+  explicit error feedback.
 - `toggleInviteStatusAction(formData)` — Activates/deactivates
   invitation codes
 - `deleteInvitationAction(formData)` — Permanently deletes an
@@ -313,10 +400,51 @@ const [invitationsResult, usersResult, authUsersResult] = await Promise.all([
 **Business rules implemented:**
 - Invite codes are random and support configurable usage limits
   (`max_uses` between 1 and 50)
+- `lead_phone` in create invite form is optional:
+  - empty -> general invite code (current behavior)
+  - with value -> phone must match an existing CRM lead or code is not created
 - Only admins can access the page and actions
 - Role update guard prevents removing the last admin account
 - User deletion clears `submissions.grader_id` references first to
   avoid FK violations on auth user delete
+
+---
+
+### `/dashboard/admin/leads` — CRM lead review panel
+
+**File:** `app/dashboard/admin/leads/page.tsx`
+**Rendering:** Async RSC + native forms with Server Actions
+**Auth:** Yes (admin only)
+
+**Data fetching:**
+- Reads up to 300 leads from `crm_leads` (desc by `created_at`)
+- Supports filter by query text, status, and CRM stage
+
+**Server Action:** `updateLeadReviewAction(formData)`
+- Verifies admin role
+- Updates `status`
+- Persists `review_notes`, `reviewed_by`, and `reviewed_at`
+
+**Server Action:** `deleteLeadAction(formData)`
+- Requires admin session
+- Deletes a lead row by `leadId`
+- Relies on `ON DELETE CASCADE` from `crm_lead_answers` to clean
+  dependent answers automatically
+
+**Business behavior:**
+- Exposes a compact review workflow directly from each table row
+- Shows full questionnaire answers for each lead in an expandable section
+
+**CRM stage behavior in admin table:**
+- Etapa 1 (`Curioso`): solo telefono capturado
+- Etapa 2 (`Interesado`): visita `/apply` sin completar calificacion
+- Etapa 3 (`Muy interesado`): calificacion completada o seguimiento activo
+- Etapa 4 (`Cuenta creada`): lead con calificacion completada y cuenta activada (`profile_id` enlazado)
+
+**Stage entry timestamps:**
+- El panel muestra `Entrada etapa` usando la fecha de ingreso de la etapa actual.
+- Estas fechas se guardan en `crm_leads.stage1_entered_at` ...
+  `crm_leads.stage4_entered_at` para trazabilidad comercial.
 
 ---
 

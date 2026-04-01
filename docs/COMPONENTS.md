@@ -200,7 +200,8 @@ number. Optional tagline text.
 
 **Behavior:** Collapsible menu toggled by gold-accented button.
 Shows "Evaluar Estudiantes" link (for instructors) and "Gestion de
-Cursos" + "Gestion de Usuarios" links (for admins).
+Cursos" + "Gestion de Usuarios" + "Gestion de Leads" links (for
+admins).
 
 ---
 
@@ -342,7 +343,9 @@ content).
 
 | Component | File | Content |
 |-----------|------|---------|
-| `HeroSection` | `landing/HeroSection.tsx` | Hero banner, tattoo arm graphic, CTA |
+| `HeroSection` | `landing/HeroSection.tsx` | Hero banner and tattoo arm graphic |
+| `PhoneLeadCaptureForm` | `landing/PhoneLeadCaptureForm.tsx` | Public phone form with country code selector and Server Action submit |
+| `LandingFlowGate` | `landing/LandingFlowGate.tsx` | Client-side progressive lock with floating phone form and blurred content behind |
 | `TargetAudienceSection` | `landing/TargetAudienceSection.tsx` | Green CTA bar + 3 audience bullets |
 | `FeaturesSection` | `landing/FeaturesSection.tsx` | Three-column: Mentalidad, Practica, Carrera |
 | `MissionVisionSection` | `landing/MissionVisionSection.tsx` | Mission + Vision dark cards |
@@ -425,6 +428,24 @@ a single route.
 |-----------|------|-------|
 | `ApplyForm` | Client | None (uses action directly) |
 
+### Qualification route (`app/dashboard/qualify/`)
+
+| Component | Type | Props |
+|-----------|------|-------|
+| `QualifyForm` | Client | None (uses action directly) |
+
+**Behavior:**
+- Typeform-like wizard with one question per screen
+- Local per-step validation before moving forward
+- Hidden full payload inputs for final server submit
+- Progress indicator and mobile-first navigation controls
+
+### Admin leads route (`app/dashboard/admin/leads/`)
+
+| Component | Type | Props |
+|-----------|------|-------|
+| `page.tsx` table + native forms | RSC | `searchParams` filters |
+
 ## Component dependency graph
 
 ```
@@ -470,6 +491,7 @@ Root Layout
     ├── Admin
     │   ├── AdminCourseList (client)
     │   ├── EditableText (client)
+    │   ├── Leads review table (RSC)
     │   ├── EditLessonForm (client)
     │   ├── RichTextEditor (client, dynamic)
     │   └── EditorToolbar (client)

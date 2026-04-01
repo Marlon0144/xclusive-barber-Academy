@@ -1,10 +1,41 @@
 import Image from 'next/image'
 import Link from 'next/link'
+import { cookies } from 'next/headers'
 import ApplyForm from './ApplyForm'
 import { AuthCard, AuthCardContent } from '@/components/ui/auth-card'
 import { DashboardFooter } from '@/components/dashboard/DashboardFooter'
+import { createAdminClient } from '@/utils/supabase/server'
 
-export default function ApplyPage() {
+export default async function ApplyPage() {
+  const cookieStore = await cookies()
+  const trackedPhone = cookieStore.get('tracked_lead_phone')?.value ?? null
+
+  if (trackedPhone) {
+    const supabaseAdmin = createAdminClient()
+    const now = new Date().toISOString()
+
+    // Etapa 2: el usuario llego a /apply pero aun no completo registro.
+    const { data: preLead } = await supabaseAdmin
+      .from('crm_leads')
+      .select('id, stage2_entered_at')
+      .eq('phone_number', trackedPhone)
+      .is('profile_id', null)
+      .order('created_at', { ascending: true })
+      .limit(1)
+      .maybeSingle()
+
+    if (preLead?.id) {
+      await supabaseAdmin
+        .from('crm_leads')
+        .update({
+          source: 'apply_page_visit',
+          stage2_entered_at: preLead.stage2_entered_at ?? now,
+          updated_at: now,
+        })
+        .eq('id', preLead.id)
+    }
+  }
+
   return (
     <div className="min-h-screen w-full bg-[#161616] flex flex-col items-center justify-center relative overflow-hidden p-4">
       {/* Background gradients/overlay if needed */}
