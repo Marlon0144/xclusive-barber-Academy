@@ -50,8 +50,16 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url)
   }
 
-  // Si YA hay usuario y trata de entrar al login o signup...
-  if (user && (request.nextUrl.pathname === '/login' || request.nextUrl.pathname === '/signup')) {
+  // Si YA hay usuario y trata de entrar a rutas publicas de acceso/onboarding...
+  if (
+    user &&
+    (
+      request.nextUrl.pathname === '/login' ||
+      request.nextUrl.pathname === '/signup' ||
+      request.nextUrl.pathname === '/apply' ||
+      request.nextUrl.pathname === '/qualify'
+    )
+  ) {
      // (Opcional) Podrías redirigirlo directo al dashboard si ya está logueado
      // Por ahora lo dejamos simple o redirigimos a dashboard:
      const url = request.nextUrl.clone()
