@@ -3,9 +3,12 @@ import DashboardPageHeader from '@/components/headers/DashboardPageHeader'
 import { DashboardFooter } from '@/components/dashboard/DashboardFooter'
 import { createClient } from '@/utils/supabase/server'
 import QualifyForm from './QualifyForm'
+import { getServerDictionary } from '@/lib/i18n/server'
 
 export default async function QualifyPage() {
   const supabase = await createClient()
+  const dictionary = await getServerDictionary()
+  const text = dictionary.dashboardQualifyPage
 
   const {
     data: { user },
@@ -32,19 +35,16 @@ export default async function QualifyPage() {
 
   return (
     <div className="min-h-screen bg-[#161616] text-white">
-      <DashboardPageHeader title="Calificacion Inicial" />
+      <DashboardPageHeader title={text.headerTitle} />
 
       <main className="px-4 py-6 md:p-8 max-w-4xl mx-auto space-y-6">
         <header className="border-b border-white/10 pb-6">
           <p className="text-[10px] md:text-xs uppercase tracking-[0.3em] text-gold-500 mb-2">
-            Paso 2 de 2
+            {text.stepLabel}
           </p>
-          <h1 className="text-3xl md:text-5xl font-serif text-white mb-3">
-            Queremos conocer tu nivel de compromiso
-          </h1>
+          <h1 className="text-3xl md:text-5xl font-serif text-white mb-3">{text.title}</h1>
           <p className="text-zinc-400 text-sm md:text-base max-w-2xl font-light">
-            Este formulario toma menos de 3 minutos. Nos ayuda a evaluar tu perfil y darte
-            seguimiento personalizado dentro del proceso de admision.
+            {text.subtitle}
           </p>
         </header>
 
@@ -53,7 +53,7 @@ export default async function QualifyPage() {
         </section>
       </main>
 
-      <DashboardFooter tagline="Xclusive Barber Academy" />
+      <DashboardFooter tagline={text.footerTagline} />
     </div>
   )
 }

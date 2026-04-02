@@ -4,6 +4,7 @@ import { createClient } from "@/utils/supabase/server"
 import { signout } from "@/app/auth/actions"
 import { Button } from "@/components/ui/button"
 import React from "react"
+import { getServerDictionary } from "@/lib/i18n/server"
 
 // cache the current user so multiple components can read it without
 // re-running the request during the same render/flight.
@@ -17,6 +18,8 @@ const getCurrentUser = React.cache(async () => {
 
 export default async function Header() {
   const user = await getCurrentUser()
+  const dictionary = await getServerDictionary()
+  const text = dictionary.header
 
   return (
     /**
@@ -51,7 +54,7 @@ export default async function Header() {
             <div className="relative h-[55px] w-[55px] shrink-0 md:h-[67px] md:w-[67px]">
               <Image
                 src="/assets/logo-academia.svg"
-                alt="Xclusive Barber Academy Logo"
+                alt={text.logoAlt}
                 fill
                 priority
                 className="object-contain"
@@ -62,7 +65,7 @@ export default async function Header() {
             <div className="relative h-[30px] w-[78px] shrink-0 sm:h-[36px] sm:w-[94px] md:h-[46px] md:w-[120px]">
               <Image
                 src="/assets/xclusive-barber-academy-text.svg"
-                alt="Xclusive Barber Academy"
+                alt={text.brandAlt}
                 fill
                 priority
                 className="object-contain object-left"
@@ -79,14 +82,14 @@ export default async function Header() {
                 href="/dashboard"
                 className="rounded-md border border-gold-500/30 px-3 py-2 text-xs font-semibold uppercase tracking-wider text-gold-500 transition-colors hover:bg-gold-500/10 md:text-sm"
               >
-                Dashboard
+                {text.dashboard}
               </Link>
               <form action={signout}>
                 <Button
                   variant="ghost"
                   className="h-auto px-3 py-2 text-xs font-semibold uppercase tracking-wider text-[#d3cbba] hover:bg-white/5 hover:text-white md:text-sm"
                 >
-                  Salir
+                  {text.signOut}
                 </Button>
               </form>
             </div>
@@ -99,7 +102,7 @@ export default async function Header() {
                 href="/qualify"
                 className="text-[0.5rem] font-light uppercase tracking-widest text-[#d3cbba] transition-colors hover:text-white sm:text-[0.6rem] md:text-[0.7rem] lg:text-xs"
               >
-                Aplicar
+                {text.apply}
               </Link>
 
               {/* ACCEDER — Poppins Light */}
@@ -107,7 +110,7 @@ export default async function Header() {
                 href="/login"
                 className="text-[0.5rem] font-light uppercase tracking-widest text-[#d3cbba] transition-colors hover:text-white sm:text-[0.6rem] md:text-[0.7rem] lg:text-xs"
               >
-                Acceder
+                {text.login}
               </Link>
 
               {/* APLICAR — Poppins Bold + golden divider accent (Figma: Rectangle 29) */}
@@ -116,7 +119,7 @@ export default async function Header() {
                 className="group relative flex flex-col items-center gap-0.5"
               >
                 <span className="text-[0.55rem] font-extrabold uppercase tracking-widest text-[#d3cbba] transition-colors group-hover:text-white sm:text-[0.65rem] md:text-[0.75rem] lg:text-sm">
-                  Crear cuenta
+                  {text.createAccount}
                 </span>
                 {/* Golden line divider */}
                 <span className="relative block h-[5px] w-full overflow-hidden">

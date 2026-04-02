@@ -3,6 +3,9 @@ import { Poppins } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/Header";
 import HeaderWrapper from "@/components/HeaderWrapper";
+import { LanguageProvider } from "@/components/i18n/LanguageProvider";
+import FloatingLanguageSwitcher from "@/components/i18n/FloatingLanguageSwitcher";
+import { getServerLanguage } from "@/lib/i18n/server";
 
 // Figma source of truth: Poppins (ExtraBold for headings, Regular for body)
 const poppins = Poppins({
@@ -13,24 +16,29 @@ const poppins = Poppins({
 });
 
 export const metadata: Metadata = {
-  title: "Xclusive Barber Academy | Formación Profesional",
-  description: "Formación profesional en barbería para latinos en Australia.",
+  title: "Xclusive Barber Academy",
+  description: "Professional barber training for committed students.",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const language = await getServerLanguage();
+
   return (
-    <html lang="es">
+    <html lang={language}>
       <body className={`${poppins.variable} antialiased bg-background text-foreground-strong`}>
-        <HeaderWrapper>
-          <Header />
-        </HeaderWrapper>
-        <main>
-          {children}
-        </main>
+        <LanguageProvider initialLanguage={language}>
+          <HeaderWrapper>
+            <Header />
+          </HeaderWrapper>
+          <FloatingLanguageSwitcher />
+          <main>
+            {children}
+          </main>
+        </LanguageProvider>
       </body>
     </html>
   );

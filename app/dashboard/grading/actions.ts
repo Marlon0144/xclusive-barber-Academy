@@ -4,6 +4,7 @@ import { createClient } from '@/utils/supabase/server'
 import { revalidatePath } from 'next/cache'
 // Asegúrate de que esta ruta sea correcta, si no la tienes, comenta la línea de IA temporalmente para probar
 import { generateAIFeedback } from '@/utils/openai'
+import { getServerDictionary, getServerLanguage } from '@/lib/i18n/server'
 
 interface Grades {
   fade: number
@@ -20,11 +21,14 @@ export type GradeState = {
 
 export async function submitGrade(submissionId: string, grades: Grades): Promise<GradeState> {
   try {
+    const language = await getServerLanguage()
+    const dictionary = await getServerDictionary()
+    const messages = dictionary.actions.grading
     const supabase = await createClient()
 
     // 1. Verificar Usuario
     const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return { error: 'No estás autenticado.' }
+    if (!user) return { error: messages.unauthenticated }
 
     // 2. Verificar Permisos (Doble chequeo: Código + RLS)
     const { data: profile } = await supabase
@@ -34,7 +38,7 @@ export async function submitGrade(submissionId: string, grades: Grades): Promise
       .single()
 
     if (!profile || (profile.role !== 'admin' && profile.role !== 'instructor')) {
-      return { error: 'No tienes permisos de Instructor para realizar esta acción.' }
+      return { error: messages.instructorOnly }
     }
 
     // 3. Obtener datos para la IA
@@ -44,17 +48,17 @@ export async function submitGrade(submissionId: string, grades: Grades): Promise
       .eq('id', submissionId)
       .single()
 
-    if (fetchError || !submission) return { error: 'No se encontró el envío o no tienes permiso para verlo.' }
+    if (fetchError || !submission) return { error: messages.submissionMissing }
 
     // 4. Generar Feedback IA (Manejo de errores específico)
-    let feedback = "Feedback manual pendiente."
+    let feedback: string = messages.manualPending
     try {
       if (submission.cut_type) {
-        feedback = await generateAIFeedback(submission.cut_type, grades)
+        feedback = await generateAIFeedback(submission.cut_type, grades, language)
       }
     } catch (aiError) {
       console.error("Error generando IA:", aiError)
-      feedback = "No se pudo generar feedback automático. (Error IA)"
+      feedback = messages.aiError
       // No detenemos el proceso, guardamos la nota aunque falle la IA
     }
 
@@ -72,14 +76,16 @@ export async function submitGrade(submissionId: string, grades: Grades): Promise
 
     if (updateError) {
       console.error("Error DB Update:", updateError)
-      return { error: `Error al guardar: ${updateError.message}` }
+      return { error: messages.saveFailed }
     }
 
     revalidatePath('/dashboard/grading')
     return { success: true }
 
   } catch (err) {
-    const error = err instanceof Error ? err.message : 'Ocurrió un error inesperado en el servidor.'
+    const dictionary = await getServerDictionary()
+    const fallbackError = dictionary.actions.grading.unexpectedError
+    const error = err instanceof Error ? err.message : fallbackError
     console.error("Error inesperado en submitGrade:", error)
     return { error }
   }

@@ -1,6 +1,7 @@
 import Link from "next/link"
 import Image from "next/image"
 import UserMenu from "@/components/headers/UserMenu"
+import { getServerDictionary } from "@/lib/i18n/server"
 
 /**
  * Header verde para la vista principal del Dashboard (/dashboard).
@@ -19,11 +20,14 @@ interface DashboardGreenHeaderProps {
   showDashboardLink?: boolean
 }
 
-export default function DashboardGreenHeader({
+export default async function DashboardGreenHeader({
   userName,
   userEmail,
   showDashboardLink,
 }: DashboardGreenHeaderProps) {
+  const dictionary = await getServerDictionary()
+  const text = dictionary.dashboardHeader
+
   return (
     <header className="relative z-50 w-full h-[53px] md:h-[64px] lg:h-[72px] mt-4 md:mt-5">
       {/* Fondo verde: cubre todo el header */}
@@ -52,7 +56,7 @@ export default function DashboardGreenHeader({
             style={{ width: 74, height: 14 }}
           >
             <span className="font-sans font-light text-[8px] uppercase tracking-wider text-[#1e3a27]">
-              DASHBOARD
+              {text.dashboard}
             </span>
           </Link>
         )}

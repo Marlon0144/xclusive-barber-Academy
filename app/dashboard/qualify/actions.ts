@@ -6,6 +6,7 @@ import { z } from 'zod'
 import { computeLeadScore } from '@/utils/crm-scoring'
 import { createAdminClient, createClient } from '@/utils/supabase/server'
 import type { LeadAnswers } from '@/types/crm'
+import { getServerDictionary, getServerLanguage } from '@/lib/i18n/server'
 
 export type QualifyState = {
   error?: string | null
@@ -30,6 +31,9 @@ export async function submitLeadQualification(
   formData: FormData,
 ): Promise<QualifyState> {
   const supabase = await createClient()
+  const language = await getServerLanguage()
+  const dictionary = await getServerDictionary()
+  const messages = dictionary.actions.qualifyDashboard
 
   const {
     data: { user },
@@ -37,7 +41,7 @@ export async function submitLeadQualification(
   } = await supabase.auth.getUser()
 
   if (authError || !user) {
-    return { error: 'Debes iniciar sesion para completar este paso.' }
+    return { error: messages.mustLogin }
   }
 
   const { data: profile, error: profileError } = await supabase
@@ -47,7 +51,7 @@ export async function submitLeadQualification(
     .single()
 
   if (profileError || !profile) {
-    return { error: 'No pudimos encontrar tu perfil.' }
+    return { error: messages.profileMissing }
   }
 
   if (profile.role !== 'student') {
@@ -69,7 +73,7 @@ export async function submitLeadQualification(
   })
 
   if (!parsed.success) {
-    const firstIssue = parsed.error.issues[0]?.message ?? 'Formulario invalido.'
+    const firstIssue = parsed.error.issues[0]?.message ?? messages.invalidForm
     return { error: firstIssue }
   }
 
@@ -87,13 +91,13 @@ export async function submitLeadQualification(
     callWillingness: parsed.data.callWillingness,
   } satisfies LeadAnswers
 
-  const scoring = computeLeadScore(answers)
+  const scoring = computeLeadScore(answers, language)
 
   const fullName = profile.full_name?.trim() || user.email?.split('@')[0] || 'Sin nombre'
   const email = user.email || profile.email || ''
 
   if (!email) {
-    return { error: 'Tu cuenta no tiene email valido.' }
+    return { error: messages.invalidEmail }
   }
 
   const supabaseAdmin = createAdminClient()
@@ -126,7 +130,7 @@ export async function submitLeadQualification(
     .single()
 
   if (leadError || !upsertedLead) {
-    return { error: 'No pudimos guardar tu calificacion. Intenta de nuevo.' }
+    return { error: messages.qualificationSaveError }
   }
 
   const answersRows = [
@@ -153,7 +157,7 @@ export async function submitLeadQualification(
     .upsert(answersPayload, { onConflict: 'lead_id,question_key' })
 
   if (answersError) {
-    return { error: 'Guardamos parte de tu informacion, pero hubo un error en respuestas.' }
+    return { error: messages.answersPartialError }
   }
 
   revalidatePath('/dashboard')

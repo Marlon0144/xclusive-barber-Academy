@@ -5,23 +5,37 @@ import { cookies } from 'next/headers'
 import { z } from 'zod'
 import { createAdminClient } from '@/utils/supabase/server'
 import { normalizePhoneNumber } from '@/utils/phone'
+import { getServerDictionary } from '@/lib/i18n/server'
 
 export type CapturePhoneLeadState = {
   error?: string | null
   success?: boolean
 }
 
-const capturePhoneSchema = z.object({
-  phone: z.string().trim().min(8, 'Ingresa un telefono valido.').max(25, 'Telefono invalido.'),
-  countryCode: z.string().trim().regex(/^\+[1-9]\d{0,3}$/, 'Codigo de pais invalido.').default('+61'),
-  company: z.string().optional(),
-})
+function buildCapturePhoneSchema(messages: {
+  phoneRequired: string
+  invalidPhone: string
+  invalidCountryCode: string
+}) {
+  return z.object({
+    phone: z.string().trim().min(8, messages.phoneRequired).max(25, messages.invalidPhone),
+    countryCode: z
+      .string()
+      .trim()
+      .regex(/^\+[1-9]\d{0,3}$/, messages.invalidCountryCode)
+      .default('+61'),
+    company: z.string().optional(),
+  })
+}
 
 export async function capturePhoneLead(
   _prevState: CapturePhoneLeadState,
   formData: FormData,
 ): Promise<CapturePhoneLeadState> {
   const cookieStore = await cookies()
+  const dictionary = await getServerDictionary()
+  const messages = dictionary.actions.landing
+  const capturePhoneSchema = buildCapturePhoneSchema(messages)
 
   const parsed = capturePhoneSchema.safeParse({
     phone: formData.get('phone'),
@@ -30,7 +44,7 @@ export async function capturePhoneLead(
   })
 
   if (!parsed.success) {
-    return { error: parsed.error.issues[0]?.message ?? 'Datos invalidos.', success: false }
+    return { error: parsed.error.issues[0]?.message ?? messages.invalidData, success: false }
   }
 
   // Honeypot anti-spam: bots suelen completar este campo oculto.
@@ -44,7 +58,7 @@ export async function capturePhoneLead(
 
   const normalized = normalizePhoneNumber(phoneWithCountryCode)
   if (!normalized.isValid) {
-    return { error: 'Ingresa un telefono valido con codigo de pais.', success: false }
+    return { error: messages.phoneWithCountryCode, success: false }
   }
 
   const supabaseAdmin = createAdminClient()
@@ -59,7 +73,7 @@ export async function capturePhoneLead(
     .maybeSingle()
 
   if (existingLeadError) {
-    return { error: 'No pudimos registrar tu contacto. Intenta nuevamente.', success: false }
+    return { error: messages.registerFailed, success: false }
   }
 
   if (existingLead) {
@@ -74,7 +88,7 @@ export async function capturePhoneLead(
       .eq('id', existingLead.id)
 
     if (updateError) {
-      return { error: 'No pudimos registrar tu contacto. Intenta nuevamente.', success: false }
+      return { error: messages.registerFailed, success: false }
     }
 
     cookieStore.set('tracked_lead_phone', normalized.value, {
@@ -108,21 +122,19 @@ export async function capturePhoneLead(
 
     if (isNotNullViolation) {
       return {
-        error:
-          'No pudimos registrar tu contacto porque la base de datos aun no tiene habilitado el flujo de pre-leads. Ejecuta la migracion 2026-04-01-prelead-phone-capture.sql.',
+        error: messages.migrationMissing,
         success: false,
       }
     }
 
     if (isUniqueViolation) {
       return {
-        error:
-          'Este numero ya fue registrado recientemente. Si quieres, usa otro numero o continua con el proceso de aplicacion.',
+        error: messages.duplicatePhone,
         success: false,
       }
     }
 
-    return { error: 'No pudimos registrar tu contacto. Intenta nuevamente.', success: false }
+    return { error: messages.registerFailed, success: false }
   }
 
   cookieStore.set('tracked_lead_phone', normalized.value, {

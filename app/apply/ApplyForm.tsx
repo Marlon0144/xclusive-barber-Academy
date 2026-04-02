@@ -6,6 +6,7 @@ import { applyAccess } from './actions'
 import { AuthInput } from '@/components/ui/auth-input'
 import { AuthButton } from '@/components/ui/auth-button'
 import { AlertCircle } from 'lucide-react'
+import { useLanguage } from '@/components/i18n/LanguageProvider'
 
 // Initial state matching the server action's return type
 const initialState = {
@@ -15,6 +16,8 @@ const initialState = {
 
 function SubmitButton() {
   const { pending } = useFormStatus()
+  const { dictionary } = useLanguage()
+  const text = dictionary.applyForm
 
   return (
     <AuthButton 
@@ -23,13 +26,15 @@ function SubmitButton() {
       className="w-full bg-[#d3cbba] text-[#1e3a27] hover:bg-[#c2b9a5] hover:text-[#0f1f14] font-bold tracking-widest text-[14px] py-6 shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)] border-none mt-2"
       isLoading={pending}
     >
-      {pending ? 'PROCESANDO...' : 'ACTIVAR CUENTA'}
+      {pending ? text.pending : text.submit}
     </AuthButton>
   )
 }
 
 export default function ApplyForm() {
   const [state, formAction] = useActionState(applyAccess, initialState)
+  const { dictionary } = useLanguage()
+  const text = dictionary.applyForm
 
   return (
     <div className="w-full">
@@ -47,7 +52,7 @@ export default function ApplyForm() {
               <AuthInput
                 name="fullName"
                 type="text"
-                placeholder="NOMBRE"
+                placeholder={text.fullNamePlaceholder}
                 required
                 autoComplete="name"
                 className="text-center placeholder:text-[10px] placeholder:text-[#d3cbba]/50 placeholder:font-light tracking-wide"
@@ -58,7 +63,7 @@ export default function ApplyForm() {
               <AuthInput
                 name="email"
                 type="email"
-                placeholder="CORREO ELECTRÓNICO"
+                placeholder={text.emailPlaceholder}
                 required
                 autoComplete="email"
                 className="text-center placeholder:text-[10px] placeholder:text-[#d3cbba]/50 placeholder:font-light tracking-wide"
@@ -69,7 +74,7 @@ export default function ApplyForm() {
               <AuthInput
                 name="inviteCode"
                 type="text"
-                placeholder="CÓDIGO DE ACCESO"
+                placeholder={text.inviteCodePlaceholder}
                 required
                 className="text-center placeholder:text-[10px] placeholder:text-[#d3cbba]/50 placeholder:font-light tracking-wide"
               />
@@ -79,7 +84,7 @@ export default function ApplyForm() {
               <AuthInput
                 name="password"
                 type="password"
-                placeholder="CREAR CONTRASEÑA"
+                placeholder={text.passwordPlaceholder}
                 required
                 autoComplete="new-password"
                 className="text-center placeholder:text-[10px] placeholder:text-[#d3cbba]/50 placeholder:font-light tracking-wide"

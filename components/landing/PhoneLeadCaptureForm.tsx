@@ -3,6 +3,7 @@
 import { useActionState, useEffect } from 'react'
 import { useFormStatus } from 'react-dom'
 import { capturePhoneLead, type CapturePhoneLeadState } from '@/app/landing/actions'
+import { useLanguage } from '@/components/i18n/LanguageProvider'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { cn } from '@/lib/utils'
@@ -27,7 +28,7 @@ const COUNTRY_OPTIONS = [
   { value: '+56', label: 'CL +56' },
 ]
 
-function SubmitButton({ label }: { label: string }) {
+function SubmitButton({ label, pendingLabel }: { label: string; pendingLabel: string }) {
   const { pending } = useFormStatus()
 
   return (
@@ -36,16 +37,20 @@ function SubmitButton({ label }: { label: string }) {
       disabled={pending}
       className="h-11 min-w-[170px] rounded-sm bg-[#1c3123] px-5 text-[11px] font-bold uppercase tracking-[0.14em] text-[#d3cbba] shadow-none hover:bg-[#1c3123] hover:shadow-none"
     >
-      {pending ? 'ENVIANDO...' : label}
+      {pending ? pendingLabel : label}
     </Button>
   )
 }
 
 export default function PhoneLeadCaptureForm({
-  submitLabel = 'OBTENER MAS INFORMACION',
+  submitLabel,
   className,
 }: PhoneLeadCaptureFormProps) {
+  const { dictionary } = useLanguage()
+  const phoneCapture = dictionary.landing.phoneCapture
+
   const [state, formAction] = useActionState(capturePhoneLead, initialState)
+  const resolvedSubmitLabel = submitLabel ?? phoneCapture.defaultSubmit
 
   useEffect(() => {
     if (!state?.success) return
@@ -57,7 +62,7 @@ export default function PhoneLeadCaptureForm({
       <form action={formAction} className="flex w-full flex-col gap-2 md:flex-row md:items-center md:gap-2">
         <div className="w-full md:w-auto md:min-w-[118px]">
           <label htmlFor="lead-country-code" className="sr-only">
-            Extension de pais
+            {phoneCapture.countryCodeLabel}
           </label>
           <select
             id="lead-country-code"
@@ -75,7 +80,7 @@ export default function PhoneLeadCaptureForm({
 
         <div className="flex-1">
           <label htmlFor="lead-phone" className="sr-only">
-            Telefono
+            {phoneCapture.phoneLabel}
           </label>
           <Input
             id="lead-phone"
@@ -83,7 +88,7 @@ export default function PhoneLeadCaptureForm({
             type="tel"
             required
             autoComplete="tel"
-            placeholder="TU TELEFONO"
+            placeholder={phoneCapture.phonePlaceholder}
             className="h-11 rounded-sm border border-[#d4af37]/30 bg-[#161616] px-3 text-[11px] tracking-[0.08em] text-[#d3cbba] placeholder:text-[#d3cbba]/50"
           />
         </div>
@@ -97,7 +102,7 @@ export default function PhoneLeadCaptureForm({
           aria-hidden
         />
 
-        <SubmitButton label={submitLabel} />
+        <SubmitButton label={resolvedSubmitLabel} pendingLabel={phoneCapture.pending} />
       </form>
 
       {state?.error ? (
@@ -106,11 +111,11 @@ export default function PhoneLeadCaptureForm({
 
       {state?.success ? (
         <p className="mt-2 text-[10px] uppercase tracking-[0.08em] text-[#d3cbba]">
-          Gracias. Recibimos tu contacto. Puedes seguir explorando nuestros cursos.
+          {phoneCapture.success}
         </p>
       ) : (
         <p className="mt-2 text-[10px] uppercase tracking-[0.1em] text-[#d3cbba]/70">
-          Para mostrarte mas informacion del programa, dejanos tu telefono. Te guiaremos sin compromiso.
+          {phoneCapture.helper}
         </p>
       )}
     </div>

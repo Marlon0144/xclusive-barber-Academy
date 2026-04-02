@@ -1,4 +1,7 @@
+'use client'
+
 import PhoneLeadCaptureForm from '@/components/landing/PhoneLeadCaptureForm'
+import { useLanguage } from '@/components/i18n/LanguageProvider'
 import { cn } from '@/lib/utils'
 
 type PremiumPhoneCaptureSectionProps = {
@@ -10,6 +13,9 @@ export default function PremiumPhoneCaptureSection({
   className,
   tone = 'desktop',
 }: PremiumPhoneCaptureSectionProps) {
+  const { dictionary } = useLanguage()
+  const premiumCapture = dictionary.landing.premiumCapture
+
   const isMobile = tone === 'mobile'
 
   return (
@@ -27,7 +33,7 @@ export default function PremiumPhoneCaptureSection({
             isMobile ? 'text-[9px]' : 'text-[10px] md:text-[11px]',
           )}
         >
-          Contacto rapido
+          {premiumCapture.quickContact}
         </p>
 
         <h3
@@ -36,7 +42,7 @@ export default function PremiumPhoneCaptureSection({
             isMobile ? 'text-[10px]' : 'text-xs md:text-sm',
           )}
         >
-          Deja tu telefono y recibe orientacion para elegir el curso ideal.
+          {premiumCapture.heading}
         </h3>
 
         <PhoneLeadCaptureForm />

@@ -4,6 +4,8 @@ import { useActionState, useMemo, useState } from 'react'
 import { useFormStatus } from 'react-dom'
 import { AlertCircle, ArrowLeft, ArrowRight } from 'lucide-react'
 import { submitLeadQualification, type QualifyState } from './actions'
+import { useLanguage } from '@/components/i18n/LanguageProvider'
+import type { Dictionary } from '@/lib/i18n/dictionaries'
 
 const initialState: QualifyState = {
   error: null,
@@ -33,119 +35,123 @@ type Step = {
   options?: Array<{ value: string; label: string; badge?: string }>
 }
 
-const steps: Step[] = [
-  {
-    key: 'citySuburb',
-    indexLabel: '1',
-    title: 'City/Suburb you currently live in?*',
-    type: 'text',
-  },
-  {
-    key: 'hasCutHairBefore',
-    indexLabel: '2',
-    title: 'Have you ever cut hair before?*',
-    type: 'choice',
-    options: [
-      { value: 'yes', label: 'Yes', badge: 'Y' },
-      { value: 'no', label: 'No', badge: 'N' },
-    ],
-  },
-  {
-    key: 'mainGoal',
-    indexLabel: '3',
-    title: 'What is your main goal after completing the academy?*',
-    type: 'text',
-  },
-  {
-    key: 'consideredOtherPrograms',
-    indexLabel: '4',
-    title: 'Have you considered other barber programs before applying?*',
-    type: 'choice',
-    options: [
-      { value: 'yes', label: 'Yes', badge: 'Y' },
-      { value: 'no', label: 'No', badge: 'N' },
-    ],
-  },
-  {
-    key: 'seriousness',
-    indexLabel: '5',
-    title: 'How serious are you about becoming a barber?*',
-    hint: 'Selecciona un numero del 1 al 10.',
-    type: 'scale',
-  },
-  {
-    key: 'incomeGoal',
-    indexLabel: '6',
-    title: 'What income would you like to be earning as a barber?*',
-    type: 'choice',
-    options: [
-      { value: '50k_70k', label: '$50k - $70k', badge: 'A' },
-      { value: '70k_100k', label: '$70k - $100k', badge: 'B' },
-      { value: '100k_plus', label: '$100k+', badge: 'C' },
-      { value: 'own_shop', label: 'Own my own shop', badge: 'D' },
-    ],
-  },
-  {
-    key: 'followsBarberPages',
-    indexLabel: '7',
-    title: 'Do you currently follow barbers or barbering pages online?*',
-    type: 'choice',
-    options: [
-      { value: 'yes', label: 'Yes', badge: 'Y' },
-      { value: 'no', label: 'No', badge: 'N' },
-    ],
-  },
-  {
-    key: 'financialPreparedness',
-    indexLabel: '8',
-    title: 'Are you financially prepared to invest in your education?*',
-    type: 'choice',
-    options: [
-      { value: 'yes', label: 'Yes', badge: 'A' },
-      { value: 'payment_plan', label: 'I need payment plan option', badge: 'B' },
-      { value: 'not_yet', label: 'Not yet', badge: 'C' },
-    ],
-  },
-  {
-    key: 'careerStartWindow',
-    indexLabel: '9',
-    title: 'When are you looking to start your barber career?*',
-    type: 'choice',
-    options: [
-      { value: 'immediately', label: 'Immediately', badge: 'A' },
-      { value: 'within_3_months', label: 'Within 3 months', badge: 'B' },
-      { value: 'within_6_months', label: 'Within 6 months', badge: 'C' },
-      { value: 'just_researching', label: 'Just researching', badge: 'D' },
-    ],
-  },
-  {
-    key: 'longTermAmbition',
-    indexLabel: '10',
-    title: 'Do you have long-term ambitions in the barber industry?*',
-    type: 'choice',
-    options: [
-      { value: 'senior_barber', label: 'Become a senior barber', badge: 'A' },
-      { value: 'open_shop', label: 'Open my own shop', badge: 'B' },
-      { value: 'personal_brand', label: 'Build a personal brand', badge: 'C' },
-      { value: 'educator', label: 'Become an educator', badge: 'D' },
-      { value: 'not_sure', label: 'Not sure yet', badge: 'E' },
-    ],
-  },
-  {
-    key: 'callWillingness',
-    indexLabel: '11',
-    title: 'If accepted, are you willing to jump on a short call with our team?*',
-    type: 'choice',
-    options: [
-      { value: 'yes', label: 'Yes', badge: 'A' },
-      { value: 'maybe', label: 'Maybe', badge: 'B' },
-      { value: 'no', label: 'No', badge: 'C' },
-    ],
-  },
-]
+function buildSteps(text: Dictionary['qualifyForm']): Step[] {
+  return [
+    {
+      key: 'citySuburb',
+      indexLabel: '1',
+      title: text.steps.citySuburb,
+      type: 'text',
+    },
+    {
+      key: 'hasCutHairBefore',
+      indexLabel: '2',
+      title: text.steps.hasCutHairBefore,
+      type: 'choice',
+      options: [
+        { value: 'yes', label: text.options.yes, badge: 'Y' },
+        { value: 'no', label: text.options.no, badge: 'N' },
+      ],
+    },
+    {
+      key: 'mainGoal',
+      indexLabel: '3',
+      title: text.steps.mainGoal,
+      type: 'text',
+    },
+    {
+      key: 'consideredOtherPrograms',
+      indexLabel: '4',
+      title: text.steps.consideredOtherPrograms,
+      type: 'choice',
+      options: [
+        { value: 'yes', label: text.options.yes, badge: 'Y' },
+        { value: 'no', label: text.options.no, badge: 'N' },
+      ],
+    },
+    {
+      key: 'seriousness',
+      indexLabel: '5',
+      title: text.steps.seriousness,
+      hint: text.hintSeriousness,
+      type: 'scale',
+    },
+    {
+      key: 'incomeGoal',
+      indexLabel: '6',
+      title: text.steps.incomeGoal,
+      type: 'choice',
+      options: [
+        { value: '50k_70k', label: text.options.income50to70, badge: 'A' },
+        { value: '70k_100k', label: text.options.income70to100, badge: 'B' },
+        { value: '100k_plus', label: text.options.income100plus, badge: 'C' },
+        { value: 'own_shop', label: text.options.ownShop, badge: 'D' },
+      ],
+    },
+    {
+      key: 'followsBarberPages',
+      indexLabel: '7',
+      title: text.steps.followsBarberPages,
+      type: 'choice',
+      options: [
+        { value: 'yes', label: text.options.yes, badge: 'Y' },
+        { value: 'no', label: text.options.no, badge: 'N' },
+      ],
+    },
+    {
+      key: 'financialPreparedness',
+      indexLabel: '8',
+      title: text.steps.financialPreparedness,
+      type: 'choice',
+      options: [
+        { value: 'yes', label: text.options.yes, badge: 'A' },
+        { value: 'payment_plan', label: text.options.needPaymentPlan, badge: 'B' },
+        { value: 'not_yet', label: text.options.notYet, badge: 'C' },
+      ],
+    },
+    {
+      key: 'careerStartWindow',
+      indexLabel: '9',
+      title: text.steps.careerStartWindow,
+      type: 'choice',
+      options: [
+        { value: 'immediately', label: text.options.immediately, badge: 'A' },
+        { value: 'within_3_months', label: text.options.within3Months, badge: 'B' },
+        { value: 'within_6_months', label: text.options.within6Months, badge: 'C' },
+        { value: 'just_researching', label: text.options.researching, badge: 'D' },
+      ],
+    },
+    {
+      key: 'longTermAmbition',
+      indexLabel: '10',
+      title: text.steps.longTermAmbition,
+      type: 'choice',
+      options: [
+        { value: 'senior_barber', label: text.options.seniorBarber, badge: 'A' },
+        { value: 'open_shop', label: text.options.openShop, badge: 'B' },
+        { value: 'personal_brand', label: text.options.personalBrand, badge: 'C' },
+        { value: 'educator', label: text.options.educator, badge: 'D' },
+        { value: 'not_sure', label: text.options.notSure, badge: 'E' },
+      ],
+    },
+    {
+      key: 'callWillingness',
+      indexLabel: '11',
+      title: text.steps.callWillingness,
+      type: 'choice',
+      options: [
+        { value: 'yes', label: text.options.yes, badge: 'A' },
+        { value: 'maybe', label: text.options.maybe, badge: 'B' },
+        { value: 'no', label: text.options.no, badge: 'C' },
+      ],
+    },
+  ]
+}
 
 function SubmitButton({ disabled }: { disabled: boolean }) {
   const { pending } = useFormStatus()
+  const { dictionary } = useLanguage()
+  const text = dictionary.qualifyForm
 
   return (
     <button
@@ -153,20 +159,20 @@ function SubmitButton({ disabled }: { disabled: boolean }) {
       disabled={pending || disabled}
       className="w-full h-12 rounded-sm bg-[#d3cbba] text-[#1e3a27] font-bold uppercase tracking-[0.18em] text-xs hover:bg-[#c2b9a5] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
     >
-      {pending ? 'GUARDANDO...' : 'FINALIZAR CALIFICACION'}
+      {pending ? text.sending : text.finish}
     </button>
   )
 }
 
-function validateStep(step: Step, value: string): string | null {
+function validateStep(step: Step, value: string, text: Dictionary['qualifyForm']): string | null {
   const clean = value.trim()
 
-  if (!clean) return 'Esta pregunta es obligatoria.'
+  if (!clean) return text.requiredQuestion
 
   if (step.key === 'seriousness') {
     const numeric = Number(clean)
     if (!Number.isInteger(numeric) || numeric < 1 || numeric > 10) {
-      return 'Selecciona un valor entre 1 y 10.'
+      return text.seriousnessRange
     }
   }
 
@@ -192,14 +198,14 @@ export default function QualifyForm() {
   const [stepIndex, setStepIndex] = useState(0)
   const [answers, setAnswers] = useState<Answers>(INITIAL_ANSWERS)
   const [localError, setLocalError] = useState<string | null>(null)
+  const { dictionary } = useLanguage()
+  const text = dictionary.qualifyForm
+  const steps = useMemo(() => buildSteps(text), [text])
 
   const currentStep = steps[stepIndex]
   const currentValue = answers[currentStep.key]
   const isLastStep = stepIndex === steps.length - 1
-  const progress = useMemo(
-    () => Math.round(((stepIndex + 1) / steps.length) * 100),
-    [stepIndex],
-  )
+  const progress = Math.round(((stepIndex + 1) / steps.length) * 100)
 
   function updateAnswer(key: AnswerKey, value: string) {
     setAnswers((prev) => ({ ...prev, [key]: value }))
@@ -207,7 +213,7 @@ export default function QualifyForm() {
   }
 
   function handleNext() {
-    const error = validateStep(currentStep, currentValue)
+    const error = validateStep(currentStep, currentValue, text)
     if (error) {
       setLocalError(error)
       return
@@ -233,7 +239,7 @@ export default function QualifyForm() {
           onChange={(event) => updateAnswer(currentStep.key, event.target.value)}
           type="text"
           autoComplete="off"
-          placeholder="Type your answer here..."
+          placeholder={text.answerPlaceholder}
           className="h-14 w-full rounded-sm border border-white/20 bg-black/50 px-4 text-xl md:text-2xl text-zinc-100 placeholder:text-zinc-500 focus:border-[#d3cbba] focus:ring-2 focus:ring-[#d3cbba]/20 focus:outline-none transition-all"
         />
       )
@@ -309,7 +315,7 @@ export default function QualifyForm() {
       <div className="space-y-3">
         <div className="flex items-center justify-between text-[10px] md:text-xs uppercase tracking-[0.2em] text-zinc-400">
           <span>
-            Paso {stepIndex + 1} / {steps.length}
+            {text.stepPrefix} {stepIndex + 1} / {steps.length}
           </span>
           <span>{progress}%</span>
         </div>
@@ -347,20 +353,20 @@ export default function QualifyForm() {
             onClick={handleBack}
             disabled={stepIndex === 0}
             className="h-12 min-w-12 px-3 rounded-sm border border-white/15 text-zinc-200 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-white/5 transition-colors"
-            aria-label="Volver"
+              aria-label={text.back}
           >
             <ArrowLeft className="w-4 h-4" />
           </button>
 
           {isLastStep ? (
-            <SubmitButton disabled={Boolean(validateStep(currentStep, currentValue))} />
+            <SubmitButton disabled={Boolean(validateStep(currentStep, currentValue, text))} />
           ) : (
             <button
               type="button"
               onClick={handleNext}
               className="w-full h-12 rounded-sm bg-[#d3cbba] text-[#1e3a27] font-bold uppercase tracking-[0.18em] text-xs hover:bg-[#c2b9a5] transition-colors inline-flex items-center justify-center gap-2"
             >
-              Continuar
+              {text.continue}
               <ArrowRight className="w-4 h-4" />
             </button>
           )}

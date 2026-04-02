@@ -46,7 +46,8 @@ routes or modifying existing ones.
 - `FeaturesSection` — Three-column methodology
 - `MissionVisionSection` — Mission and Vision cards
 - `InstructorSection` — Founder introduction
-- `FinalCtaSection` — Final CTA with contact info
+- `PricingSection` — Three-course pricing section
+- `FinalCtaSection` — Final CTA (sin bloque de contacto)
 
 **Data flow:**
 ```
@@ -116,14 +117,18 @@ ApplyForm (client)
 
 **Server Action:** `submitPublicLeadQualification(prevState, formData)`
 - Validates inputs with Zod
+- Accepts optional `selectedPlan` from query (`starter`, `premium`, `mastery`)
 - Requires tracked phone context (`tracked_lead_phone` cookie)
 - Upserts `crm_leads` by `phone_number` with `auto_score`,
   `status = contacted`, and completion timestamp
 - Upserts `crm_lead_answers` by `lead_id + question_key`
-- Redirects to WhatsApp deal chat (`https://wa.me/61413891977`) with prefilled message
+- Redirects to WhatsApp deal chat (`https://wa.me/61413891977`) with prefilled
+  message personalized by selected plan (fallback to generic message)
 
 **Business behavior:**
-- Landing CTA buttons (`Header` + `FinalCtaSection`) point to this route.
+- Landing CTA buttons (`Header` + `PricingSection`) point to this route.
+- Pricing plan cards append `?plan=<plan_key>` so the qualification submit carries
+  plan context into CRM answers and WhatsApp message.
 - This route is the first conversion step before purchase and invite code.
 
 ### `/login` — Login page

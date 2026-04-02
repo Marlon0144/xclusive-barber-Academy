@@ -4,6 +4,7 @@ import FeaturesSection from "@/components/landing/FeaturesSection";
 import MissionVisionSection from "@/components/landing/MissionVisionSection";
 import InstructorSection from "@/components/landing/InstructorSection";
 import FinalCtaSection from "@/components/landing/FinalCtaSection";
+import PricingSection from "@/components/landing/PricingSection";
 import LandingFlowGate from "@/components/landing/LandingFlowGate";
 import { createClient } from "@/utils/supabase/server";
 
@@ -36,8 +37,14 @@ export default async function Home() {
         {/* 5. INSTRUCTOR & CREDIBILITY */}
         <InstructorSection />
 
-        {/* 6. FINAL CTA */}
+        {/* 7. FINAL CTA */}
         <FinalCtaSection />
+
+
+        {/* 6. PRICING */}
+        <PricingSection />
+
+
       </LandingFlowGate>
 
     </div>

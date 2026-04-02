@@ -1,5 +1,8 @@
+'use client'
+
 import Link from "next/link"
 import Image from "next/image"
+import { useLanguage } from "@/components/i18n/LanguageProvider"
 
 /**
  * Header oscuro para las páginas internas del dashboard
@@ -22,6 +25,9 @@ export default function DashboardPageHeader({
   title,
   bgColor = '#1d1d1d',
 }: DashboardPageHeaderProps) {
+  const { dictionary } = useLanguage()
+  const text = dictionary.dashboardPageHeader
+
   return (
     <header className="relative z-50 w-full h-[53px] mt-4">
       {/* Fondo que cubre todo el header */}
@@ -34,7 +40,7 @@ export default function DashboardPageHeader({
           <div className="absolute top-[-7px] left-0 h-[67px] w-[55px] z-10">
             <Image
               src="/assets/logo-academia.svg"
-              alt="Xclusive Barber Academy"
+              alt={text.brandAlt}
               fill
               priority
               className="object-contain object-top"
@@ -51,7 +57,7 @@ export default function DashboardPageHeader({
             className="flex items-center justify-center h-[22px] md:h-[26px] rounded-full bg-[#d9d9d9]/40 px-3 md:px-4 transition-all hover:bg-[#d9d9d9]/60"
           >
             <span className="font-sans text-[10px] md:text-[12px] font-light text-[#161616] uppercase tracking-wider">
-              DASHBOARD
+              {text.dashboard}
             </span>
           </Link>
 
@@ -64,7 +70,7 @@ export default function DashboardPageHeader({
             <div className="mt-1 w-[77px] md:w-[100px]">
               <Image
                 src="/assets/divider.svg"
-                alt="Línea divisora"
+                alt={text.dividerAlt}
                 width={183}
                 height={9}
                 className="w-full h-auto"
