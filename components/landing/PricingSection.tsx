@@ -3,6 +3,15 @@ import Link from "next/link";
 import ScrollReveal from "./ScrollReveal";
 import { getServerDictionary } from "@/lib/i18n/server";
 
+const INSTAGRAM_URL = "https://www.instagram.com/xclusiveacademy_au?igsh=bms4MHQ4bzB4a3Jy";
+const INSTAGRAM_HANDLE = "@xclusiveacademy_au";
+const WHATSAPP_NUMBER = "61413891977";
+const WHATSAPP_LABEL = "+61 413 891 977";
+const WHATSAPP_MESSAGE = encodeURIComponent(
+  "Hola equipo de Xclusive Barber Academy, quiero recibir asesoria sobre sus programas."
+);
+const WHATSAPP_URL = `https://wa.me/${WHATSAPP_NUMBER}?text=${WHATSAPP_MESSAGE}`;
+
 type PricingPlan = {
   id: string;
   name: string;
@@ -100,7 +109,13 @@ export default async function PricingSection() {
 
             <div className="mt-10 md:mt-14">
               <div className="mx-auto flex w-full max-w-5xl flex-col items-center justify-center gap-5 md:flex-row md:gap-12">
-                <div className="flex items-center gap-2.5">
+                <a
+                  href={INSTAGRAM_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Abrir Instagram de Xclusive Barber Academy"
+                  className="flex items-center gap-2.5 opacity-90 transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#d3cbba]/70 rounded-sm"
+                >
                   <div className="relative h-[14px] w-[14px] opacity-75 md:h-[20px] md:w-[20px]">
                     <Image
                       src="/assets/landing/FinalSection/icono.ig.png"
@@ -110,9 +125,9 @@ export default async function PricingSection() {
                     />
                   </div>
                   <span className="font-sans text-[13px] font-medium text-[#d3cbba] md:text-[18px]">
-                    @xclusivebarberau
+                    {INSTAGRAM_HANDLE}
                   </span>
-                </div>
+                </a>
 
                 <div className="relative h-[44px] w-[36px] md:h-[78px] md:w-[64px]">
                   <Image
@@ -123,7 +138,13 @@ export default async function PricingSection() {
                   />
                 </div>
 
-                <div className="flex items-center gap-2.5">
+                <a
+                  href={WHATSAPP_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Abrir chat de WhatsApp con el equipo de Xclusive"
+                  className="flex items-center gap-2.5 opacity-90 transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#d3cbba]/70 rounded-sm"
+                >
                   <div className="relative h-[15px] w-[15px] opacity-75 md:h-[21px] md:w-[21px]">
                     <Image
                       src="/assets/landing/FinalSection/icono-wpp.png"
@@ -133,9 +154,9 @@ export default async function PricingSection() {
                     />
                   </div>
                   <span className="font-sans text-[13px] font-medium text-[#d3cbba] md:text-[18px]">
-                    +61 413 891 977
+                    {WHATSAPP_LABEL}
                   </span>
-                </div>
+                </a>
               </div>
             </div>
 

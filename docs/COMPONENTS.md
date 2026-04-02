@@ -186,8 +186,8 @@ and description.
 
 **Props:** `{ tagline?: string }`
 
-**Renders:** Shared footer with Instagram handle, logo, and phone
-number. Optional tagline text.
+**Renders:** Shared footer with actionable Instagram and WhatsApp
+contact links, centered logo, and optional tagline text.
 
 ---
 
