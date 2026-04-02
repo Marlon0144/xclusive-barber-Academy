@@ -1,5 +1,40 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
+import {
+  LANGUAGE_COOKIE_MAX_AGE,
+  LANGUAGE_COOKIE_NAME,
+  isSupportedLanguage,
+  resolvePreferredLanguage,
+  type Language,
+} from '@/lib/i18n/config'
+
+function setLanguageCookie(response: NextResponse, language: Language) {
+  response.cookies.set(LANGUAGE_COOKIE_NAME, language, {
+    path: '/',
+    sameSite: 'lax',
+    secure: process.env.NODE_ENV === 'production',
+    maxAge: LANGUAGE_COOKIE_MAX_AGE,
+  })
+}
+
+function redirectWithSessionCookies(
+  request: NextRequest,
+  destinationPath: string,
+  sourceResponse: NextResponse,
+  language: Language,
+) {
+  const url = request.nextUrl.clone()
+  url.pathname = destinationPath
+
+  const redirectResponse = NextResponse.redirect(url)
+
+  sourceResponse.cookies.getAll().forEach(({ name, value }) => {
+    redirectResponse.cookies.set(name, value)
+  })
+
+  setLanguageCookie(redirectResponse, language)
+  return redirectResponse
+}
 
 export async function updateSession(request: NextRequest) {
   // 1. Creamos una respuesta inicial. El middleware necesita modificarla.
@@ -38,25 +73,36 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser()
 
+  const cookieLanguage = request.cookies.get(LANGUAGE_COOKIE_NAME)?.value
+  const preferredLanguage = resolvePreferredLanguage(
+    cookieLanguage,
+    request.headers.get('accept-language'),
+  )
+
+  if (!isSupportedLanguage(cookieLanguage)) {
+    setLanguageCookie(supabaseResponse, preferredLanguage)
+  }
+
   // 4. Lógica de Protección de Rutas
   // Si NO hay usuario y trata de entrar a cualquier ruta que empiece por /dashboard...
   if (
     !user &&
     request.nextUrl.pathname.startsWith('/dashboard')
   ) {
-    // ...lo redirigimos al login
-    const url = request.nextUrl.clone()
-    url.pathname = '/login'
-    return NextResponse.redirect(url)
+    return redirectWithSessionCookies(request, '/login', supabaseResponse, preferredLanguage)
   }
 
-  // Si YA hay usuario y trata de entrar al login o signup...
-  if (user && (request.nextUrl.pathname === '/login' || request.nextUrl.pathname === '/signup')) {
-     // (Opcional) Podrías redirigirlo directo al dashboard si ya está logueado
-     // Por ahora lo dejamos simple o redirigimos a dashboard:
-     const url = request.nextUrl.clone()
-     url.pathname = '/dashboard'
-     return NextResponse.redirect(url)
+  // Si YA hay usuario y trata de entrar a rutas publicas de acceso/onboarding...
+  if (
+    user &&
+    (
+      request.nextUrl.pathname === '/login' ||
+      request.nextUrl.pathname === '/signup' ||
+      request.nextUrl.pathname === '/apply' ||
+      request.nextUrl.pathname === '/qualify'
+    )
+  ) {
+    return redirectWithSessionCookies(request, '/dashboard', supabaseResponse, preferredLanguage)
   }
 
   return supabaseResponse

@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { signout } from "@/app/auth/actions"
+import { useLanguage } from "@/components/i18n/LanguageProvider"
 
 /**
  * UserMenu — dropdown interactivo para el DashboardGreenHeader.
@@ -22,6 +23,8 @@ interface UserMenuProps {
 export default function UserMenu({ userName, userEmail }: UserMenuProps) {
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
+  const { dictionary } = useLanguage()
+  const text = dictionary.userMenu
 
   // Cerrar al hacer clic fuera
   useEffect(() => {
@@ -47,7 +50,7 @@ export default function UserMenu({ userName, userEmail }: UserMenuProps) {
           <span
             className="font-sans font-bold tracking-wider text-[#d3cbba] uppercase whitespace-nowrap group-hover:text-white transition-colors text-[10px] md:text-[13px] lg:text-[15px]"
           >
-            Bienvenido, {userName || "Estudiante"}
+            {text.welcome}, {userName || text.defaultName}
           </span>
           <div className="mt-1 w-[130px] md:w-[160px] lg:w-[200px] xl:w-[240px]">
             <Image
@@ -63,7 +66,7 @@ export default function UserMenu({ userName, userEmail }: UserMenuProps) {
         <div className="relative h-[34px] w-[31px] md:h-[38px] md:w-[34px] lg:h-[44px] lg:w-[40px] flex-shrink-0">
           <Image
             src="/assets/header_dash/avatar-perfil.png"
-            alt="Perfil"
+            alt={text.profileAlt}
             fill
             className="object-contain"
             sizes="40px"
@@ -88,7 +91,7 @@ export default function UserMenu({ userName, userEmail }: UserMenuProps) {
               </svg>
             </div>
             <span className="truncate font-sans text-[11px] text-[#d3cbba]">
-              {userEmail || "usuario@email.com"}
+              {userEmail || text.fallbackEmail}
             </span>
           </div>
 
@@ -98,7 +101,7 @@ export default function UserMenu({ userName, userEmail }: UserMenuProps) {
             onClick={() => setOpen(false)}
             className="block px-4 py-3 font-sans text-[11px] text-[#d3cbba]/70 transition-colors hover:bg-white/5 hover:text-[#d3cbba]"
           >
-            Progreso profesional
+            {text.professionalProgress}
           </Link>
 
           {/* Sign out */}
@@ -107,7 +110,7 @@ export default function UserMenu({ userName, userEmail }: UserMenuProps) {
               type="submit"
               className="w-full border-t border-white/10 bg-[#d3cbba]/10 px-4 py-3 font-sans text-[11px] font-bold uppercase tracking-widest text-[#d3cbba] transition-colors hover:bg-[#d3cbba]/20"
             >
-              Cerrar Sesión
+              {text.signOut}
             </button>
           </form>
         </div>

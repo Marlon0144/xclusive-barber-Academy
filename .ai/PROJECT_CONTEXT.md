@@ -1,5 +1,5 @@
 # PROJECT_CONTEXT.md
-> **Última actualización:** 2026-04-01 — Captura pre-lead por telefono (Fase inicial)
+> **Última actualización:** 2026-04-01 — Landing pricing section (reemplazo CTA final)
 
 ## 1. Project Identity
 **Nombre:** Xclusive Barber Academy (LMS)
@@ -124,6 +124,31 @@ ADD COLUMN IF NOT EXISTS competency TEXT
 (Sin cambios recientes - Ver versión anterior para inventario de policies)
 
 ## 5. Estado del Sprint 6 (Progreso Profesional — Backend)
+
+### ✅ Landing Pricing Section integrada (2026-04-01)
+
+**Objetivo:** reemplazar el CTA final por una seccion de pricing editable,
+manteniendo coherencia visual con la landing Premium Dark y el funnel publico.
+
+#### Cambios de aplicacion
+- Nuevo componente compartido:
+   `components/landing/PricingSection.tsx`
+   - Renderiza 3 cards de cursos/programas desde arreglo de datos tipado
+   - Mantiene CTA unificado por card hacia `/qualify`
+   - Conserva bloque de contacto (Instagram, logo, WhatsApp)
+   - Botones CTA verdes de marca (sin dorado/amarillo)
+- Integracion en landing principal:
+   - `app/page.tsx` reemplaza `FinalCtaSection` por `PricingSection`
+
+#### Impacto en flujo comercial
+- El flujo publico se mantiene sin cambios:
+   Landing -> `/qualify` -> WhatsApp -> `/apply` (post compra)
+- El nuevo bloque agrega visibilidad de planes/cursos antes del
+   paso de calificacion.
+
+#### Documentacion sincronizada
+- `docs/ROUTES.md` actualizado para reflejar `PricingSection` en `/`
+- `docs/COMPONENTS.md` actualizado con inventario de `PricingSection`
 
 ### ✅ CRM Básico V1 Implementado (2026-04-01)
 

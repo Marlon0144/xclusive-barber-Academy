@@ -2,6 +2,7 @@
 
 import { createAdminClient } from '@/utils/supabase/server'
 import { revalidatePath } from 'next/cache'
+import { getServerDictionary } from '@/lib/i18n/server'
 
 export type ActionState = {
   success?: boolean
@@ -14,6 +15,9 @@ const supabaseAdmin = createAdminClient()
 // --- MÓDULOS ---
 
 export async function createModule(title: string): Promise<ActionState> {
+  const dictionary = await getServerDictionary()
+  const messages = dictionary.actions.adminCourses
+
   // Usamos supabaseAdmin directamente
   const { error } = await supabaseAdmin
     .from('modules')
@@ -21,7 +25,7 @@ export async function createModule(title: string): Promise<ActionState> {
 
   if (error) {
     console.error("❌ Error creando módulo:", error.message)
-    return { error: "Error DB: " + error.message }
+    return { error: messages.createModuleError }
   }
   
   revalidatePath('/dashboard/admin/courses')
@@ -98,13 +102,16 @@ export async function reorderLessonsInModule(
   moduleId: string,
   orderedLessonIds: string[],
 ): Promise<ActionState> {
+  const dictionary = await getServerDictionary()
+  const messages = dictionary.actions.adminCourses
+
   if (!moduleId || orderedLessonIds.length === 0) {
-    return { error: 'Datos inválidos para reordenar lecciones.' }
+    return { error: messages.reorderInvalidData }
   }
 
   const uniqueIds = new Set(orderedLessonIds)
   if (uniqueIds.size !== orderedLessonIds.length) {
-    return { error: 'Hay lecciones duplicadas en el nuevo orden.' }
+    return { error: messages.reorderDuplicate }
   }
 
   const { data: moduleLessons, error: fetchError } = await supabaseAdmin
@@ -121,7 +128,7 @@ export async function reorderLessonsInModule(
     moduleLessonIds.size !== orderedLessonIds.length ||
     orderedLessonIds.some((id) => !moduleLessonIds.has(id))
   ) {
-    return { error: 'El orden recibido no coincide con el módulo seleccionado.' }
+    return { error: messages.reorderMismatch }
   }
 
   const updates = orderedLessonIds.map((lessonId, index) =>

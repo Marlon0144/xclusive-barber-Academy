@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { getServerDictionary } from "@/lib/i18n/server";
 
 /**
  * HeroSection
@@ -31,7 +32,9 @@ import Image from "next/image";
  *
  * Assets: /public/assets/landing/HeroSection/
  */
-export default function HeroSection() {
+export default async function HeroSection() {
+  const hero = (await getServerDictionary()).landing.hero;
+
   return (
     <section className="relative w-full bg-[#161616]">
 
@@ -67,7 +70,7 @@ export default function HeroSection() {
         <div className="absolute left-0 top-[182px] w-[189px] h-[283px] z-0 pointer-events-none">
           <Image
             src="/assets/landing/HeroSection/hero-tattoo-arm.png"
-            alt="Barber profesional"
+            alt={hero.armAlt}
             fill
             className="object-cover object-top"
             sizes="189px"
@@ -87,7 +90,7 @@ export default function HeroSection() {
             text-[11px] text-[#d3cbba] tracking-[0.09em] leading-normal
           "
         >
-          EDUCACIÓN PROFESIONAL EN BARBERÍA PARA LATINOS
+          {hero.subtitle}
         </p>
 
         {/* ── 4. Main heading ──────────────────────────────────────────────── */}
@@ -100,12 +103,12 @@ export default function HeroSection() {
           className="absolute top-[103px] left-1/2 -translate-x-1/2 z-20 w-[359px] text-center"
         >
           <p className="font-sans font-extrabold uppercase text-[#d3cbba] text-[20px] leading-[1.25] tracking-tight">
-            FORMACIÓN ORIENTADA A LOS ESTÁNDARES REALES DEL
+            {hero.headingTop}
           </p>
           {/* Figma blank line between heading rows ≈ 17px */}
           <div className="h-[17px]" aria-hidden />
           <p className="font-sans font-extrabold uppercase text-[#d3cbba] text-[24px] leading-none tracking-tight">
-            MERCADO AUSTRALIANO
+            {hero.headingBottom}
           </p>
         </div>
 
@@ -141,8 +144,7 @@ export default function HeroSection() {
             text-right leading-[1.3]
           "
         >
-          Sistema de aprendizaje práctico y estructurado para construir una
-          carrera real, con estándares profesionales y mentalidad de negocio.
+          {hero.paragraph}
         </p>
 
       </div>
@@ -183,7 +185,7 @@ export default function HeroSection() {
               "
               style={{ '--reveal-delay': '0.1s' } as React.CSSProperties}
             >
-              Educación profesional en barbería para latinos
+              {hero.subtitle}
             </p>
 
             {/* H1 block — Poppins ExtraBold · center · hero-reveal */}
@@ -199,7 +201,7 @@ export default function HeroSection() {
                   text-[clamp(18px,3.6vw,52px)]
                 "
               >
-                Formación orientada a los estándares reales del
+                {hero.headingTop}
               </h1>
 
               {/* Line 3 */}
@@ -211,7 +213,7 @@ export default function HeroSection() {
                   mt-1 md:mt-3
                 "
               >
-                Mercado Australiano
+                {hero.headingBottom}
               </h2>
             </div>
 
@@ -244,8 +246,7 @@ export default function HeroSection() {
                   max-w-3xl
                 "
               >
-                Sistema de aprendizaje práctico y estructurado para construir una
-                carrera real, con estándares profesionales y mentalidad de negocio.
+                {hero.paragraph}
               </p>
             </div>
 
@@ -266,7 +267,7 @@ export default function HeroSection() {
         >
           <Image
             src="/assets/landing/HeroSection/hero-tattoo-arm.png"
-            alt="Barber profesional cortando cabello"
+            alt={hero.armAlt}
             fill
             className="object-contain object-bottom"
             sizes="(max-width: 1024px) 380px, 617px"

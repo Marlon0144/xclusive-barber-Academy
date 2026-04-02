@@ -5,6 +5,7 @@ import { AuthButton } from "@/components/ui/auth-button"
 import Link from "next/link"
 import Image from "next/image"
 import { DashboardFooter } from "@/components/dashboard/DashboardFooter"
+import { getServerDictionary } from "@/lib/i18n/server"
 
 export default async function LoginPage({
   searchParams,
@@ -13,6 +14,8 @@ export default async function LoginPage({
 }) {
   const params = await searchParams
   const errorMessage = params.error
+  const dictionary = await getServerDictionary()
+  const text = dictionary.loginPage
 
   return (
     <div className="min-h-screen w-full bg-[#161616] flex flex-col items-center justify-center relative overflow-hidden p-4">
@@ -28,7 +31,7 @@ export default async function LoginPage({
           <Link href="/" className="absolute top-6 left-6 z-20 opacity-80 hover:opacity-100 transition-opacity">
              <Image 
                src="/assets/login/icon-arrow-back.png" 
-               alt="Back" 
+               alt={text.back} 
                width={24} 
                height={12} 
                className="w-auto h-3"
@@ -49,20 +52,20 @@ export default async function LoginPage({
           {/* Title - Dark Green Strip */}
           <div className="bg-[#1e3a27]/60 w-full py-5 mb-4 shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)] backdrop-blur-sm">
             <h1 className="text-[#d3cbba] font-sans font-extrabold text-2xl leading-none tracking-widest">
-              ACCEDE A LA
+              {text.titleLineOne}
               <br />
-              <span className="text-[#d3cbba]">ACADEMIA</span>
+              <span className="text-[#d3cbba]">{text.titleLineTwo}</span>
             </h1>
           </div>
 
           <p className="text-[#d3cbba] text-[10px] font-light tracking-wide mb-6 opacity-80">
-            Acceso exclusivo para estudiantes activos.
+            {text.subtitle}
           </p>
 
           <div className="px-8 text-center space-y-4 w-full">
              <div className="text-[#d3cbba] text-[12px] leading-relaxed">
-               <p className="font-bold mb-2">¡Bienvenido a Xclusive Barber Academy!</p>
-               <p className="font-light opacity-90">Ingresa para acceder a tus clases, contenidos exclusivos y seguimiento académico.</p>
+               <p className="font-bold mb-2">{text.welcomeTitle}</p>
+               <p className="font-light opacity-90">{text.welcomeBody}</p>
              </div>
              
              {/* Separator Image */}
@@ -81,7 +84,7 @@ export default async function LoginPage({
                 <AuthInput
                   name="email"
                   type="email"
-                  placeholder="CORREO ELECTRÓNICO"
+                  placeholder={text.emailPlaceholder}
                   required
                   className="text-center placeholder:text-[10px] placeholder:text-[#d3cbba]/40 placeholder:font-light placeholder:tracking-widest"
                 />
@@ -92,7 +95,7 @@ export default async function LoginPage({
                 <AuthInput
                   name="password"
                   type="password"
-                  placeholder="CONTRASEÑA"
+                  placeholder={text.passwordPlaceholder}
                   required
                   className="text-center placeholder:text-[10px] placeholder:text-[#d3cbba]/40 placeholder:font-light placeholder:tracking-widest"
                 />
@@ -102,7 +105,7 @@ export default async function LoginPage({
             {/* Forgot Password */}
             <div className="text-center -mt-2">
                <Link href="/auth/forgot-password" className="text-[9px] text-[#d3cbba] hover:text-white transition-colors tracking-wide font-light opacity-80">
-                 ¿OLVIDASTE TU CONTRASEÑA?
+                 {text.forgotPassword}
                </Link>
             </div>
 
@@ -112,7 +115,7 @@ export default async function LoginPage({
                 formAction={login}
                 className="w-full bg-[#D3CBBA] text-[#1e3a27] hover:brightness-110 font-bold tracking-[0.2em] text-[13px] py-6 shadow-[0px_4px_15px_rgba(212,175,55,0.15)] border-none "
               >
-                ACCEDER A MI FORMACIÓN
+                {text.submit}
               </AuthButton>
             </div>
 
@@ -127,20 +130,20 @@ export default async function LoginPage({
           {/* Links Footer inside Card */}
           <div className="text-center space-y-3 pt-4 border-t border-[#d3cbba]/10">
             <div className="text-[9px] text-[#d3cbba]">
-              <span className="font-light">¿ES TU PRIMER INGRESO? </span>
-              <Link href="/apply" className="font-bold hover:text-white transition-colors ml-1">ACTIVAR CUENTA</Link>
+              <span className="font-light">{text.firstAccessPrefix} </span>
+              <Link href="/apply" className="font-bold hover:text-white transition-colors ml-1">{text.activateAccount}</Link>
             </div>
             
             <div className="text-[9px] text-[#d3cbba]">
-              <p className="opacity-80 mb-1">¿TIENES PROBLEMAS PARA INGRESAR?</p>
-              <Link href="/contact" className="font-bold hover:text-white transition-colors">CONTÁCTANOS</Link>
+              <p className="opacity-80 mb-1">{text.issuesLine}</p>
+              <Link href="/contact" className="font-bold hover:text-white transition-colors">{text.contact}</Link>
             </div>
           </div>
         </AuthCardContent>
 
       </AuthCard>
 
-      <DashboardFooter tagline="Formación profesional para construir una carrera real." />
+      <DashboardFooter tagline={text.footerTagline} />
 
     </div>
   )

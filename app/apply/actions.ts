@@ -6,21 +6,37 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/utils/supabase/server'
 import { createClient as createSupabaseClient } from '@supabase/supabase-js'
 import { z } from 'zod'
+import { getServerDictionary } from '@/lib/i18n/server'
 
 export type ApplyState = {
   error?: string | null
   success?: boolean
 }
 
-const applySchema = z.object({
-  email: z.string().email('Correo electronico invalido.'),
-  password: z.string().min(6, 'La contraseña debe tener al menos 6 caracteres.'),
-  fullName: z.string().trim().min(2, 'Nombre invalido.').max(120, 'Nombre demasiado largo.'),
-  inviteCode: z.string().trim().min(3, 'Codigo de acceso invalido.').max(80, 'Codigo de acceso invalido.'),
-})
+function buildApplySchema(messages: {
+  invalidEmail: string
+  invalidPassword: string
+  invalidName: string
+  nameTooLong: string
+  invalidInviteCode: string
+}) {
+  return z.object({
+    email: z.string().email(messages.invalidEmail),
+    password: z.string().min(6, messages.invalidPassword),
+    fullName: z.string().trim().min(2, messages.invalidName).max(120, messages.nameTooLong),
+    inviteCode: z
+      .string()
+      .trim()
+      .min(3, messages.invalidInviteCode)
+      .max(80, messages.invalidInviteCode),
+  })
+}
 
 export async function applyAccess(prevState: ApplyState, formData: FormData): Promise<ApplyState> {
   const cookieStore = await cookies()
+  const dictionary = await getServerDictionary()
+  const messages = dictionary.actions.apply
+  const applySchema = buildApplySchema(messages)
 
   // Cliente NORMAL (para validar invitación y crear auth user)
   const supabase = await createClient()
@@ -33,7 +49,7 @@ export async function applyAccess(prevState: ApplyState, formData: FormData): Pr
   })
 
   if (!parsed.success) {
-    return { error: parsed.error.issues[0]?.message ?? 'Datos del formulario invalidos.', success: false }
+    return { error: parsed.error.issues[0]?.message ?? messages.invalidForm, success: false }
   }
 
   const { email, password, fullName, inviteCode } = parsed.data
@@ -47,7 +63,7 @@ export async function applyAccess(prevState: ApplyState, formData: FormData): Pr
     .single()
 
   if (inviteError || !invitation || (invitation.used_count >= invitation.max_uses)) {
-    return { error: 'Código de acceso inválido o expirado.', success: false }
+    return { error: messages.inviteExpired, success: false }
   }
 
   // 2. CREAR USUARIO (Auth)
@@ -87,7 +103,7 @@ export async function applyAccess(prevState: ApplyState, formData: FormData): Pr
 
     if (profileError) {
       console.error("Error creando perfil:", profileError)
-      return { error: 'Error al activar tu cuenta. Por favor intenta nuevamente.', success: false }
+      return { error: messages.activationError, success: false }
     }
 
     const trackedPhone = cookieStore.get('tracked_lead_phone')?.value ?? null

@@ -6,13 +6,32 @@ import { z } from 'zod'
 import { computeLeadScore } from '@/utils/crm-scoring'
 import { createAdminClient } from '@/utils/supabase/server'
 import type { LeadAnswers } from '@/types/crm'
+import { getServerDictionary, getServerLanguage } from '@/lib/i18n/server'
+import { interpolate } from '@/lib/i18n/dictionaries'
 
 export type QualifyState = {
   error?: string | null
 }
 
 const WHATSAPP_DEAL_NUMBER = '61413891977'
-const WHATSAPP_DEAL_MESSAGE = 'Estoy interesado en ser parte de la academia, quiero inscribirme ya'
+
+type PlanKey = 'starter' | 'premium' | 'mastery'
+
+function buildWhatsAppDealMessage(
+  messages: {
+    defaultWhatsappMessage: string
+    selectedPlanMessage: string
+    planLabels: Record<PlanKey, string>
+  },
+  selectedPlan?: PlanKey,
+) {
+  if (!selectedPlan) {
+    return messages.defaultWhatsappMessage
+  }
+
+  const planLabel = messages.planLabels[selectedPlan]
+  return interpolate(messages.selectedPlanMessage, { plan: planLabel })
+}
 
 const qualifySchema = z.object({
   citySuburb: z.string().trim().min(2).max(120),
@@ -26,6 +45,7 @@ const qualifySchema = z.object({
   careerStartWindow: z.enum(['immediately', 'within_3_months', 'within_6_months', 'just_researching']),
   longTermAmbition: z.enum(['senior_barber', 'open_shop', 'personal_brand', 'educator', 'not_sure']),
   callWillingness: z.enum(['yes', 'maybe', 'no']),
+  selectedPlan: z.enum(['starter', 'premium', 'mastery']).optional(),
 })
 
 export async function submitPublicLeadQualification(
@@ -33,10 +53,15 @@ export async function submitPublicLeadQualification(
   formData: FormData,
 ): Promise<QualifyState> {
   const cookieStore = await cookies()
+  const language = await getServerLanguage()
+  const dictionary = await getServerDictionary()
+  const messages = dictionary.actions.qualifyPublic
   const trackedPhone = cookieStore.get('tracked_lead_phone')?.value ?? null
+  const selectedPlanRaw = formData.get('selectedPlan')
+  const selectedPlan = typeof selectedPlanRaw === 'string' ? selectedPlanRaw : undefined
 
   if (!trackedPhone) {
-    return { error: 'Primero deja tu telefono en la landing para iniciar el proceso.' }
+    return { error: messages.missingTrackedPhone }
   }
 
   const parsed = qualifySchema.safeParse({
@@ -51,10 +76,11 @@ export async function submitPublicLeadQualification(
     careerStartWindow: formData.get('careerStartWindow'),
     longTermAmbition: formData.get('longTermAmbition'),
     callWillingness: formData.get('callWillingness'),
+    selectedPlan,
   })
 
   if (!parsed.success) {
-    const firstIssue = parsed.error.issues[0]?.message ?? 'Formulario invalido.'
+    const firstIssue = parsed.error.issues[0]?.message ?? messages.invalidForm
     return { error: firstIssue }
   }
 
@@ -72,7 +98,7 @@ export async function submitPublicLeadQualification(
     callWillingness: parsed.data.callWillingness,
   } satisfies LeadAnswers
 
-  const scoring = computeLeadScore(answers)
+  const scoring = computeLeadScore(answers, language)
   const supabaseAdmin = createAdminClient()
   const now = new Date().toISOString()
 
@@ -103,7 +129,7 @@ export async function submitPublicLeadQualification(
       .single()
 
     if (insertLeadError || !insertedLead) {
-      return { error: 'No pudimos guardar tu calificacion. Intenta nuevamente.' }
+      return { error: messages.qualificationSaveError }
     }
 
     leadId = insertedLead.id
@@ -122,7 +148,7 @@ export async function submitPublicLeadQualification(
       .eq('id', leadId)
 
     if (updateLeadError) {
-      return { error: 'No pudimos guardar tu calificacion. Intenta nuevamente.' }
+      return { error: messages.qualificationSaveError }
     }
   }
 
@@ -138,6 +164,9 @@ export async function submitPublicLeadQualification(
     { question_key: 'career_start_window', answer_choice: answers.careerStartWindow },
     { question_key: 'long_term_ambition', answer_choice: answers.longTermAmbition },
     { question_key: 'call_willingness', answer_choice: answers.callWillingness },
+    ...(parsed.data.selectedPlan
+      ? [{ question_key: 'selected_plan', answer_choice: parsed.data.selectedPlan }]
+      : []),
   ]
 
   const answersPayload = answersRows.map((row) => ({
@@ -150,9 +179,10 @@ export async function submitPublicLeadQualification(
     .upsert(answersPayload, { onConflict: 'lead_id,question_key' })
 
   if (answersError) {
-    return { error: 'Guardamos parte de tu informacion, pero hubo un error en respuestas.' }
+    return { error: messages.answersPartialError }
   }
 
-  const whatsappUrl = `https://wa.me/${WHATSAPP_DEAL_NUMBER}?text=${encodeURIComponent(WHATSAPP_DEAL_MESSAGE)}`
+  const whatsappMessage = buildWhatsAppDealMessage(messages, parsed.data.selectedPlan)
+  const whatsappUrl = `https://wa.me/${WHATSAPP_DEAL_NUMBER}?text=${encodeURIComponent(whatsappMessage)}`
   redirect(whatsappUrl)
 }

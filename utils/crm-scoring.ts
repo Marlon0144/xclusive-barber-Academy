@@ -8,6 +8,8 @@ import type {
   LeadScoringResult,
   LongTermAmbition,
 } from '@/types/crm'
+import { getDictionary } from '@/lib/i18n/dictionaries'
+import { type Language } from '@/lib/i18n/config'
 
 const FINANCIAL_POINTS: Record<FinancialPreparedness, number> = {
   yes: 30,
@@ -50,7 +52,11 @@ const YES_NO_POINTS: Record<DiscoverySource, number> = {
 
 const MAX_POINTS = 125
 
-export function computeLeadScore(answers: LeadAnswers): LeadScoringResult {
+export function computeLeadScore(
+  answers: LeadAnswers,
+  language: Language = 'es',
+): LeadScoringResult {
+  const messages = getDictionary(language).actions.crmScoring
   const seriousnessPoints = Math.max(0, Math.min(10, answers.seriousness)) * 3
 
   const rawPoints =
@@ -67,10 +73,10 @@ export function computeLeadScore(answers: LeadAnswers): LeadScoringResult {
   const score = Math.round((rawPoints / MAX_POINTS) * 100)
 
   const rationale: string[] = []
-  if (answers.financialPreparedness === 'yes') rationale.push('Listo para invertir en su formacion')
-  if (answers.careerStartWindow === 'immediately') rationale.push('Busca iniciar de inmediato')
-  if (answers.callWillingness === 'yes') rationale.push('Disponible para llamada de admision')
-  if (answers.longTermAmbition === 'open_shop') rationale.push('Meta de abrir su propio negocio')
+  if (answers.financialPreparedness === 'yes') rationale.push(messages.readyToInvest)
+  if (answers.careerStartWindow === 'immediately') rationale.push(messages.startImmediately)
+  if (answers.callWillingness === 'yes') rationale.push(messages.callAvailable)
+  if (answers.longTermAmbition === 'open_shop') rationale.push(messages.ownBusinessGoal)
 
   return { score, rationale }
 }

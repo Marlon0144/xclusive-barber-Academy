@@ -350,11 +350,12 @@ content).
 | `FeaturesSection` | `landing/FeaturesSection.tsx` | Three-column: Mentalidad, Practica, Carrera |
 | `MissionVisionSection` | `landing/MissionVisionSection.tsx` | Mission + Vision dark cards |
 | `InstructorSection` | `landing/InstructorSection.tsx` | Julian founder bio + photo |
-| `FinalCtaSection` | `landing/FinalCtaSection.tsx` | Final CTA + Instagram/WhatsApp contact |
+| `PricingSection` | `landing/PricingSection.tsx` | Three-course pricing cards + green CTA buttons that pass `?plan=` context to `/qualify` |
+| `FinalCtaSection` | `landing/FinalCtaSection.tsx` | Final CTA de cierre sin bloque de contacto |
 
 **Design:** All sections follow the "Premium Dark" aesthetic with
-gold accents, mobile-first responsive design, and Figma-faithful
-spacing.
+gold and dark green accents, mobile-first responsive design, and
+Figma-faithful spacing.
 
 ---
 
@@ -460,6 +461,7 @@ Root Layout
 │   ├── FeaturesSection
 │   ├── MissionVisionSection
 │   ├── InstructorSection
+│   ├── PricingSection
 │   └── FinalCtaSection
 │
 ├── Auth Pages (/apply, /login, /signup)

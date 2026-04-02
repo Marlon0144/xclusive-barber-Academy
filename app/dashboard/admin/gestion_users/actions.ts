@@ -5,12 +5,18 @@ import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { createAdminClient, createClient } from '@/utils/supabase/server'
 import { normalizePhoneNumber } from '@/utils/phone'
+import { getServerDictionary } from '@/lib/i18n/server'
 
 type UserRole = 'admin' | 'instructor' | 'student'
 const MIN_INVITE_USES = 1
 const MAX_INVITE_USES = 50
 
 const VALID_ROLES = new Set<UserRole>(['admin', 'instructor', 'student'])
+
+async function getAdminUserMessages() {
+  const dictionary = await getServerDictionary()
+  return dictionary.actions.adminUsers
+}
 
 function parseRole(raw: FormDataEntryValue | null): UserRole | null {
   if (typeof raw !== 'string') return null
@@ -29,6 +35,7 @@ function parseMaxUses(raw: FormDataEntryValue | null): number | null {
 }
 
 async function assertAdmin(): Promise<{ ok: true; userId: string } | { ok: false; error: string }> {
+  const messages = await getAdminUserMessages()
   const supabase = await createClient()
   const {
     data: { user },
@@ -36,7 +43,7 @@ async function assertAdmin(): Promise<{ ok: true; userId: string } | { ok: false
   } = await supabase.auth.getUser()
 
   if (authError || !user) {
-    return { ok: false, error: 'No autorizado: debes iniciar sesion.' }
+    return { ok: false, error: messages.unauthorizedUser }
   }
 
   const { data: profile, error: profileError } = await supabase
@@ -46,7 +53,7 @@ async function assertAdmin(): Promise<{ ok: true; userId: string } | { ok: false
     .single()
 
   if (profileError || profile?.role !== 'admin') {
-    return { ok: false, error: 'No autorizado: solo administradores.' }
+    return { ok: false, error: messages.unauthorizedAdmin }
   }
 
   return { ok: true, userId: user.id }
@@ -67,6 +74,7 @@ function generateInviteCode(length = 10): string {
 export async function createInviteCodeAction(formData: FormData): Promise<void> {
   const adminCheck = await assertAdmin()
   if (!adminCheck.ok) return
+  const messages = await getAdminUserMessages()
 
   const role = parseRole(formData.get('role_to_assign'))
   if (!role) {
@@ -94,7 +102,8 @@ export async function createInviteCodeAction(formData: FormData): Promise<void> 
 
     const normalizedPhone = normalizePhoneNumber(phoneWithCountryCode)
     if (!normalizedPhone.isValid) {
-      redirect('/dashboard/admin/gestion_users?invite_error=Telefono%20de%20lead%20invalido.')
+      const inviteError = encodeURIComponent(messages.invalidLeadPhone)
+      redirect(`/dashboard/admin/gestion_users?invite_error=${inviteError}`)
     }
 
     const { data: leadByPhone } = await supabaseAdmin
@@ -106,7 +115,8 @@ export async function createInviteCodeAction(formData: FormData): Promise<void> 
       .maybeSingle()
 
     if (!leadByPhone?.id) {
-      redirect('/dashboard/admin/gestion_users?invite_error=No%20existe%20telefono%20asociado%20a%20ese%20lead.')
+      const inviteError = encodeURIComponent(messages.leadPhoneNotFound)
+      redirect(`/dashboard/admin/gestion_users?invite_error=${inviteError}`)
     }
 
     leadIdToLink = leadByPhone.id

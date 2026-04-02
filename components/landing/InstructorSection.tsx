@@ -1,7 +1,10 @@
 import Image from "next/image";
 import ScrollReveal from "./ScrollReveal";
+import { getServerDictionary } from "@/lib/i18n/server";
 
-export default function InstructorSection() {
+export default async function InstructorSection() {
+  const instructor = (await getServerDictionary()).landing.instructor;
+
   return (
     <section className="relative w-full bg-[#161616] overflow-hidden">
 
@@ -14,7 +17,7 @@ export default function InstructorSection() {
         <p
           className="absolute top-[43px] left-0 right-0 text-center font-sans font-extralight text-[11px] text-[#d3cbba] tracking-[0.99px] uppercase z-20"
         >
-          XCLUSIVE BARBER ACADEMY
+          {instructor.academyLabel}
         </p>
 
         {/* "JULIAN" — tipografía de impacto */}
@@ -26,14 +29,14 @@ export default function InstructorSection() {
             leading-[1.28] z-10 pointer-events-none select-none
           "
         >
-          JULIAN
+          {instructor.name}
         </h2>
 
         {/* Subtítulo itálico */}
         <p
           className="absolute top-[194px] left-[28px] font-sans italic font-light text-[14px] text-[#d3cbba] leading-[1.3] w-[202px] z-20"
         >
-          Una academia creada desde la experiencia real
+          {instructor.subtitle}
         </p>
 
         {/* Fotografía del instructor — posicionada según Figma */}
@@ -43,7 +46,7 @@ export default function InstructorSection() {
         >
           <Image
             src="/assets/imagen-julian.svg"
-            alt="Julian Giraldo — Fundador de Xclusive Barber Academy"
+            alt={instructor.imageAlt}
             fill
             className="object-contain object-top"
             priority
@@ -56,7 +59,7 @@ export default function InstructorSection() {
           style={{ top: "317px", left: "0px", width: "310px", minHeight: "100px" }}
         >
           <p className="font-sans font-light not-italic text-[10px] text-[#d3cbba] leading-[1.3] w-[151px] ml-[40px] my-[14px]">
-            Xclusive Barber Academy nace desde la experiencia directa de su fundador como migrante, barbero profesional y emprendedor en Australia.
+            {instructor.description}
           </p>
         </div>
 
@@ -86,7 +89,7 @@ export default function InstructorSection() {
         >
           <Image
             src="/assets/imagen-julian.svg"
-            alt="Julian Giraldo — Fundador de Xclusive Barber Academy"
+            alt={instructor.imageAlt}
             fill
             className="object-contain object-top"
             sizes="(max-width: 1440px) 59vw, 851px"
@@ -104,7 +107,7 @@ export default function InstructorSection() {
             fontSize: "clamp(11px, 1.5vw, 28px)",
           }}
         >
-          XCLUSIVE BARBER ACADEMY
+          {instructor.academyLabel}
         </p>
 
         {/* ── "JULIAN" — below academy label, centered */}
@@ -117,7 +120,7 @@ export default function InstructorSection() {
             fontSize: "clamp(60px, 14vw, 260px)",
           }}
         >
-          JULIAN
+          {instructor.name}
         </h2>
 
         {/* ── Italic subtitle — Figma: x=301 y=464 w=837 text-[32px] Light Italic */}
@@ -130,7 +133,7 @@ export default function InstructorSection() {
             fontSize: "clamp(12px, 1.5vw, 28px)",
           }}
         >
-          Una academia creada desde la experiencia real
+          {instructor.subtitle}
         </p>
 
         {/* ── Green description box — behind photo (z-10 < photo z-20) */}
@@ -152,9 +155,7 @@ export default function InstructorSection() {
               fontSize: "clamp(11px, 1.5vw, 28px)",
             }}
           >
-            Xclusive Barber Academy nace desde la experiencia directa de su
-            fundador como migrante, barbero profesional y emprendedor en
-            Australia.
+            {instructor.description}
           </p>
         </div>
 

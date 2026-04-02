@@ -1,5 +1,6 @@
 import Image from "next/image";
 import ScrollReveal from "./ScrollReveal";
+import { getServerDictionary } from "@/lib/i18n/server";
 
 /**
  * TargetAudienceSection
@@ -22,12 +23,9 @@ import ScrollReveal from "./ScrollReveal";
  * DESKTOP (≥ md) — fluid scale-up preserving all Figma proportions
  * ─────────────────────────────────────────────────────────────────────────────
  */
-export default function TargetAudienceSection() {
-  const items = [
-    "Latinos en Australia que buscan aprender un oficio real.",
-    "Migrantes que quieren estabilidad y crecimiento.",
-    "Barberos principiantes o intermedios que quieren subir su nivel.",
-  ];
+export default async function TargetAudienceSection() {
+  const audience = (await getServerDictionary()).landing.targetAudience;
+  const items = audience.items;
 
   return (
     <section className="relative z-10 w-full bg-[#161616]">
@@ -55,7 +53,7 @@ export default function TargetAudienceSection() {
               text-[26px] leading-[25px] text-center w-[359px]
             "
           >
-            ¿LISTO PARA DAR EL SIGUIENTE PASO?
+            {audience.ctaTitle}
           </p>
         </div>
 
@@ -70,7 +68,7 @@ export default function TargetAudienceSection() {
             font-sans font-normal text-[7px] text-[#d3cbba] leading-normal
           "
         >
-          Entrenamos barberos con disciplina y visión de negocio para el mercado australiano.
+          {audience.subtitle}
         </p>
 
         {/* ── 3. Dark card ─────────────────────────────────────────────────── */}
@@ -98,7 +96,7 @@ export default function TargetAudienceSection() {
             text-[17px] leading-normal
           "
         >
-          XCLUSIVE BARBER ACADEMY ES PARA
+          {audience.cardTitle}
         </p>
 
         {/* ── 5. List items ────────────────────────────────────────────────── */}
@@ -132,7 +130,7 @@ export default function TargetAudienceSection() {
         >
           <Image
             src="/assets/logo-academia.svg"
-            alt="Xclusive Barber Academy"
+            alt={audience.logoAlt}
             fill
             className="object-contain"
             sizes="73px"
@@ -164,7 +162,7 @@ export default function TargetAudienceSection() {
                 max-w-[1270px] px-6
               "
             >
-              ¿LISTO PARA DAR EL SIGUIENTE PASO?
+              {audience.ctaTitle}
             </h2>
           </div>
         </ScrollReveal>
@@ -179,7 +177,7 @@ export default function TargetAudienceSection() {
                 max-w-3xl leading-relaxed
               "
             >
-              Entrenamos barberos con disciplina y visión de negocio para el mercado australiano.
+              {audience.subtitle}
             </p>
           </div>
         </ScrollReveal>
@@ -202,7 +200,7 @@ export default function TargetAudienceSection() {
                   mb-4 md:mb-6 lg:mb-10
                 "
               >
-                XCLUSIVE BARBER ACADEMY ES PARA
+                {audience.cardTitle}
               </h3>
 
               <div className="flex flex-col items-center gap-3 md:gap-4 w-full max-w-3xl">
@@ -229,7 +227,7 @@ export default function TargetAudienceSection() {
             <div className="relative w-[clamp(110px,11.7vw,168px)] h-[clamp(133px,14.2vw,204px)]">
               <Image
                 src="/assets/logo-academia.svg"
-                alt="Xclusive Barber Academy"
+                alt={audience.logoAlt}
                 fill
                 className="object-contain"
                 sizes="180px"

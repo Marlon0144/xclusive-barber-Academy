@@ -4,10 +4,18 @@ import FeaturesSection from "@/components/landing/FeaturesSection";
 import MissionVisionSection from "@/components/landing/MissionVisionSection";
 import InstructorSection from "@/components/landing/InstructorSection";
 import FinalCtaSection from "@/components/landing/FinalCtaSection";
+import PricingSection from "@/components/landing/PricingSection";
 import LandingFlowGate from "@/components/landing/LandingFlowGate";
+import { createClient } from "@/utils/supabase/server";
 
 export default async function Home() {
-  // no server data needed on landing page
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  const isAuthenticated = Boolean(user);
+
   return (
     <div className="flex flex-col min-h-screen text-[#d3cbba] bg-[#161616] overflow-x-hidden">
 
@@ -17,7 +25,7 @@ export default async function Home() {
       {/* 2. TARGET AUDIENCE (Para quién es) */}
       <TargetAudienceSection />
 
-      <LandingFlowGate>
+      <LandingFlowGate forceUnlocked={isAuthenticated}>
         <div id="landing-features-start">
           {/* 3. CORE FEATURES (Metodología) */}
           <FeaturesSection />
@@ -29,8 +37,14 @@ export default async function Home() {
         {/* 5. INSTRUCTOR & CREDIBILITY */}
         <InstructorSection />
 
-        {/* 6. FINAL CTA */}
+        {/* 7. FINAL CTA */}
         <FinalCtaSection />
+
+
+        {/* 6. PRICING */}
+        <PricingSection />
+
+
       </LandingFlowGate>
 
     </div>

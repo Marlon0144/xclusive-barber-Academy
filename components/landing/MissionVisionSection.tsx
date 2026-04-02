@@ -1,5 +1,6 @@
 import Image from "next/image";
 import ScrollReveal from "./ScrollReveal";
+import { getServerDictionary, getServerLanguage } from "@/lib/i18n/server";
 
 /**
  * MissionVisionSection
@@ -27,7 +28,11 @@ import ScrollReveal from "./ScrollReveal";
  * DESKTOP (≥ md) — fluid scale preserving Figma proportions
  * ─────────────────────────────────────────────────────────────────────────────
  */
-export default function MissionVisionSection() {
+export default async function MissionVisionSection() {
+  const language = await getServerLanguage();
+  const missionVision = (await getServerDictionary()).landing.missionVision;
+  const isSpanish = language === "es";
+
   return (
     <section className="relative w-full bg-[#161616] pt-10 md:pt-0">
 
@@ -75,13 +80,19 @@ export default function MissionVisionSection() {
         <div
           className="absolute top-[30px] left-1/2 -translate-x-1/2 z-10 w-[118px] h-[27px]"
         >
-          <Image
-            src="/assets/landing/landing_mision.svg"
-            alt="Misión"
-            fill
-            className="object-contain object-center"
-            sizes="118px"
-          />
+          {isSpanish ? (
+            <Image
+              src="/assets/landing/landing_mision.svg"
+              alt={missionVision.missionAlt}
+              fill
+              className="object-contain object-center"
+              sizes="118px"
+            />
+          ) : (
+            <p className="text-center font-sans text-[19px] font-extrabold uppercase leading-none tracking-[0.04em] text-[#d3cbba]">
+              {missionVision.missionTitle}
+            </p>
+          )}
         </div>
 
         {/* ── 4. MISIÓN description ─────────────────────────────────────────── */}
@@ -96,8 +107,7 @@ export default function MissionVisionSection() {
             font-sans font-light text-[7px] text-[#d3cbba] leading-[1.3]
           "
         >
-          Formar barberos con nivel profesional, disciplina y mentalidad de crecimiento, capaces de insertarse laboralmente en Australia y construir estabilidad económica a través de una habilidad real.{" "}
-          No formamos solo técnicos, formamos personas con criterio, ética y visión de futuro.
+          {missionVision.missionText}
         </p>
 
         {/* ── 5. VISIÓN header image ────────────────────────────────────────── */}
@@ -107,13 +117,19 @@ export default function MissionVisionSection() {
         <div
           className="absolute top-[175px] left-1/2 -translate-x-1/2 z-10 w-[116px] h-[27px]"
         >
-          <Image
-            src="/assets/landing/landing_vision.svg"
-            alt="Visión"
-            fill
-            className="object-contain object-center"
-            sizes="116px"
-          />
+          {isSpanish ? (
+            <Image
+              src="/assets/landing/landing_vision.svg"
+              alt={missionVision.visionAlt}
+              fill
+              className="object-contain object-center"
+              sizes="116px"
+            />
+          ) : (
+            <p className="text-center font-sans text-[19px] font-extrabold uppercase leading-none tracking-[0.04em] text-[#d3cbba]">
+              {missionVision.visionTitle}
+            </p>
+          )}
         </div>
 
         {/* ── 6. VISIÓN description ─────────────────────────────────────────── */}
@@ -128,9 +144,7 @@ export default function MissionVisionSection() {
             font-sans font-light text-[7px] text-[#d3cbba] leading-[1.3]
           "
         >
-          Construir una de las academias de barbería más sólidas para la comunidad latina en Australia,
-          con proyección a largo plazo, alianzas estratégicas, programas formativos más amplios e
-          impacto real en la vida de quienes confían en este proceso.
+          {missionVision.visionText}
         </p>
 
       </div>
@@ -153,13 +167,19 @@ export default function MissionVisionSection() {
 
             {/* recurso-texto1 — MISIÓN heading */}
             <div className="relative w-[clamp(118px,19vw,270px)] h-[clamp(27px,4.4vw,63px)] mb-4 md:mb-6">
-              <Image
-                src="/assets/landing/landing_mision.svg"
-                alt="Misión"
-                fill
-                className="object-contain object-center"
-                sizes="(max-width: 1024px) 200px, 270px"
-              />
+              {isSpanish ? (
+                <Image
+                  src="/assets/landing/landing_mision.svg"
+                  alt={missionVision.missionAlt}
+                  fill
+                  className="object-contain object-center"
+                  sizes="(max-width: 1024px) 200px, 270px"
+                />
+              ) : (
+                <p className="text-center font-sans text-[clamp(22px,3vw,44px)] font-extrabold uppercase leading-none tracking-[0.03em] text-[#d3cbba]">
+                  {missionVision.missionTitle}
+                </p>
+              )}
             </div>
 
             <p
@@ -169,10 +189,7 @@ export default function MissionVisionSection() {
                 leading-[1.3] text-center max-w-[593px]
               "
             >
-              Formar barberos con nivel profesional, disciplina y mentalidad de crecimiento,
-              capaces de insertarse laboralmente en Australia y construir estabilidad económica
-              a través de una habilidad real.{" "}
-              No formamos solo técnicos, formamos personas con criterio, ética y visión de futuro.
+              {missionVision.missionText}
             </p>
           </div>
 
@@ -193,13 +210,19 @@ export default function MissionVisionSection() {
 
             {/* recurso-texto2 — VISIÓN heading */}
             <div className="relative w-[clamp(116px,18.6vw,268px)] h-[clamp(27px,4.3vw,62px)] mb-4 md:mb-6">
-              <Image
-                src="/assets/landing/landing_vision.svg"
-                alt="Visión"
-                fill
-                className="object-contain object-center"
-                sizes="(max-width: 1024px) 200px, 268px"
-              />
+              {isSpanish ? (
+                <Image
+                  src="/assets/landing/landing_vision.svg"
+                  alt={missionVision.visionAlt}
+                  fill
+                  className="object-contain object-center"
+                  sizes="(max-width: 1024px) 200px, 268px"
+                />
+              ) : (
+                <p className="text-center font-sans text-[clamp(22px,3vw,44px)] font-extrabold uppercase leading-none tracking-[0.03em] text-[#d3cbba]">
+                  {missionVision.visionTitle}
+                </p>
+              )}
             </div>
 
             <p
@@ -209,9 +232,7 @@ export default function MissionVisionSection() {
                 leading-[1.3] text-center max-w-[593px]
               "
             >
-              Construir una de las academias de barbería más sólidas para la comunidad latina en
-              Australia, con proyección a largo plazo, alianzas estratégicas, programas formativos
-              más amplios e impacto real en la vida de quienes confían en este proceso.
+              {missionVision.visionText}
             </p>
           </div>
 

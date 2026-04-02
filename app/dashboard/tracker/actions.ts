@@ -3,6 +3,8 @@
 import { createClient } from '@/utils/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
+import { getServerDictionary } from '@/lib/i18n/server'
+import { interpolate } from '@/lib/i18n/dictionaries'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Seguridad: sólo formatos de imagen clásicos de celular / computador.
@@ -33,22 +35,30 @@ const CUT_TYPES_ALLOWED = [
 ] as const
 
 // Zod valida los campos de texto para evitar inyecciones o datos basura
-const submissionSchema = z.object({
-  cutType: z.enum(CUT_TYPES_ALLOWED),
-  description: z
-    .string()
-    .trim()
-    .min(10, 'La descripción debe tener al menos 10 caracteres')
-    .max(1000, 'La descripción no puede superar 1000 caracteres'),
-})
+function buildSubmissionSchema(messages: {
+  descriptionMin: string
+  descriptionMax: string
+}) {
+  return z.object({
+    cutType: z.enum(CUT_TYPES_ALLOWED),
+    description: z
+      .string()
+      .trim()
+      .min(10, messages.descriptionMin)
+      .max(1000, messages.descriptionMax),
+  })
+}
 
 export async function uploadSubmission(formData: FormData) {
+  const dictionary = await getServerDictionary()
+  const messages = dictionary.actions.tracker
+  const submissionSchema = buildSubmissionSchema(messages)
   const supabase = await createClient()
 
   // 1. Verificar Usuario
   const { data: { user }, error: authError } = await supabase.auth.getUser()
   if (authError || !user) {
-    throw new Error('Usuario no autenticado')
+    throw new Error(messages.unauthenticated)
   }
 
   // ── Extraer campos ────────────────────────────────────────────────────────
@@ -58,31 +68,43 @@ export async function uploadSubmission(formData: FormData) {
 
   // 2. Validar existencia y tipo del archivo (capa de seguridad servidor)
   if (!(file instanceof File) || file.size === 0) {
-    throw new Error('La imagen es obligatoria')
+    throw new Error(messages.imageRequired)
   }
 
   // 2a. Validar tamaño
   if (file.size > MAX_FILE_SIZE_BYTES) {
-    throw new Error(`El archivo supera el límite de ${MAX_FILE_SIZE_BYTES / 1024 / 1024} MB`)
+    throw new Error(
+      interpolate(messages.fileTooLarge, {
+        sizeMb: MAX_FILE_SIZE_BYTES / 1024 / 1024,
+      }),
+    )
   }
 
   // 2b. Validar MIME type declarado
   const mimeType = file.type.toLowerCase()
   if (!ALLOWED_MIME_TYPES.has(mimeType)) {
-    throw new Error(`Tipo de archivo no permitido: ${mimeType || 'desconocido'}. Solo se aceptan imágenes.`)
+    throw new Error(
+      interpolate(messages.invalidMimeType, {
+        mimeType: mimeType || 'unknown',
+      }),
+    )
   }
 
   // 2c. Validar extensión del nombre de archivo
   const rawExt = file.name.split('.').pop()?.toLowerCase() ?? ''
   if (!ALLOWED_EXTENSIONS.has(rawExt)) {
-    throw new Error(`Extensión no permitida: .${rawExt}. Solo se aceptan imágenes.`)
+    throw new Error(
+      interpolate(messages.invalidExtension, {
+        extension: rawExt,
+      }),
+    )
   }
 
   // 3. Validar campos de texto con Zod
   const parsed = submissionSchema.safeParse({ cutType, description })
   if (!parsed.success) {
     // Zod v4 usa `issues` en vez de `errors`
-    const firstError = parsed.error.issues[0]?.message ?? 'Datos del formulario no válidos'
+    const firstError = parsed.error.issues[0]?.message ?? messages.invalidForm
     throw new Error(firstError)
   }
 
@@ -95,7 +117,7 @@ export async function uploadSubmission(formData: FormData) {
     .from('practice_images')
     .upload(safeName, file)
 
-  if (storageError) throw new Error('Error subiendo imagen a Storage')
+  if (storageError) throw new Error(messages.uploadStorageError)
 
   // 5. Obtener URL pública
   const { data: { publicUrl } } = supabase.storage
@@ -115,7 +137,7 @@ export async function uploadSubmission(formData: FormData) {
 
   if (dbError) {
     console.error('Error DB:', dbError)
-    throw new Error(`No se pudo guardar: ${dbError.message}`)
+    throw new Error(messages.saveDbError)
   }
 
   revalidatePath('/dashboard/tracker')
@@ -131,11 +153,13 @@ export async function uploadSubmission(formData: FormData) {
 //   3. Se elimina primero la imagen en Storage para no dejar huérfanos.
 // ─────────────────────────────────────────────────────────────────────────────
 export async function deleteSubmission(submissionId: string) {
+  const dictionary = await getServerDictionary()
+  const messages = dictionary.actions.tracker
   const supabase = await createClient()
 
   // 1. Verificar usuario autenticado
   const { data: { user }, error: authError } = await supabase.auth.getUser()
-  if (authError || !user) throw new Error('Usuario no autenticado')
+  if (authError || !user) throw new Error(messages.unauthenticated)
 
   // 2. Obtener la práctica y verificar ownership en la misma query
   const { data: submission, error: fetchError } = await supabase
@@ -146,7 +170,7 @@ export async function deleteSubmission(submissionId: string) {
     .single()
 
   if (fetchError || !submission) {
-    throw new Error('Práctica no encontrada o no tienes permiso para eliminarla')
+    throw new Error(messages.notFoundOrForbidden)
   }
 
   // 3. Eliminar imagen del Storage (no bloqueante: si falla, igual borramos el registro)
@@ -168,7 +192,7 @@ export async function deleteSubmission(submissionId: string) {
 
   if (deleteError) {
     console.error('Error al eliminar práctica:', deleteError)
-    throw new Error('No se pudo eliminar la práctica')
+    throw new Error(messages.deleteFailed)
   }
 
   revalidatePath('/dashboard/tracker')

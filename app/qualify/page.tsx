@@ -3,10 +3,13 @@ import { cookies } from 'next/headers'
 import { DashboardFooter } from '@/components/dashboard/DashboardFooter'
 import { createAdminClient } from '@/utils/supabase/server'
 import QualifyForm from './QualifyForm'
+import { getServerDictionary } from '@/lib/i18n/server'
 
 export default async function PublicQualifyPage() {
   const cookieStore = await cookies()
   const trackedPhone = cookieStore.get('tracked_lead_phone')?.value ?? null
+  const dictionary = await getServerDictionary()
+  const text = dictionary.qualifyPage
 
   if (trackedPhone) {
     const supabaseAdmin = createAdminClient()
@@ -38,16 +41,16 @@ export default async function PublicQualifyPage() {
 
       <main className="px-4 py-6 md:p-8 max-w-4xl mx-auto space-y-6">
         <header className="border-b border-white/10 pb-6">
-          <p className="text-[10px] md:text-xs uppercase tracking-[0.3em] text-gold-500 mb-2">Paso 1 de 2</p>
-          <h1 className="text-3xl md:text-5xl font-serif text-white mb-3">Queremos conocer tu nivel de compromiso</h1>
+          <p className="text-[10px] md:text-xs uppercase tracking-[0.3em] text-gold-500 mb-2">{text.stepLabel}</p>
+          <h1 className="text-3xl md:text-5xl font-serif text-white mb-3">{text.title}</h1>
           <p className="text-zinc-400 text-sm md:text-base max-w-2xl font-light">
-            Completa este wizard para que el equipo comercial te contacte y te guie con la compra del acceso.
+            {text.subtitle}
           </p>
           <p className="text-zinc-500 text-xs md:text-sm mt-2">
-            Si aun no dejaste tu telefono, vuelve al landing y registralo primero para continuar.
+            {text.helper}
           </p>
           <Link href="/" className="inline-block mt-3 text-gold-500 text-xs uppercase tracking-[0.12em] hover:underline">
-            Volver al landing
+            {text.backToLanding}
           </Link>
         </header>
 
@@ -56,7 +59,7 @@ export default async function PublicQualifyPage() {
         </section>
       </main>
 
-      <DashboardFooter tagline="Xclusive Barber Academy" />
+      <DashboardFooter tagline={text.footerTagline} />
     </div>
   )
 }
