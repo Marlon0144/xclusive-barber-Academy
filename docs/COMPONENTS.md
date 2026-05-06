@@ -350,7 +350,7 @@ content).
 | `FeaturesSection` | `landing/FeaturesSection.tsx` | Three-column: Mentalidad, Practica, Carrera |
 | `MissionVisionSection` | `landing/MissionVisionSection.tsx` | Mission + Vision dark cards |
 | `InstructorSection` | `landing/InstructorSection.tsx` | Julian founder bio + photo |
-| `PricingSection` | `landing/PricingSection.tsx` | Three-course pricing cards + green CTA buttons that pass `?plan=` context to `/qualify` |
+| `PricingSection` | `landing/PricingSection.tsx` | Four-program pricing cards built from internal `PricingPlanGrid` and `PricingPlanCard` subcomponents, with CTA buttons that pass `?plan=` context to `/qualify` |
 | `FinalCtaSection` | `landing/FinalCtaSection.tsx` | Final CTA de cierre sin bloque de contacto |
 
 **Design:** All sections follow the "Premium Dark" aesthetic with

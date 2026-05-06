@@ -46,7 +46,7 @@ routes or modifying existing ones.
 - `FeaturesSection` — Three-column methodology
 - `MissionVisionSection` — Mission and Vision cards
 - `InstructorSection` — Founder introduction
-- `PricingSection` — Three-course pricing section
+- `PricingSection` — Four-program pricing section
 - `FinalCtaSection` — Final CTA (sin bloque de contacto)
 
 **Data flow:**
@@ -117,7 +117,7 @@ ApplyForm (client)
 
 **Server Action:** `submitPublicLeadQualification(prevState, formData)`
 - Validates inputs with Zod
-- Accepts optional `selectedPlan` from query (`starter`, `premium`, `mastery`)
+- Accepts optional `selectedPlan` from query (`starter`, `profesional`, `elite`, `business`)
 - Requires tracked phone context (`tracked_lead_phone` cookie)
 - Upserts `crm_leads` by `phone_number` with `auto_score`,
   `status = contacted`, and completion timestamp

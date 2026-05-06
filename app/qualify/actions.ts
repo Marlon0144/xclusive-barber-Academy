@@ -15,7 +15,7 @@ export type QualifyState = {
 
 const WHATSAPP_DEAL_NUMBER = '61413891977'
 
-type PlanKey = 'starter' | 'premium' | 'mastery'
+type PlanKey = 'starter' | 'profesional' | 'elite' | 'business'
 
 function buildWhatsAppDealMessage(
   messages: {
@@ -45,7 +45,7 @@ const qualifySchema = z.object({
   careerStartWindow: z.enum(['immediately', 'within_3_months', 'within_6_months', 'just_researching']),
   longTermAmbition: z.enum(['senior_barber', 'open_shop', 'personal_brand', 'educator', 'not_sure']),
   callWillingness: z.enum(['yes', 'maybe', 'no']),
-  selectedPlan: z.enum(['starter', 'premium', 'mastery']).optional(),
+  selectedPlan: z.enum(['starter', 'profesional', 'elite', 'business']).optional(),
 })
 
 export async function submitPublicLeadQualification(
