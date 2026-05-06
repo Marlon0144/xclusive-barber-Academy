@@ -276,20 +276,20 @@ export const dictionaries = {
         whatsappAlt: 'WhatsApp',
       },
       flowGate: {
-        unlockTitle: 'Desbloquea el contenido completo',
-        unlockDescription:
-          'Para obtener mas informacion del programa y continuar navegando, dejanos tu numero de contacto.',
+        unlockTitle: 'Desbloquea el contenido',
+        unlockDescription: 'Deja tu correo y telefono para ver toda la informacion.',
         submitLabel: 'OBTENER MAS INFORMACION',
       },
       phoneCapture: {
         pending: 'ENVIANDO...',
         countryCodeLabel: 'Extension de pais',
+        emailLabel: 'Correo',
+        emailPlaceholder: 'TU CORREO',
         phoneLabel: 'Telefono',
         phonePlaceholder: 'TU TELEFONO',
         success:
           'Gracias. Recibimos tu contacto. Puedes seguir explorando nuestros cursos.',
-        helper:
-          'Para mostrarte mas informacion del programa, dejanos tu telefono. Te guiaremos sin compromiso.',
+        helper: 'Necesitamos tu correo y telefono para continuar.',
         defaultSubmit: 'OBTENER MAS INFORMACION',
       },
       premiumCapture: {
@@ -312,6 +312,7 @@ export const dictionaries = {
         invalidCredentials: 'Credenciales incorrectas',
       },
       landing: {
+        invalidEmail: 'Correo electronico invalido.',
         phoneRequired: 'Ingresa un teléfono válido.',
         invalidPhone: 'Teléfono inválido.',
         invalidCountryCode: 'Código de país inválido.',
@@ -321,7 +322,8 @@ export const dictionaries = {
         migrationMissing:
           'No pudimos registrar tu contacto porque la base de datos aún no tiene habilitado el flujo de pre-leads. Ejecuta la migración 2026-04-01-prelead-phone-capture.sql.',
         duplicatePhone:
-          'Este número ya fue registrado recientemente. Si quieres, usa otro número o continúa con el proceso de aplicación.',
+          'Este telefono ya fue registrado. Usa otro telefono o continua con el proceso de aplicacion.',
+        duplicateEmail: 'Este correo ya fue registrado. Usa otro correo para continuar.',
       },
       qualifyPublic: {
         missingTrackedPhone:
@@ -675,19 +677,19 @@ export const dictionaries = {
       },
       flowGate: {
         unlockTitle: 'Unlock full content',
-        unlockDescription:
-          'To get more program information and keep browsing, leave your contact number.',
+        unlockDescription: 'Share your email and phone to see all the details.',
         submitLabel: 'GET MORE INFORMATION',
       },
       phoneCapture: {
         pending: 'SENDING...',
         countryCodeLabel: 'Country code',
+        emailLabel: 'Email',
+        emailPlaceholder: 'YOUR EMAIL',
         phoneLabel: 'Phone',
         phonePlaceholder: 'YOUR PHONE',
         success:
           'Thank you. We received your contact information. You can continue exploring our courses.',
-        helper:
-          'To show you more about the program, leave your phone number. We will guide you with no obligation.',
+        helper: 'We need your email and phone to continue.',
         defaultSubmit: 'GET MORE INFORMATION',
       },
       premiumCapture: {
@@ -710,6 +712,7 @@ export const dictionaries = {
         invalidCredentials: 'Invalid credentials',
       },
       landing: {
+        invalidEmail: 'Invalid email address.',
         phoneRequired: 'Enter a valid phone number.',
         invalidPhone: 'Invalid phone number.',
         invalidCountryCode: 'Invalid country code.',
@@ -719,7 +722,8 @@ export const dictionaries = {
         migrationMissing:
           'We could not save your contact because the pre-lead database flow is not enabled yet. Run migration 2026-04-01-prelead-phone-capture.sql.',
         duplicatePhone:
-          'This phone number was already registered recently. You can continue with the application flow.',
+          'This phone number is already registered. Use another phone number to continue.',
+        duplicateEmail: 'This email address is already registered. Use another email to continue.',
       },
       qualifyPublic: {
         missingTrackedPhone:

@@ -218,7 +218,7 @@ student.
 | `id` | `uuid` | PK, DEFAULT `gen_random_uuid()` | Lead ID |
 | `profile_id` | `uuid` | UNIQUE, FK -> `profiles.id` | Optional link to registered user |
 | `full_name` | `text` | nullable | Lead display name (optional at pre-lead stage) |
-| `email` | `text` | UNIQUE, nullable | Lead contact email (captured later in flow) |
+| `email` | `text` | UNIQUE, nullable | Lead contact email (captured at stage 1) |
 | `phone_number` | `text` | nullable | Lead phone |
 | `city_suburb` | `text` | nullable | Lead location |
 | `auto_score` | `integer` | CHECK `0..100`, DEFAULT `0` | Automatic score from questionnaire |
@@ -228,7 +228,7 @@ student.
 | `reviewed_at` | `timestamptz` | nullable | Review timestamp |
 | `review_notes` | `text` | nullable | Internal admin notes |
 | `qualification_completed_at` | `timestamptz` | nullable | Wizard completion timestamp |
-| `stage1_entered_at` | `timestamptz` | nullable | Fecha de entrada a etapa 1 (captura telefono) |
+| `stage1_entered_at` | `timestamptz` | nullable | Fecha de entrada a etapa 1 (captura correo y telefono) |
 | `stage2_entered_at` | `timestamptz` | nullable | Fecha de entrada a etapa 2 (visita `/apply`) |
 | `stage3_entered_at` | `timestamptz` | nullable | Fecha de entrada a etapa 3 (wizard completado) |
 | `stage4_entered_at` | `timestamptz` | nullable | Fecha de entrada a etapa 4 (cuenta activada con codigo) |
@@ -236,16 +236,16 @@ student.
 | `updated_at` | `timestamptz` | NOT NULL, DEFAULT `now()` | Last update timestamp |
 
 **Access patterns:**
-- Created from `/` landing capture (phone-first pre-lead)
+- Created from `/` landing capture (email + phone pre-lead)
 - Linked and enriched from `/apply` registration flow using tracked phone context
 - Updated/merged from `/dashboard/qualify` on questionnaire submit
 - Reviewed by admins in `/dashboard/admin/leads`
 
 **Pre-lead notes:**
-- A pre-lead can start with phone only (`source = landing_phone_capture`).
+- A pre-lead can start with email and phone (`source = landing_phone_capture`).
 - Visiting `/apply` marks intent with `source = apply_page_visit`
   when tracked pre-lead context exists.
-- Email and full name are completed later when the user progresses through
+- Full name is completed later when the user progresses through
   registration and qualification.
 - The wizard no longer requests phone again; the same lead is updated by
   `profile_id` after registration.

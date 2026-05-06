@@ -13,11 +13,18 @@ export type CapturePhoneLeadState = {
 }
 
 function buildCapturePhoneSchema(messages: {
+  invalidEmail: string
   phoneRequired: string
   invalidPhone: string
   invalidCountryCode: string
 }) {
   return z.object({
+    email: z
+      .string()
+      .trim()
+      .min(1, messages.invalidEmail)
+      .email(messages.invalidEmail)
+      .max(255, messages.invalidEmail),
     phone: z.string().trim().min(8, messages.phoneRequired).max(25, messages.invalidPhone),
     countryCode: z
       .string()
@@ -38,6 +45,7 @@ export async function capturePhoneLead(
   const capturePhoneSchema = buildCapturePhoneSchema(messages)
 
   const parsed = capturePhoneSchema.safeParse({
+    email: formData.get('email'),
     phone: formData.get('phone'),
     countryCode: formData.get('countryCode') ?? '+61',
     company: formData.get('company') ?? '',
@@ -52,6 +60,8 @@ export async function capturePhoneLead(
     return { success: true, error: null }
   }
 
+  const normalizedEmail = parsed.data.email.trim().toLowerCase()
+
   const phoneWithCountryCode = parsed.data.phone.startsWith('+')
     ? parsed.data.phone
     : `${parsed.data.countryCode} ${parsed.data.phone}`
@@ -64,28 +74,85 @@ export async function capturePhoneLead(
   const supabaseAdmin = createAdminClient()
   const now = new Date().toISOString()
 
-  const { data: existingLead, error: existingLeadError } = await supabaseAdmin
+  const { data: phoneLead, error: phoneLeadError } = await supabaseAdmin
     .from('crm_leads')
-    .select('id, profile_id, stage1_entered_at')
+    .select('id, email, stage1_entered_at')
     .eq('phone_number', normalized.value)
     .order('created_at', { ascending: true })
     .limit(1)
     .maybeSingle()
 
-  if (existingLeadError) {
+  if (phoneLeadError) {
     return { error: messages.registerFailed, success: false }
   }
 
-  if (existingLead) {
+  if (phoneLead) {
+    const { data: emailConflict, error: emailConflictError } = await supabaseAdmin
+      .from('crm_leads')
+      .select('id')
+      .eq('email', normalizedEmail)
+      .maybeSingle()
+
+    if (emailConflictError) {
+      return { error: messages.registerFailed, success: false }
+    }
+
+    if (emailConflict && emailConflict.id !== phoneLead.id) {
+      return { error: messages.duplicateEmail, success: false }
+    }
+
     const { error: updateError } = await supabaseAdmin
       .from('crm_leads')
       .update({
+        email: normalizedEmail,
         source: 'landing_phone_capture',
         status: 'new',
-        stage1_entered_at: existingLead.stage1_entered_at ?? now,
+        stage1_entered_at: phoneLead.stage1_entered_at ?? now,
         updated_at: now,
       })
-      .eq('id', existingLead.id)
+      .eq('id', phoneLead.id)
+
+    if (updateError) {
+      return { error: messages.registerFailed, success: false }
+    }
+
+    cookieStore.set('tracked_lead_phone', normalized.value, {
+      path: '/',
+      httpOnly: true,
+      sameSite: 'lax',
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: 60 * 60 * 24 * 30,
+    })
+
+    revalidatePath('/')
+    return { success: true, error: null }
+  }
+
+  const { data: emailLead, error: emailLeadError } = await supabaseAdmin
+    .from('crm_leads')
+    .select('id, phone_number, stage1_entered_at')
+    .eq('email', normalizedEmail)
+    .maybeSingle()
+
+  if (emailLeadError) {
+    return { error: messages.registerFailed, success: false }
+  }
+
+  if (emailLead) {
+    if (emailLead.phone_number && emailLead.phone_number !== normalized.value) {
+      return { error: messages.duplicatePhone, success: false }
+    }
+
+    const { error: updateError } = await supabaseAdmin
+      .from('crm_leads')
+      .update({
+        phone_number: normalized.value,
+        source: 'landing_phone_capture',
+        status: 'new',
+        stage1_entered_at: emailLead.stage1_entered_at ?? now,
+        updated_at: now,
+      })
+      .eq('id', emailLead.id)
 
     if (updateError) {
       return { error: messages.registerFailed, success: false }
@@ -105,7 +172,7 @@ export async function capturePhoneLead(
 
   const { error: insertError } = await supabaseAdmin.from('crm_leads').insert({
     full_name: null,
-    email: null,
+    email: normalizedEmail,
     phone_number: normalized.value,
     source: 'landing_phone_capture',
     status: 'new',
@@ -128,6 +195,15 @@ export async function capturePhoneLead(
     }
 
     if (isUniqueViolation) {
+      const rawDetails = `${insertError.message ?? ''} ${insertError.details ?? ''}`.toLowerCase()
+
+      if (rawDetails.includes('email')) {
+        return {
+          error: messages.duplicateEmail,
+          success: false,
+        }
+      }
+
       return {
         error: messages.duplicatePhone,
         success: false,

@@ -35,8 +35,8 @@ routes or modifying existing ones.
 
 **Server Action:** `capturePhoneLead(prevState, formData)`
 - Publica (sin auth) y ejecutada en servidor
-- Valida telefono con Zod y normaliza formato de contacto
-- Crea o actualiza pre-lead en `crm_leads` con
+- Valida correo y telefono con Zod y normaliza formato de contacto
+- Crea o actualiza pre-lead en `crm_leads` con email y telefono,
   `source = 'landing_phone_capture'`
 - Devuelve feedback no bloqueante para que el usuario continue navegando
 
@@ -58,8 +58,8 @@ LandingFlowGate (client)
 
 PhoneLeadCaptureForm (client)
   └─ useActionState(capturePhoneLead)
-       ├─ Validate + normalize phone
-       ├─ Upsert pre-lead in crm_leads
+  ├─ Validate + normalize email + phone
+  ├─ Upsert pre-lead in crm_leads (email + phone)
        └─ Return { success, error }
 
 LandingFlowGate (client)
@@ -70,8 +70,8 @@ LandingFlowGate (client)
 **Progressive reveal behavior:**
 - Users can read the hero immediately.
 - Users can read target audience immediately.
-- Sections below target audience stay visible but blurred until phone
-  capture succeeds.
+- Sections below target audience stay visible but blurred until email
+  and phone capture succeeds.
 - While locked, the floating form appears over the blocked section area.
 - After success, the page unlocks and scrolls smoothly to Features.
 

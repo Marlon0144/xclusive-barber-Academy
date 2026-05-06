@@ -58,66 +58,79 @@ export default function PhoneLeadCaptureForm({
   }, [state?.success])
 
   return (
-    <div className={cn('w-full max-w-2xl', className)}>
-      <form action={formAction} className="flex w-full flex-col gap-2 md:flex-row md:items-center md:gap-2">
-        <div className="w-full md:w-auto md:min-w-[118px]">
-          <label htmlFor="lead-country-code" className="sr-only">
-            {phoneCapture.countryCodeLabel}
-          </label>
-          <select
-            id="lead-country-code"
-            name="countryCode"
-            defaultValue="+61"
-            className="h-11 w-full rounded-sm border border-[#d4af37]/30 bg-[#161616] px-2 text-[11px] tracking-[0.06em] text-[#d3cbba]"
-          >
-            {COUNTRY_OPTIONS.map((option) => (
-              <option key={option.value} value={option.value} className="bg-[#161616] text-[#d3cbba]">
-                {option.label}
-              </option>
-            ))}
-          </select>
-        </div>
+<div className={cn('w-full max-w-md mx-auto', className)}>
+  <form action={formAction} className="flex w-full flex-col gap-3">
+    
+    {/* FILA 1: Selector de País + Input de Teléfono */}
+    <div className="flex w-full gap-2">
+      {/* Selector de Código de País */}
+      <div className="w-[118px] shrink-0">
+        <label htmlFor="lead-country-code" className="sr-only">
+          {phoneCapture.countryCodeLabel}
+        </label>
+        <select
+          id="lead-country-code"
+          name="countryCode"
+          defaultValue="+61"
+          className="h-11 w-full rounded-sm border border-[#d4af37]/30 bg-[#161616] px-2 text-[11px] tracking-[0.06em] text-[#d3cbba]"
+        >
+          {COUNTRY_OPTIONS.map((option) => (
+            <option key={option.value} value={option.value} className="bg-[#161616] text-[#d3cbba]">
+              {option.label}
+            </option>
+          ))}
+        </select>
+      </div>
 
-        <div className="flex-1">
-          <label htmlFor="lead-phone" className="sr-only">
-            {phoneCapture.phoneLabel}
-          </label>
-          <Input
-            id="lead-phone"
-            name="phone"
-            type="tel"
-            required
-            autoComplete="tel"
-            placeholder={phoneCapture.phonePlaceholder}
-            className="h-11 rounded-sm border border-[#d4af37]/30 bg-[#161616] px-3 text-[11px] tracking-[0.08em] text-[#d3cbba] placeholder:text-[#d3cbba]/50"
-          />
-        </div>
-
-        <input
-          name="company"
-          type="text"
-          autoComplete="off"
-          tabIndex={-1}
-          className="hidden"
-          aria-hidden
+      {/* Input de Teléfono */}
+      <div className="flex-1">
+        <label htmlFor="lead-phone" className="sr-only">
+          {phoneCapture.phoneLabel}
+        </label>
+        <Input
+          id="lead-phone"
+          name="phone"
+          type="tel"
+          required
+          autoComplete="tel"
+          placeholder={phoneCapture.phonePlaceholder}
+          className="h-11 w-full rounded-sm border border-[#d4af37]/30 bg-[#161616] px-3 text-[11px] tracking-[0.08em] text-[#d3cbba] placeholder:text-[#d3cbba]/50"
         />
-
-        <SubmitButton label={resolvedSubmitLabel} pendingLabel={phoneCapture.pending} />
-      </form>
-
-      {state?.error ? (
-        <p className="mt-2 text-[10px] uppercase tracking-[0.08em] text-red-300">{state.error}</p>
-      ) : null}
-
-      {state?.success ? (
-        <p className="mt-2 text-[10px] uppercase tracking-[0.08em] text-[#d3cbba]">
-          {phoneCapture.success}
-        </p>
-      ) : (
-        <p className="mt-2 text-[10px] uppercase tracking-[0.1em] text-[#d3cbba]/70">
-          {phoneCapture.helper}
-        </p>
-      )}
+      </div>
     </div>
+
+    {/* FILA 2: Input de Email (Ubicado debajo del teléfono y con ancho completo) */}
+    <div className="w-full">
+      <label htmlFor="lead-email" className="sr-only">
+        {phoneCapture.emailLabel}
+      </label>
+      <Input
+        id="lead-email"
+        name="email"
+        type="email"
+        required
+        autoComplete="email"
+        placeholder={phoneCapture.emailPlaceholder}
+        className="h-11 w-full rounded-sm border border-[#d4af37]/30 bg-[#161616] px-3 text-[11px] tracking-[0.08em] text-[#d3cbba] placeholder:text-[#d3cbba]/50"
+      />
+    </div>
+
+    {/* Campo de control Honeypot (Oculto para evitar Spam) */}
+    <input
+      name="company"
+      type="text"
+      autoComplete="off"
+      tabIndex={-1}
+      className="hidden"
+      aria-hidden
+    />
+
+    {/* FILA 3: Botón de Envío */}
+    <div className="w-full pt-1">
+      <SubmitButton label={resolvedSubmitLabel} pendingLabel={phoneCapture.pending} />
+    </div>
+
+  </form>
+</div>
   )
 }

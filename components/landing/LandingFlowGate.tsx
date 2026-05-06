@@ -11,7 +11,8 @@ type LandingFlowGateProps = {
   forceUnlocked?: boolean
 }
 
-const STORAGE_KEY = 'landing_phone_captured_v1'
+const STORAGE_KEY = 'landing_phone_captured_v2'
+const LEGACY_STORAGE_KEY = 'landing_phone_captured_v1'
 const CAPTURE_EVENT = 'lead-capture:success'
 
 function getLockedSnapshot() {
@@ -47,6 +48,7 @@ export default function LandingFlowGate({ children, className, forceUnlocked = f
     function handleCaptureSuccess() {
       try {
         window.localStorage.setItem(STORAGE_KEY, '1')
+        window.localStorage.removeItem(LEGACY_STORAGE_KEY)
       } catch {
         // Ignore storage errors and still unlock for current session.
       }
