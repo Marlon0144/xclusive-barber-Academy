@@ -54,8 +54,18 @@ export default function PhoneLeadCaptureForm({
 
   useEffect(() => {
     if (!state?.success) return
+
+    // Setear la cookie de tracking desde el cliente.
+    // Antes se hacía en el Server Action con cookies().set(), pero eso
+    // provocaba un full page re-render en Next.js 15 que destruía el estado.
+    if (state.phone) {
+      const maxAge = 60 * 60 * 24 * 30 // 30 días
+      const secure = window.location.protocol === 'https:'
+      document.cookie = `tracked_lead_phone=${encodeURIComponent(state.phone)}; path=/; max-age=${maxAge}; samesite=lax${secure ? '; secure' : ''}`
+    }
+
     window.dispatchEvent(new CustomEvent('lead-capture:success'))
-  }, [state?.success])
+  }, [state?.success, state?.phone])
 
   return (
 <div className={cn('w-full max-w-md mx-auto', className)}>
@@ -129,6 +139,13 @@ export default function PhoneLeadCaptureForm({
     <div className="w-full pt-1">
       <SubmitButton label={resolvedSubmitLabel} pendingLabel={phoneCapture.pending} />
     </div>
+
+    {/* Error feedback — antes no se mostraba y el usuario no sabía por qué fallaba */}
+    {state?.error ? (
+      <p className="text-center text-[11px] tracking-wide text-red-400/90 mt-2">
+        {state.error}
+      </p>
+    ) : null}
 
   </form>
 </div>

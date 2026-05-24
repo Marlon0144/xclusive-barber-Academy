@@ -66,12 +66,6 @@ function PricingPlanCard({ plan }: { plan: PricingPlan }) {
 
         <div className="mt-4 mb-5">
           <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
-            <span className="font-sans text-4xl font-black leading-[1.1] tracking-tight text-[#f0ece3] md:text-[38px]">
-              {plan.priceLabel}
-            </span>
-            <span className="relative top-[-4px] font-sans text-[11px] font-medium uppercase tracking-[0.06em] text-[#9ea79f] md:top-[-6px] md:text-[13px]">
-              {plan.billingLabel}
-            </span>
           </div>
           <p className="mt-1.5 font-sans text-sm font-semibold tracking-wide text-[#D4AF37]">
             {plan.formatLabel}

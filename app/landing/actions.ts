@@ -1,7 +1,5 @@
 'use server'
 
-import { revalidatePath } from 'next/cache'
-import { cookies } from 'next/headers'
 import { z } from 'zod'
 import { createAdminClient } from '@/utils/supabase/server'
 import { normalizePhoneNumber } from '@/utils/phone'
@@ -10,6 +8,8 @@ import { getServerDictionary } from '@/lib/i18n/server'
 export type CapturePhoneLeadState = {
   error?: string | null
   success?: boolean
+  /** Teléfono normalizado — el cliente lo usa para setear la cookie de tracking. */
+  phone?: string | null
 }
 
 function buildCapturePhoneSchema(messages: {
@@ -39,7 +39,6 @@ export async function capturePhoneLead(
   _prevState: CapturePhoneLeadState,
   formData: FormData,
 ): Promise<CapturePhoneLeadState> {
-  const cookieStore = await cookies()
   const dictionary = await getServerDictionary()
   const messages = dictionary.actions.landing
   const capturePhoneSchema = buildCapturePhoneSchema(messages)
@@ -116,16 +115,7 @@ export async function capturePhoneLead(
       return { error: messages.registerFailed, success: false }
     }
 
-    cookieStore.set('tracked_lead_phone', normalized.value, {
-      path: '/',
-      httpOnly: true,
-      sameSite: 'lax',
-      secure: process.env.NODE_ENV === 'production',
-      maxAge: 60 * 60 * 24 * 30,
-    })
-
-    revalidatePath('/')
-    return { success: true, error: null }
+    return { success: true, error: null, phone: normalized.value }
   }
 
   const { data: emailLead, error: emailLeadError } = await supabaseAdmin
@@ -158,16 +148,7 @@ export async function capturePhoneLead(
       return { error: messages.registerFailed, success: false }
     }
 
-    cookieStore.set('tracked_lead_phone', normalized.value, {
-      path: '/',
-      httpOnly: true,
-      sameSite: 'lax',
-      secure: process.env.NODE_ENV === 'production',
-      maxAge: 60 * 60 * 24 * 30,
-    })
-
-    revalidatePath('/')
-    return { success: true, error: null }
+    return { success: true, error: null, phone: normalized.value }
   }
 
   const { error: insertError } = await supabaseAdmin.from('crm_leads').insert({
@@ -213,14 +194,5 @@ export async function capturePhoneLead(
     return { error: messages.registerFailed, success: false }
   }
 
-  cookieStore.set('tracked_lead_phone', normalized.value, {
-    path: '/',
-    httpOnly: true,
-    sameSite: 'lax',
-    secure: process.env.NODE_ENV === 'production',
-    maxAge: 60 * 60 * 24 * 30,
-  })
-
-  revalidatePath('/')
-  return { success: true, error: null }
+  return { success: true, error: null, phone: normalized.value }
 }

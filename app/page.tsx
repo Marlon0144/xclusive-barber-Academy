@@ -34,6 +34,9 @@ export default async function Home() {
         {/* 4. MISION & VISION */}
         <MissionVisionSection />
 
+        {/* Spacer to separate Mission & Vision from Instructor */}
+        <div className="h-8 md:h-16" />
+
         {/* 5. INSTRUCTOR & CREDIBILITY */}
         <InstructorSection />
 
