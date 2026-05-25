@@ -24,6 +24,7 @@ routes or modifying existing ones.
 | `/dashboard/admin/leads` | Yes | admin | RSC + Server Actions | Standard |
 | `/dashboard/admin/lessons/[lessonId]/edit` | Yes | admin | RSC + Client | Standard |
 | `/dashboard/progreso_profesional` | Yes | Any | RSC | 139 B |
+| `/qualify` | No | Any | Dynamic RSC + Client | Standard |
 
 ## Public routes
 
@@ -112,7 +113,7 @@ ApplyForm (client)
 ### `/qualify` — Public pre-sales wizard
 
 **File:** `app/qualify/page.tsx`
-**Rendering:** RSC wrapper + Client form
+**Rendering:** Dynamic RSC + Client form (force-dynamic with Suspense)
 **Auth:** None (public)
 
 **Server Action:** `submitPublicLeadQualification(prevState, formData)`

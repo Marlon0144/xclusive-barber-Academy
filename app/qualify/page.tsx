@@ -1,9 +1,12 @@
 import Link from 'next/link'
 import { cookies } from 'next/headers'
+import { Suspense } from 'react'
 import { DashboardFooter } from '@/components/dashboard/DashboardFooter'
 import { createAdminClient } from '@/utils/supabase/server'
 import QualifyForm from './QualifyForm'
 import { getServerDictionary } from '@/lib/i18n/server'
+
+export const dynamic = 'force-dynamic'
 
 export default async function PublicQualifyPage() {
   const cookieStore = await cookies()
@@ -55,7 +58,9 @@ export default async function PublicQualifyPage() {
         </header>
 
         <section className="border border-white/10 bg-[#121212]/90 rounded-sm p-4 md:p-6">
-          <QualifyForm />
+          <Suspense fallback={<div className="h-40 flex items-center justify-center text-zinc-500">Cargando...</div>}>
+            <QualifyForm />
+          </Suspense>
         </section>
       </main>
 

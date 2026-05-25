@@ -27,7 +27,9 @@ export default function LandingFlowGate({ children, className, forceUnlocked = f
     // 1. Check if already unlocked from a previous visit
     try {
       if (window.localStorage.getItem(STORAGE_KEY) === '1') {
-        setIsLocked(false)
+        setTimeout(() => {
+          setIsLocked(false)
+        }, 0)
         return
       }
     } catch {
