@@ -36,6 +36,12 @@ export default function ApplyForm() {
   const { dictionary } = useLanguage()
   const text = dictionary.applyForm
 
+  // Note: applyAccess redirects to /dashboard on success (see app/apply/actions.ts),
+  // so `state.success` never actually renders here — the server action throws a
+  // Next.js redirect before returning. application_submit is tracked via a
+  // short-lived cookie set right before that redirect and read by
+  // ApplicationSuccessTracker on the dashboard (see components/analytics/ApplicationSuccessTracker.tsx).
+
   return (
     <div className="w-full">
         {/* Error Message */}

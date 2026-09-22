@@ -1,10 +1,20 @@
 import Image from 'next/image'
 import Link from 'next/link'
+import type { Metadata } from 'next'
 import { cookies } from 'next/headers'
 import ApplyForm from './ApplyForm'
 import { AuthCard, AuthCardContent } from '@/components/ui/auth-card'
 import { DashboardFooter } from '@/components/dashboard/DashboardFooter'
 import { createAdminClient } from '@/utils/supabase/server'
+
+export const metadata: Metadata = {
+  title: 'Apply to the Academy',
+  description:
+    'Start your application to Xclusive Barber Academy in Melbourne. Practical, hands-on barber training inside a real operating barbershop.',
+  alternates: {
+    canonical: '/apply',
+  },
+}
 
 export default async function ApplyPage() {
   const cookieStore = await cookies()

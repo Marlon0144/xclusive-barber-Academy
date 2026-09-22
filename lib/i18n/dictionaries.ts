@@ -127,7 +127,7 @@ export const dictionaries = {
     },
     landing: {
       hero: {
-        subtitle: 'EDUCACION PROFESIONAL EN BARBERIA PARA LATINOS',
+        subtitle: 'EDUCACION PROFESIONAL EN BARBERIA EN MELBOURNE',
         headingTop: 'FORMACION ORIENTADA A LOS ESTANDARES REALES DEL',
         headingBottom: 'MERCADO AUSTRALIANO',
         paragraph:
@@ -140,8 +140,8 @@ export const dictionaries = {
           'Entrenamos barberos con disciplina y vision de negocio para el mercado australiano.',
         cardTitle: 'XCLUSIVE BARBER ACADEMY ES PARA',
         items: [
-          'Latinos en Australia que buscan aprender un oficio real.',
-          'Migrantes que quieren estabilidad y crecimiento.',
+          'Cualquier persona en Melbourne que quiera aprender barberia de forma practica y profesional.',
+          'Migrantes, incluida la comunidad latina, que buscan estabilidad y crecimiento a traves de un oficio real.',
           'Barberos principiantes o intermedios que quieren subir su nivel.',
         ],
         logoAlt: 'Xclusive Barber Academy',
@@ -180,7 +180,7 @@ export const dictionaries = {
         missionText:
           'Formar barberos con nivel profesional, disciplina y mentalidad de crecimiento, capaces de insertarse laboralmente en Australia y construir estabilidad economica a traves de una habilidad real. No formamos solo tecnicos, formamos personas con criterio, etica y vision de futuro.',
         visionText:
-          'Construir una de las academias de barberia mas solidas para la comunidad latina en Australia, con proyeccion a largo plazo, alianzas estrategicas, programas formativos mas amplios e impacto real en la vida de quienes confian en este proceso.',
+          'Construir una de las academias de barberia mas solidas de Melbourne, con raices en la comunidad latina y proyeccion hacia todo el mercado australiano, alianzas estrategicas, programas formativos mas amplios e impacto real en la vida de quienes confian en este proceso.',
       },
       instructor: {
         academyLabel: 'XCLUSIVE BARBER ACADEMY',
@@ -307,6 +307,7 @@ export const dictionaries = {
         invalidForm: 'Datos del formulario inválidos.',
         inviteExpired: 'Código de acceso inválido o expirado.',
         activationError: 'Error al activar tu cuenta. Por favor intenta nuevamente.',
+        rateLimited: 'Demasiados intentos. Espera unos minutos y vuelve a intentarlo.',
       },
       login: {
         invalidCredentials: 'Credenciales incorrectas',
@@ -324,11 +325,13 @@ export const dictionaries = {
         duplicatePhone:
           'Este telefono ya fue registrado. Usa otro telefono o continua con el proceso de aplicacion.',
         duplicateEmail: 'Este correo ya fue registrado. Usa otro correo para continuar.',
+        rateLimited: 'Demasiados intentos. Espera unos minutos y vuelve a intentarlo.',
       },
       qualifyPublic: {
         missingTrackedPhone:
           'Primero deja tu teléfono en la landing para iniciar el proceso.',
         invalidForm: 'Formulario inválido.',
+        rateLimited: 'Demasiados intentos. Espera unos minutos y vuelve a intentarlo.',
         qualificationSaveError: 'No pudimos guardar tu calificación. Intenta nuevamente.',
         answersPartialError:
           'Guardamos parte de tu información, pero hubo un error en respuestas.',
@@ -527,7 +530,7 @@ export const dictionaries = {
     },
     landing: {
       hero: {
-        subtitle: 'PROFESSIONAL BARBER EDUCATION FOR LATINOS',
+        subtitle: 'PROFESSIONAL BARBER EDUCATION IN MELBOURNE',
         headingTop: 'TRAINING ALIGNED WITH REAL STANDARDS OF THE',
         headingBottom: 'AUSTRALIAN MARKET',
         paragraph:
@@ -540,8 +543,8 @@ export const dictionaries = {
           'We train barbers with discipline and business mindset for the Australian market.',
         cardTitle: 'XCLUSIVE BARBER ACADEMY IS FOR',
         items: [
-          'Latinos in Australia looking to learn a real trade.',
-          'Migrants seeking stability and growth.',
+          'Anyone in Melbourne who wants to learn barbering the practical, professional way.',
+          'Migrants, including the Latino community, seeking stability and growth through a real trade.',
           'Beginner or intermediate barbers ready to level up.',
         ],
         logoAlt: 'Xclusive Barber Academy',
@@ -580,7 +583,7 @@ export const dictionaries = {
         missionText:
           'Train barbers with professional level, discipline, and growth mindset, capable of entering the Australian workforce and building economic stability through a real skill. We do not train only technicians, we build people with criteria, ethics, and future vision.',
         visionText:
-          'Build one of the strongest barber academies for the Latino community in Australia, with long-term projection, strategic partnerships, broader training programs, and real impact on the lives of those who trust this process.',
+          'Build one of the strongest barber academies in Melbourne, rooted in the Latino community and reaching the broader Australian market, with long-term projection, strategic partnerships, broader training programs, and real impact on the lives of those who trust this process.',
       },
       instructor: {
         academyLabel: 'XCLUSIVE BARBER ACADEMY',
@@ -707,6 +710,7 @@ export const dictionaries = {
         invalidForm: 'Invalid form data.',
         inviteExpired: 'Invalid or expired access code.',
         activationError: 'Failed to activate your account. Please try again.',
+        rateLimited: 'Too many attempts. Please wait a few minutes and try again.',
       },
       login: {
         invalidCredentials: 'Invalid credentials',
@@ -724,11 +728,13 @@ export const dictionaries = {
         duplicatePhone:
           'This phone number is already registered. Use another phone number to continue.',
         duplicateEmail: 'This email address is already registered. Use another email to continue.',
+        rateLimited: 'Too many attempts. Please wait a few minutes and try again.',
       },
       qualifyPublic: {
         missingTrackedPhone:
           'Please submit your phone number on the landing page before starting this process.',
         invalidForm: 'Invalid form.',
+        rateLimited: 'Too many attempts. Please wait a few minutes and try again.',
         qualificationSaveError: 'We could not save your qualification. Please try again.',
         answersPartialError:
           'Part of your information was saved, but there was an error saving your answers.',

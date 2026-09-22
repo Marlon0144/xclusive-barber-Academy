@@ -1,0 +1,45 @@
+name: CI
+
+# Basic build-safety net: catches type errors, lint errors, and broken
+# builds before they land on main or reach a Vercel preview. Intentionally
+# does not run against a real Supabase project (no DB migrations, no
+# integration tests) — this repo has no automated test suite yet. See
+# docs/ACADEMY_TECHNICAL_AUDIT.md for that gap.
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Type check
+        run: npx tsc --noEmit
+
+      - name: Build
+        env:
+          # Falls back to empty strings when secrets aren't configured on the
+          # repo — the app builds without live credentials (no Supabase call
+          # happens at module load time, only inside request-scoped Server
+          # Actions/Components), matching local `npm run build` behavior.
+          NEXT_PUBLIC_SITE_URL: ${{ vars.NEXT_PUBLIC_SITE_URL || 'https://xclusiveacademy.com.au' }}
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: npm run build

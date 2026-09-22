@@ -1,5 +1,6 @@
 import React from 'react'
 import Image from 'next/image'
+import { TrackedLink } from '@/components/analytics/TrackedLink'
 
 const INSTAGRAM_URL = 'https://www.instagram.com/xclusiveacademy_au?igsh=bms4MHQ4bzB4a3Jy'
 const INSTAGRAM_HANDLE = '@xclusiveacademy_au'
@@ -43,8 +44,10 @@ export function DashboardFooter({
         <div className="relative flex items-center justify-center w-full mb-6">
 
           {/* Left: Instagram */}
-          <a
+          <TrackedLink
             href={INSTAGRAM_URL}
+            event="instagram_click"
+            external
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Abrir Instagram de Xclusive Barber Academy"
@@ -60,7 +63,7 @@ export function DashboardFooter({
             <p className="font-sans font-medium text-[9px] text-[#d3cbba] leading-[1.3]">
               {INSTAGRAM_HANDLE}
             </p>
-          </a>
+          </TrackedLink>
 
           {/* Center: Logo */}
           <Image
@@ -72,8 +75,10 @@ export function DashboardFooter({
           />
 
           {/* Right: Phone */}
-          <a
+          <TrackedLink
             href={WHATSAPP_URL}
+            event="whatsapp_click"
+            external
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Abrir chat de WhatsApp con el equipo de Xclusive"
@@ -87,7 +92,7 @@ export function DashboardFooter({
             <p className="font-sans font-medium text-[9px] text-[#d3cbba] leading-[1.3]">
               {WHATSAPP_LABEL}
             </p>
-          </a>
+          </TrackedLink>
 
         </div>
 
@@ -122,8 +127,10 @@ export function DashboardFooter({
         >
 
           {/* Left: Instagram */}
-          <a
+          <TrackedLink
             href={INSTAGRAM_URL}
+            event="instagram_click"
+            external
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Abrir Instagram de Xclusive Barber Academy"
@@ -142,7 +149,7 @@ export function DashboardFooter({
             >
               {INSTAGRAM_HANDLE}
             </p>
-          </a>
+          </TrackedLink>
 
           {/* Center: Logo */}
           <Image
@@ -154,8 +161,10 @@ export function DashboardFooter({
           />
 
           {/* Right: Phone */}
-          <a
+          <TrackedLink
             href={WHATSAPP_URL}
+            event="whatsapp_click"
+            external
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Abrir chat de WhatsApp con el equipo de Xclusive"
@@ -172,7 +181,7 @@ export function DashboardFooter({
             >
               {WHATSAPP_LABEL}
             </p>
-          </a>
+          </TrackedLink>
 
         </div>
 

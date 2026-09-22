@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import HeroSection from "@/components/landing/HeroSection";
 import TargetAudienceSection from "@/components/landing/TargetAudienceSection";
 import FeaturesSection from "@/components/landing/FeaturesSection";
@@ -7,6 +8,21 @@ import FinalCtaSection from "@/components/landing/FinalCtaSection";
 import PricingSection from "@/components/landing/PricingSection";
 import LandingFlowGate from "@/components/landing/LandingFlowGate";
 import { createClient } from "@/utils/supabase/server";
+
+export const metadata: Metadata = {
+  title: "Professional Barber Training in Melbourne",
+  description:
+    "Learn barbering in a real Melbourne barbershop. Practical, hands-on training programs at Xclusive Barber Academy in Coburg — Barber Starter, Professional Xclusive Program, Elite Mentoring, and Barber Business Experience.",
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    title: "Xclusive Barber Academy | Professional Barber Training in Melbourne",
+    description:
+      "Learn barbering in a real Melbourne barbershop. Practical, hands-on training programs at Xclusive Barber Academy in Coburg.",
+    url: "/",
+  },
+};
 
 export default async function Home() {
   const supabase = await createClient();

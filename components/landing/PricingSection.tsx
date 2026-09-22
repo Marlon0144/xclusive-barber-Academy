@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import ScrollReveal from "./ScrollReveal";
 import { getServerDictionary } from "@/lib/i18n/server";
+import { TrackedLink } from "@/components/analytics/TrackedLink";
 
 const INSTAGRAM_URL = "https://www.instagram.com/xclusiveacademy_au?igsh=bms4MHQ4bzB4a3Jy";
 const INSTAGRAM_HANDLE = "@xclusiveacademy_au";
@@ -56,7 +57,9 @@ function PricingPlanCard({ plan }: { plan: PricingPlan }) {
             <div className="h-[28px]" /> /* Spacer when no badge exists directly on top */
           )}
           <h3 className="font-sans text-xl font-extrabold leading-tight text-[#f0ece3] md:text-[22px]">
-            {plan.name}
+            <Link href={`/courses/${plan.id}`} className="hover:text-[#D4AF37] transition-colors">
+              {plan.name}
+            </Link>
           </h3>
         </div>
 
@@ -93,8 +96,10 @@ function PricingPlanCard({ plan }: { plan: PricingPlan }) {
       </div>
 
       <div className="mt-7 pt-2 relative z-10">
-        <Link
+        <TrackedLink
           href={plan.ctaHref}
+          event="pricing_plan_select"
+          eventParams={{ plan: plan.id }}
           className={[
             "relative inline-flex w-full min-h-[48px] items-center justify-center overflow-hidden rounded-sm px-5 py-3",
             "font-sans text-[13px] font-black uppercase tracking-[0.08em] text-[#161616] md:text-[14px]",
@@ -105,7 +110,7 @@ function PricingPlanCard({ plan }: { plan: PricingPlan }) {
           ].join(" ")}
         >
           {plan.ctaLabel}
-        </Link>
+        </TrackedLink>
       </div>
     </article>
   );
@@ -139,8 +144,10 @@ export default async function PricingSection() {
 
             <div className="mt-10 md:mt-14">
               <div className="mx-auto flex w-full max-w-5xl flex-col items-center justify-center gap-5 md:flex-row md:gap-12">
-                <a
+                <TrackedLink
                   href={INSTAGRAM_URL}
+                  event="instagram_click"
+                  external
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="Abrir Instagram de Xclusive Barber Academy"
@@ -157,7 +164,7 @@ export default async function PricingSection() {
                   <span className="font-sans text-[13px] font-medium text-[#d3cbba] md:text-[18px]">
                     {INSTAGRAM_HANDLE}
                   </span>
-                </a>
+                </TrackedLink>
 
                 <div className="relative h-[44px] w-[36px] md:h-[78px] md:w-[64px]">
                   <Image
@@ -168,8 +175,10 @@ export default async function PricingSection() {
                   />
                 </div>
 
-                <a
+                <TrackedLink
                   href={WHATSAPP_URL}
+                  event="whatsapp_click"
+                  external
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="Abrir chat de WhatsApp con el equipo de Xclusive"
@@ -186,7 +195,7 @@ export default async function PricingSection() {
                   <span className="font-sans text-[13px] font-medium text-[#d3cbba] md:text-[18px]">
                     {WHATSAPP_LABEL}
                   </span>
-                </a>
+                </TrackedLink>
               </div>
             </div>
 
