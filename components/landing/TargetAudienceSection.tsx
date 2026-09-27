@@ -47,14 +47,14 @@ export default async function TargetAudienceSection() {
             flex items-center justify-center
           "
         >
-          <p
+          <h2
             className="
               font-sans font-extrabold uppercase text-[#d3cbba]
               text-[26px] leading-[25px] text-center w-[359px]
             "
           >
             {audience.ctaTitle}
-          </p>
+          </h2>
         </div>
 
         {/* ── 2. Subtitle ──────────────────────────────────────────────────── */}
@@ -88,7 +88,7 @@ export default async function TargetAudienceSection() {
          * Figma: top=158  Poppins ExtraBold  text-[17px]  centered  w=341
          *        (14px below card top)
          */}
-        <p
+        <h3
           className="
             absolute top-[158px] left-1/2 -translate-x-1/2
             w-[341px] text-center
@@ -97,7 +97,7 @@ export default async function TargetAudienceSection() {
           "
         >
           {audience.cardTitle}
-        </p>
+        </h3>
 
         {/* ── 5. List items ────────────────────────────────────────────────── */}
         {/*

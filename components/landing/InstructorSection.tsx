@@ -14,7 +14,6 @@ export default async function InstructorSection() {
         alt=""
         fill
         className="object-cover object-center z-0 opacity-50"
-        priority
         aria-hidden="true"
       />
       {/* ── Bottom fade to dark ── */}
@@ -61,7 +60,6 @@ export default async function InstructorSection() {
             alt={instructor.imageAlt}
             fill
             className="object-contain object-top"
-            priority
           />
         </div>
 
@@ -105,7 +103,6 @@ export default async function InstructorSection() {
               fill
               className="object-contain object-top"
               sizes="(max-width: 1440px) 59vw, 851px"
-              priority
             />
           </div>
 

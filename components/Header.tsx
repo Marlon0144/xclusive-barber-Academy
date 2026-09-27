@@ -79,6 +79,12 @@ export default async function Header() {
             /* ── Authenticated state ── */
             <div className="flex items-center gap-2 md:gap-3">
               <Link
+                href="/courses"
+                className="text-xs font-semibold uppercase tracking-wider text-[#d3cbba] transition-colors hover:text-white md:text-sm"
+              >
+                {text.courses}
+              </Link>
+              <Link
                 href="/dashboard"
                 className="rounded-md border border-gold-500/30 px-3 py-2 text-xs font-semibold uppercase tracking-wider text-gold-500 transition-colors hover:bg-gold-500/10 md:text-sm"
               >
@@ -97,12 +103,22 @@ export default async function Header() {
             /* ── Unauthenticated state — matches Figma nav order ── */
             /* Figma @ 402px: todos visibles, ~8px. Se escalan hacia arriba en md/lg */
             <nav className="flex items-center gap-2 sm:gap-4 md:gap-6 lg:gap-8">
-              {/* SER MODELO — visible en todos los tamaños (Figma lo muestra a ~400px) */}
+              {/* PROGRAMAS — persistent link to the /courses index (Task #16 fix) */}
+              <Link
+                href="/courses"
+                className="text-[0.5rem] font-light uppercase tracking-widest text-[#d3cbba] transition-colors hover:text-white sm:text-[0.6rem] md:text-[0.7rem] lg:text-xs"
+              >
+                {text.courses}
+              </Link>
+
+              {/* SER MODELO / mid-funnel qualifier wizard — anchor text now matches
+                  its real destination ("Tell us about you") instead of reusing
+                  the word "Apply", which is reserved for the actual /apply page. */}
               <Link
                 href="/qualify"
                 className="text-[0.5rem] font-light uppercase tracking-widest text-[#d3cbba] transition-colors hover:text-white sm:text-[0.6rem] md:text-[0.7rem] lg:text-xs"
               >
-                {text.apply}
+                {text.getStarted}
               </Link>
 
               {/* ACCEDER — Poppins Light */}
@@ -113,13 +129,15 @@ export default async function Header() {
                 {text.login}
               </Link>
 
-              {/* APLICAR — Poppins Bold + golden divider accent (Figma: Rectangle 29) */}
+              {/* APLICAR — Poppins Bold + golden divider accent (Figma: Rectangle 29).
+                  Points at /apply, so its anchor text should say "Apply", not
+                  "Create account". */}
               <Link
                 href="/apply"
                 className="group relative flex flex-col items-center gap-0.5"
               >
                 <span className="text-[0.55rem] font-extrabold uppercase tracking-widest text-[#d3cbba] transition-colors group-hover:text-white sm:text-[0.65rem] md:text-[0.75rem] lg:text-sm">
-                  {text.createAccount}
+                  {text.apply}
                 </span>
                 {/* Golden line divider */}
                 <span className="relative block h-[5px] w-full overflow-hidden">

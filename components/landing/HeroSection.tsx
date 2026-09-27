@@ -102,14 +102,14 @@ export default async function HeroSection() {
         <div
           className="absolute top-[103px] left-1/2 -translate-x-1/2 z-20 w-[359px] text-center"
         >
-          <p className="font-sans font-extrabold uppercase text-[#d3cbba] text-[20px] leading-[1.25] tracking-tight">
+          <h1 className="font-sans font-extrabold uppercase text-[#d3cbba] text-[20px] leading-[1.25] tracking-tight">
             {hero.headingTop}
-          </p>
+          </h1>
           {/* Figma blank line between heading rows ≈ 17px */}
           <div className="h-[17px]" aria-hidden />
-          <p className="font-sans font-extrabold uppercase text-[#d3cbba] text-[24px] leading-none tracking-tight">
+          <h2 className="font-sans font-extrabold uppercase text-[#d3cbba] text-[24px] leading-none tracking-tight">
             {hero.headingBottom}
-          </p>
+          </h2>
         </div>
 
         {/* ── 5. Gold divider ──────────────────────────────────────────────── */}

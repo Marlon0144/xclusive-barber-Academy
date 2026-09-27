@@ -81,17 +81,20 @@ export default async function MissionVisionSection() {
           className="absolute top-[30px] left-1/2 -translate-x-1/2 z-10 w-[118px] h-[27px]"
         >
           {isSpanish ? (
-            <Image
-              src="/assets/landing/landing_mision.svg"
-              alt={missionVision.missionAlt}
-              fill
-              className="object-contain object-center"
-              sizes="118px"
-            />
+            <>
+              <h2 className="sr-only">{missionVision.missionTitle}</h2>
+              <Image
+                src="/assets/landing/landing_mision.svg"
+                alt={missionVision.missionAlt}
+                fill
+                className="object-contain object-center"
+                sizes="118px"
+              />
+            </>
           ) : (
-            <p className="text-center font-sans text-[19px] font-extrabold uppercase leading-none tracking-[0.04em] text-[#d3cbba]">
+            <h2 className="text-center font-sans text-[19px] font-extrabold uppercase leading-none tracking-[0.04em] text-[#d3cbba]">
               {missionVision.missionTitle}
-            </p>
+            </h2>
           )}
         </div>
 
@@ -118,17 +121,20 @@ export default async function MissionVisionSection() {
           className="absolute top-[175px] left-1/2 -translate-x-1/2 z-10 w-[116px] h-[27px]"
         >
           {isSpanish ? (
-            <Image
-              src="/assets/landing/landing_vision.svg"
-              alt={missionVision.visionAlt}
-              fill
-              className="object-contain object-center"
-              sizes="116px"
-            />
+            <>
+              <h2 className="sr-only">{missionVision.visionTitle}</h2>
+              <Image
+                src="/assets/landing/landing_vision.svg"
+                alt={missionVision.visionAlt}
+                fill
+                className="object-contain object-center"
+                sizes="116px"
+              />
+            </>
           ) : (
-            <p className="text-center font-sans text-[19px] font-extrabold uppercase leading-none tracking-[0.04em] text-[#d3cbba]">
+            <h2 className="text-center font-sans text-[19px] font-extrabold uppercase leading-none tracking-[0.04em] text-[#d3cbba]">
               {missionVision.visionTitle}
-            </p>
+            </h2>
           )}
         </div>
 
@@ -168,17 +174,20 @@ export default async function MissionVisionSection() {
             {/* recurso-texto1 — MISIÓN heading */}
             <div className="relative w-[clamp(118px,19vw,270px)] h-[clamp(27px,4.4vw,63px)] mb-4 md:mb-6">
               {isSpanish ? (
-                <Image
-                  src="/assets/landing/landing_mision.svg"
-                  alt={missionVision.missionAlt}
-                  fill
-                  className="object-contain object-center"
-                  sizes="(max-width: 1024px) 200px, 270px"
-                />
+                <>
+                  <h2 className="sr-only">{missionVision.missionTitle}</h2>
+                  <Image
+                    src="/assets/landing/landing_mision.svg"
+                    alt={missionVision.missionAlt}
+                    fill
+                    className="object-contain object-center"
+                    sizes="(max-width: 1024px) 200px, 270px"
+                  />
+                </>
               ) : (
-                <p className="text-center font-sans text-[clamp(22px,3vw,44px)] font-extrabold uppercase leading-none tracking-[0.03em] text-[#d3cbba]">
+                <h2 className="text-center font-sans text-[clamp(22px,3vw,44px)] font-extrabold uppercase leading-none tracking-[0.03em] text-[#d3cbba]">
                   {missionVision.missionTitle}
-                </p>
+                </h2>
               )}
             </div>
 
@@ -211,17 +220,20 @@ export default async function MissionVisionSection() {
             {/* recurso-texto2 — VISIÓN heading */}
             <div className="relative w-[clamp(116px,18.6vw,268px)] h-[clamp(27px,4.3vw,62px)] mb-4 md:mb-6">
               {isSpanish ? (
-                <Image
-                  src="/assets/landing/landing_vision.svg"
-                  alt={missionVision.visionAlt}
-                  fill
-                  className="object-contain object-center"
-                  sizes="(max-width: 1024px) 200px, 268px"
-                />
+                <>
+                  <h2 className="sr-only">{missionVision.visionTitle}</h2>
+                  <Image
+                    src="/assets/landing/landing_vision.svg"
+                    alt={missionVision.visionAlt}
+                    fill
+                    className="object-contain object-center"
+                    sizes="(max-width: 1024px) 200px, 268px"
+                  />
+                </>
               ) : (
-                <p className="text-center font-sans text-[clamp(22px,3vw,44px)] font-extrabold uppercase leading-none tracking-[0.03em] text-[#d3cbba]">
+                <h2 className="text-center font-sans text-[clamp(22px,3vw,44px)] font-extrabold uppercase leading-none tracking-[0.03em] text-[#d3cbba]">
                   {missionVision.visionTitle}
-                </p>
+                </h2>
               )}
             </div>
 
