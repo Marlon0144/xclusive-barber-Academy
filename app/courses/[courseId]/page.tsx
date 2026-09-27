@@ -50,6 +50,7 @@ export default async function CourseDetailPage({ params }: PageProps) {
   const plan = await getPlan(courseId);
   if (!plan) notFound();
 
+  const dictionary = await getServerDictionary();
   const language = await getServerLanguage();
   const courseSchema = getCourseSchema({
     slug: courseId,
@@ -70,7 +71,7 @@ export default async function CourseDetailPage({ params }: PageProps) {
           href="/courses"
           className="mb-8 inline-block font-sans text-xs uppercase tracking-[0.14em] text-[#9ea79f] transition-colors hover:text-[#D4AF37]"
         >
-          ← Todos los programas
+          {dictionary.courseDetailPage.backLink}
         </Link>
 
         <h1 className="mb-2 font-sans text-3xl font-extrabold uppercase leading-tight text-[#f0ece3] md:text-5xl">

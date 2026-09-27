@@ -11,6 +11,8 @@ export const dictionaries = {
     },
     header: {
       dashboard: 'Dashboard',
+      courses: 'Programas',
+      getStarted: 'Comenzar',
       apply: 'Aplicar',
       login: 'Acceder',
       createAccount: 'Crear cuenta',
@@ -125,6 +127,14 @@ export const dictionaries = {
         maybe: 'Tal vez',
       },
     },
+    coursesPage: {
+      heading: 'Programas de la Academia',
+      subtitle:
+        'Formación práctica en barbería dentro de una barbería real en Coburg, Melbourne.',
+    },
+    courseDetailPage: {
+      backLink: '← Todos los programas',
+    },
     landing: {
       hero: {
         subtitle: 'EDUCACION PROFESIONAL EN BARBERIA EN MELBOURNE',
@@ -212,7 +222,7 @@ export const dictionaries = {
             benefits: [
               'Fundamentos esenciales',
               'Uso de herramientas',
-              'Primeros corte guiados',
+              'Primeros cortes guiados',
               'Experiencia real en barberia',
               'Feedback',
             ],
@@ -228,7 +238,7 @@ export const dictionaries = {
             description:
               'Formacion completa para llevarte de cero a profesional. Aprendes tecnicas reales avanzadas, trabajas con clientes y te preparas para generar una habilidad que puede cambiarte la vida. Nuestro curso esta disenado por modulos con una duracion de alrededor de 100 horas de practica.',
             benefits: [
-              'Higiene de la babera, fades, tijera, barba y estilos modernos',
+              'Higiene de la barbería, fades, tijera, barba y estilos modernos',
               'Practica con clientes reales',
               'Kit profesional + uniforme',
               'Certificado privado',
@@ -415,6 +425,8 @@ export const dictionaries = {
     },
     header: {
       dashboard: 'Dashboard',
+      courses: 'Programs',
+      getStarted: 'Get Started',
       apply: 'Apply',
       login: 'Login',
       createAccount: 'Create account',
@@ -527,6 +539,14 @@ export const dictionaries = {
         notSure: 'Not sure yet',
         maybe: 'Maybe',
       },
+    },
+    coursesPage: {
+      heading: 'Academy Programs',
+      subtitle:
+        'Practical, hands-on barbering training inside a real, operating barbershop in Coburg, Melbourne.',
+    },
+    courseDetailPage: {
+      backLink: '← All Programs',
     },
     landing: {
       hero: {

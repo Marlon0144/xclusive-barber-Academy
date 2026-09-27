@@ -12,16 +12,18 @@ export const metadata: Metadata = {
 };
 
 export default async function CoursesIndexPage() {
-  const pricing = (await getServerDictionary()).landing.pricing;
+  const dictionary = await getServerDictionary();
+  const { pricing } = dictionary.landing;
+  const { heading, subtitle } = dictionary.coursesPage;
 
   return (
     <div className="min-h-screen bg-[#161616] text-[#d3cbba]">
       <div className="mx-auto max-w-4xl px-4 py-16 md:px-8 md:py-24">
         <h1 className="mb-3 font-sans text-3xl font-extrabold uppercase leading-tight text-[#f0ece3] md:text-5xl">
-          Programas de la Academia
+          {heading}
         </h1>
         <p className="mb-12 max-w-2xl font-sans text-sm text-[#9ea79f] md:text-base">
-          Formacion practica en barberia dentro de una barberia real en Coburg, Melbourne.
+          {subtitle}
         </p>
 
         <ul className="space-y-8">
