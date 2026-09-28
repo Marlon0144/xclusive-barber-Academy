@@ -1,21 +1,26 @@
 /**
- * Analytics configuration — env-var driven, feature-flagged.
+ * Analytics configuration — real IDs hardcoded as defaults, env-var
+ * overridable, feature-flagged.
  *
- * No tracking ID is hardcoded. Every provider is OFF by default and only
- * activates once the corresponding NEXT_PUBLIC_* env var is set (in Vercel
- * project settings or a local .env.local). This lets us ship the wiring now
- * and flip providers on later without another deploy of code — see
- * docs/ANALYTICS_TRACKING_PLAN.md for the rollout plan and what to paste in.
+ * These are the business's live tracking IDs. They're hardcoded here (not
+ * left to a Vercel env var) so analytics goes live the moment this code
+ * ships, without depending on whoever has Vercel dashboard access to also
+ * go set env vars by hand. A `NEXT_PUBLIC_*` env var, if ever set, still
+ * takes priority — useful for pointing a preview/staging deploy at a
+ * separate test container without touching this file.
  *
  * All values are NEXT_PUBLIC_* because they're read client-side (the GTM/
- * Meta Pixel loader scripts and the track() helper run in the browser).
- * None of these are secrets — GTM/GA4/Pixel IDs are not sensitive.
+ * GA4/Meta Pixel loader scripts and the track() helper run in the browser).
+ * None of these are secrets — GTM/GA4/Pixel IDs are not sensitive, they're
+ * visible in every page's HTML/network requests once live.
+ *
+ * See docs/ANALYTICS_TRACKING_PLAN.md for the full rollout plan.
  */
 
 export const analyticsConfig = {
-  gtmId: process.env.NEXT_PUBLIC_GTM_ID ?? '',
-  ga4Id: process.env.NEXT_PUBLIC_GA4_ID ?? '',
-  metaPixelId: process.env.NEXT_PUBLIC_META_PIXEL_ID ?? '',
+  gtmId: process.env.NEXT_PUBLIC_GTM_ID ?? 'GTM-TD78R9X9',
+  ga4Id: process.env.NEXT_PUBLIC_GA4_ID ?? 'G-TX8M33DNRH',
+  metaPixelId: process.env.NEXT_PUBLIC_META_PIXEL_ID ?? '1169356005611386',
 } as const
 
 export const isGtmEnabled = analyticsConfig.gtmId.length > 0

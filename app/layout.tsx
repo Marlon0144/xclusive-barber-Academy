@@ -9,6 +9,7 @@ import { getServerLanguage } from "@/lib/i18n/server";
 import { getOrganizationSchema } from "@/lib/seo/organization-schema";
 import { GoogleTagManagerScript, GoogleTagManagerNoScript } from "@/components/analytics/GoogleTagManager";
 import { MetaPixelScript, MetaPixelNoScript } from "@/components/analytics/MetaPixel";
+import { GoogleAnalyticsScript } from "@/components/analytics/GoogleAnalytics";
 
 // Figma source of truth: Poppins (ExtraBold for headings, Regular for body)
 const poppins = Poppins({
@@ -58,6 +59,7 @@ export default async function RootLayout({
     <html lang={language}>
       <head>
         <GoogleTagManagerScript />
+        <GoogleAnalyticsScript />
         <MetaPixelScript />
       </head>
       <body className={`${poppins.variable} antialiased bg-background text-foreground-strong`}>

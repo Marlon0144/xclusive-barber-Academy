@@ -1,36 +1,48 @@
 # Analytics Tracking Plan
 
-Status: scaffolding shipped, providers OFF until real IDs are supplied.
+Status: **live** — GTM, GA4, and Meta Pixel are all wired with the
+business's real IDs hardcoded as defaults in `lib/analytics/config.ts`.
 See `docs/ACADEMY_TECHNICAL_AUDIT.md` §5 for the original gap this closes
 ("zero analytics infrastructure — no GTM, no GA4, no Meta Pixel, no `track()`
 helper wired to the CRM funnel").
 
 ## How it works
 
-Everything is env-var gated. With no env vars set, `npm run build` and the
-live site behave exactly as before this change — no script tags are
-injected, `track()` calls are no-ops (safe to leave in code permanently).
+Each provider is feature-flagged on whether its ID resolves to a non-empty
+string. Real IDs are hardcoded as defaults in `lib/analytics/config.ts` (see
+below), so all three providers are live as soon as this code is deployed —
+no Vercel dashboard action required. An optional `NEXT_PUBLIC_*` env var, if
+set, overrides the hardcoded default (useful for a preview/staging deploy
+that should report to a separate test container instead of the production
+one).
 
-| Env var | Purpose | Where read |
-|---|---|---|
-| `NEXT_PUBLIC_GTM_ID` | Google Tag Manager container ID (`GTM-XXXXXXX`) | `lib/analytics/config.ts` → `components/analytics/GoogleTagManager.tsx` |
-| `NEXT_PUBLIC_GA4_ID` | GA4 measurement ID, reserved for a direct gtag.js path if ever needed | `lib/analytics/config.ts` (not wired to a loader yet — GTM is expected to own GA4 via a container tag, which is the standard/recommended setup and avoids double-loading tracking scripts) |
-| `NEXT_PUBLIC_META_PIXEL_ID` | Meta/Instagram Pixel ID | `lib/analytics/config.ts` → `components/analytics/MetaPixel.tsx` |
+| Env var (optional override) | Hardcoded default | Purpose | Where read |
+|---|---|---|---|
+| `NEXT_PUBLIC_GTM_ID` | `GTM-TD78R9X9` | Google Tag Manager container ID | `lib/analytics/config.ts` → `components/analytics/GoogleTagManager.tsx` |
+| `NEXT_PUBLIC_GA4_ID` | `G-TX8M33DNRH` | GA4 measurement ID — loaded directly via gtag.js, independent of GTM | `lib/analytics/config.ts` → `components/analytics/GoogleAnalytics.tsx` |
+| `NEXT_PUBLIC_META_PIXEL_ID` | `1169356005611386` | Meta/Instagram Pixel ID | `lib/analytics/config.ts` → `components/analytics/MetaPixel.tsx` |
 
 None of these are secrets (tracking IDs are not sensitive — they're visible
-in every page's HTML/network requests once live). Set them as plain env vars
-in Vercel project settings (Production + Preview) or a local `.env.local`.
+in every page's HTML/network requests once live).
 
-## Turning a provider on
+**Important — avoid double-counting GA4 pageviews:** GA4 is loaded two
+independent ways here — directly via `GoogleAnalyticsScript` (gtag.js), and
+potentially again if a GA4 Configuration tag is ever added inside the GTM
+container. Both write to the same `window.dataLayer`, which is safe on its
+own, but if a GA4 Configuration tag is added inside GTM, GA4 will receive
+two PageView pings per page load. Pick one path — the direct gtag.js loader
+already covers GA4, so there's no need to also configure GA4 inside GTM
+unless the direct loader is removed first.
 
-1. Create the GTM container (or Meta Pixel) in the respective ads/tag
-   manager UI — this is a business/marketing action, not a code change.
-2. Set `NEXT_PUBLIC_GTM_ID` (and/or `NEXT_PUBLIC_META_PIXEL_ID`) in Vercel.
-3. Redeploy. The loader components in `components/analytics/` render
-   automatically once the ID is present — no other code change needed.
-4. Inside GTM, add a GA4 Configuration tag that fires on all pages, plus GA4
-   Event tags listening for the custom events below (they arrive on
-   `window.dataLayer` already, via `track()`).
+## Turning a provider off / changing an ID
+
+1. To point a provider at a different container/pixel, set the matching
+   `NEXT_PUBLIC_*` env var in Vercel (Production or Preview) — it overrides
+   the hardcoded default without a code change.
+2. To fully disable a provider without removing code, override its env var
+   to an empty value, or edit the hardcoded default in
+   `lib/analytics/config.ts` directly.
+3. Redeploy for either change to take effect.
 
 ## Event taxonomy
 
@@ -70,9 +82,6 @@ the landing page. It's now wrapped in a `TrackedLink` pointing to `/apply`
 
 ## Not yet done / explicitly out of scope for this pass
 
-- No real GTM/GA4/Meta Pixel IDs have been supplied yet — providers stay
-  dark until the business owner creates the accounts and the IDs are set in
-  Vercel.
 - No server-side conversions API (Meta CAPI) — client-side pixel only, for
   now.
 - No UTM parameter capture/persistence — `crm_leads` has no confirmed UTM
