@@ -10,16 +10,16 @@ import LandingFlowGate from "@/components/landing/LandingFlowGate";
 import { createClient } from "@/utils/supabase/server";
 
 export const metadata: Metadata = {
-  title: "Professional Barber Training in Melbourne",
+  title: "Barber Training in Coburg, Melbourne",
   description:
-    "Learn barbering in a real Melbourne barbershop. Practical, hands-on training programs at Xclusive Barber Academy in Coburg — Barber Starter, Professional Xclusive Program, Elite Mentoring, and Barber Business Experience.",
+    "Learn barbering in Coburg, Melbourne, inside a real operating barbershop. Practical, hands-on training programs at Xclusive Barber Academy — Barber Starter, Professional Xclusive Program, Elite Mentoring, and Barber Business Experience.",
   alternates: {
     canonical: "/",
   },
   openGraph: {
-    title: "Xclusive Barber Academy | Professional Barber Training in Melbourne",
+    title: "Xclusive Barber Academy | Barber Training in Coburg, Melbourne",
     description:
-      "Learn barbering in a real Melbourne barbershop. Practical, hands-on training programs at Xclusive Barber Academy in Coburg.",
+      "Learn barbering in Coburg, Melbourne, inside a real operating barbershop. Practical, hands-on training programs at Xclusive Barber Academy.",
     url: "/",
   },
 };

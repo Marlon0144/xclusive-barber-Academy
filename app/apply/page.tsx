@@ -8,11 +8,19 @@ import { DashboardFooter } from '@/components/dashboard/DashboardFooter'
 import { createAdminClient } from '@/utils/supabase/server'
 
 export const metadata: Metadata = {
-  title: 'Apply to the Academy',
+  title: {
+    absolute: 'Apply to Xclusive Barber Academy',
+  },
   description:
-    'Start your application to Xclusive Barber Academy in Melbourne. Practical, hands-on barber training inside a real operating barbershop.',
+    'Start your application to Xclusive Barber Academy in Coburg, Melbourne. Practical, hands-on barber training inside a real operating barbershop.',
   alternates: {
     canonical: '/apply',
+  },
+  openGraph: {
+    title: 'Apply to Xclusive Barber Academy',
+    description:
+      'Start your application to Xclusive Barber Academy in Coburg, Melbourne. Practical, hands-on barber training inside a real operating barbershop.',
+    url: '/apply',
   },
 }
 

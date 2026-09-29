@@ -22,6 +22,17 @@ async function getPlan(courseId: string) {
   return pricing.plans.find((plan) => plan.id === courseId) ?? null;
 }
 
+// Plan names are stored ALL CAPS for on-page display emphasis, but an
+// all-caps <title> tag reads as shouting in search results/browser tabs.
+// Title-case it just for metadata; the visible page heading is untouched.
+function toTitleCase(value: string): string {
+  return value
+    .toLowerCase()
+    .split(' ')
+    .map((word) => (word ? word[0].toUpperCase() + word.slice(1) : word))
+    .join(' ');
+}
+
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { courseId } = await params;
   if (!isCourseSlug(courseId)) return {};
@@ -29,14 +40,17 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const plan = await getPlan(courseId);
   if (!plan) return {};
 
+  const displayName = toTitleCase(plan.name);
+  const title = `${displayName} in Coburg, Melbourne`;
+
   return {
-    title: plan.name,
+    title,
     description: plan.hook,
     alternates: {
       canonical: `/courses/${courseId}`,
     },
     openGraph: {
-      title: `${plan.name} | Xclusive Barber Academy`,
+      title: `${title} | Xclusive Barber Academy`,
       description: plan.hook,
       url: `/courses/${courseId}`,
     },

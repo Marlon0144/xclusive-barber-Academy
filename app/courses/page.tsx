@@ -3,11 +3,17 @@ import Link from "next/link";
 import { getServerDictionary } from "@/lib/i18n/server";
 
 export const metadata: Metadata = {
-  title: "Barber Training Programs",
+  title: "Barber Training Programs in Coburg, Melbourne",
   description:
     "Explore every Xclusive Barber Academy training program in Coburg, Melbourne: Barber Starter Experience, Professional Xclusive Program, Elite Mentoring, and Barber Business Experience.",
   alternates: {
     canonical: "/courses",
+  },
+  openGraph: {
+    title: "Xclusive Barber Academy | Barber Training Programs in Coburg, Melbourne",
+    description:
+      "Explore every Xclusive Barber Academy training program in Coburg, Melbourne: Barber Starter Experience, Professional Xclusive Program, Elite Mentoring, and Barber Business Experience.",
+    url: "/courses",
   },
 };
 
