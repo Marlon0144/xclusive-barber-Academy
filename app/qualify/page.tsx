@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import type { Metadata } from 'next'
 import { cookies } from 'next/headers'
 import { Suspense } from 'react'
 import { DashboardFooter } from '@/components/dashboard/DashboardFooter'
@@ -7,6 +8,17 @@ import QualifyForm from './QualifyForm'
 import { getServerDictionary } from '@/lib/i18n/server'
 
 export const dynamic = 'force-dynamic'
+
+// Mid-funnel wizard reached only via CTA click, personalized per visitor,
+// no standalone unique content — keep it out of the index so it doesn't
+// dilute or duplicate the homepage/program pages in search results.
+export const metadata: Metadata = {
+  title: 'Tell us about you',
+  robots: {
+    index: false,
+    follow: true,
+  },
+}
 
 export default async function PublicQualifyPage() {
   const cookieStore = await cookies()

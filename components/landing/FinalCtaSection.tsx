@@ -1,6 +1,7 @@
 import Image from "next/image";
 import ScrollReveal from "./ScrollReveal";
 import { getServerDictionary } from "@/lib/i18n/server";
+import { TrackedLink } from "@/components/analytics/TrackedLink";
 
 export default async function FinalCtaSection() {
   const finalCta = (await getServerDictionary()).landing.finalCta;
@@ -37,9 +38,11 @@ export default async function FinalCtaSection() {
           {finalCta.description}
         </p>
 
-        {/* Botón CTA */}
-        <div
-          className="absolute z-10 hover:brightness-110 transition-all duration-300 select-none"
+        {/* Botón CTA — antes era un <div> decorativo sin href, no llevaba a ningún lado */}
+        <TrackedLink
+          href="/apply"
+          event="apply_click"
+          className="absolute z-10 hover:brightness-110 transition-all duration-300 select-none block"
           style={{ top: "192px", left: "81px", width: "250px", height: "38px" }}
         >
           <div className="relative w-full h-full shadow-[inset_0px_4px_4px_0px_rgba(0,0,0,0.25)]">
@@ -55,7 +58,7 @@ export default async function FinalCtaSection() {
               </span>
             </div>
           </div>
-        </div>
+        </TrackedLink>
 
         {/* Separador dorado inferior */}
         <div
@@ -94,7 +97,11 @@ export default async function FinalCtaSection() {
         </p>
 
         {/* Botón CTA — Figma: w=932px, h=135px, text-[64px] ExtraBold */}
-        <div className="relative hover:brightness-110 transition-all duration-300 mb-6 lg:mb-10 select-none">
+        <TrackedLink
+          href="/apply"
+          event="apply_click"
+          className="relative hover:brightness-110 transition-all duration-300 mb-6 lg:mb-10 select-none block"
+        >
           <div
             className="relative shadow-[inset_0px_4px_4px_0px_rgba(0,0,0,0.25)]"
             style={{ width: "clamp(380px,58vw,932px)", height: "clamp(56px,8vw,135px)" }}
@@ -111,7 +118,7 @@ export default async function FinalCtaSection() {
               </span>
             </div>
           </div>
-        </div>
+        </TrackedLink>
 
         {/* Separador dorado inferior */}
         <div className="relative w-full" style={{ height: "4px" }}>

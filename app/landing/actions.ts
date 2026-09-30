@@ -4,6 +4,7 @@ import { z } from 'zod'
 import { createAdminClient } from '@/utils/supabase/server'
 import { normalizePhoneNumber } from '@/utils/phone'
 import { getServerDictionary } from '@/lib/i18n/server'
+import { checkActionRateLimit } from '@/lib/rate-limit'
 
 export type CapturePhoneLeadState = {
   error?: string | null
@@ -42,6 +43,12 @@ export async function capturePhoneLead(
   const dictionary = await getServerDictionary()
   const messages = dictionary.actions.landing
   const capturePhoneSchema = buildCapturePhoneSchema(messages)
+
+  // Public, unauthenticated form — minimal abuse protection before scaling ad spend.
+  const rateLimit = await checkActionRateLimit('capturePhoneLead', 5, 10 * 60 * 1000)
+  if (!rateLimit.allowed) {
+    return { error: messages.rateLimited, success: false }
+  }
 
   const parsed = capturePhoneSchema.safeParse({
     email: formData.get('email'),

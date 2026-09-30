@@ -1,4 +1,5 @@
 import { login } from './actions'
+import type { Metadata } from "next"
 import { AuthCard, AuthCardContent } from "@/components/ui/auth-card"
 import { AuthInput } from "@/components/ui/auth-input"
 import { AuthButton } from "@/components/ui/auth-button"
@@ -6,6 +7,16 @@ import Link from "next/link"
 import Image from "next/image"
 import { DashboardFooter } from "@/components/dashboard/DashboardFooter"
 import { getServerDictionary } from "@/lib/i18n/server"
+
+// Auth utility page — noindex to avoid thin-content duplication in search
+// results (standard practice for login screens).
+export const metadata: Metadata = {
+  title: 'Student Login',
+  robots: {
+    index: false,
+    follow: true,
+  },
+}
 
 export default async function LoginPage({
   searchParams,

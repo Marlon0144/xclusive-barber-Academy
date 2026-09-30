@@ -2,8 +2,12 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   images: {
+    // Scoped to actual hosts in use only. Previously "**" (any HTTPS host),
+    // which defeated the purpose of Next's remote image allowlist and
+    // allowed the image optimizer to be used as an open proxy for
+    // arbitrary URLs. Add new hostnames explicitly as they're needed.
     remotePatterns: [
-      { protocol: "https", hostname: "**" },
+      { protocol: "https", hostname: "xmyqswwitqlhrzznrscy.supabase.co" },
     ],
   },
   experimental: {

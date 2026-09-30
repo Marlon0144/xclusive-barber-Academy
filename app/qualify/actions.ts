@@ -8,6 +8,7 @@ import { createAdminClient } from '@/utils/supabase/server'
 import type { LeadAnswers } from '@/types/crm'
 import { getServerDictionary, getServerLanguage } from '@/lib/i18n/server'
 import { interpolate } from '@/lib/i18n/dictionaries'
+import { checkActionRateLimit } from '@/lib/rate-limit'
 
 export type QualifyState = {
   error?: string | null
@@ -62,6 +63,12 @@ export async function submitPublicLeadQualification(
 
   if (!trackedPhone) {
     return { error: messages.missingTrackedPhone }
+  }
+
+  // Public, unauthenticated wizard — minimal abuse protection before scaling ad spend.
+  const rateLimit = await checkActionRateLimit('submitPublicLeadQualification', 5, 10 * 60 * 1000)
+  if (!rateLimit.allowed) {
+    return { error: messages.rateLimited }
   }
 
   const parsed = qualifySchema.safeParse({

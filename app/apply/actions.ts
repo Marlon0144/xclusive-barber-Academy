@@ -7,6 +7,7 @@ import { createClient } from '@/utils/supabase/server'
 import { createClient as createSupabaseClient } from '@supabase/supabase-js'
 import { z } from 'zod'
 import { getServerDictionary } from '@/lib/i18n/server'
+import { checkActionRateLimit } from '@/lib/rate-limit'
 
 export type ApplyState = {
   error?: string | null
@@ -37,6 +38,14 @@ export async function applyAccess(prevState: ApplyState, formData: FormData): Pr
   const dictionary = await getServerDictionary()
   const messages = dictionary.actions.apply
   const applySchema = buildApplySchema(messages)
+
+  // Public, unauthenticated account-creation form — invite codes could be
+  // brute-forced without this. Stricter than the lead-capture actions since
+  // the blast radius (creating an auth user + burning an invite) is higher.
+  const rateLimit = await checkActionRateLimit('applyAccess', 5, 15 * 60 * 1000)
+  if (!rateLimit.allowed) {
+    return { error: messages.rateLimited, success: false }
+  }
 
   // Cliente NORMAL (para validar invitación y crear auth user)
   const supabase = await createClient()
@@ -202,6 +211,15 @@ export async function applyAccess(prevState: ApplyState, formData: FormData): Pr
       used_count: invitation.used_count + 1
     }).eq('id', invitation.id)
   }
+
+  // Short-lived bridge cookie so the client can fire the application_submit
+  // analytics event after landing on /dashboard (the redirect below means
+  // this function never actually returns `success: true` to the client —
+  // see ApplicationSuccessTracker, which reads and clears this cookie).
+  cookieStore.set('xba_application_submitted', '1', {
+    maxAge: 60,
+    path: '/',
+  })
 
   revalidatePath('/', 'layout')
   redirect('/dashboard')

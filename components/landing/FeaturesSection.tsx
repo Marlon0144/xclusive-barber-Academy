@@ -92,7 +92,6 @@ export default async function FeaturesSection() {
             src="/assets/landing/FeatureSection/bg.png"
             alt=""
             fill
-            priority
             className="object-cover object-top"
             sizes="506px"
           />
@@ -105,12 +104,12 @@ export default async function FeaturesSection() {
          *   "PROFESIONALES"  text-[32px]  leading-none
          */}
         <div className="absolute top-[35px] inset-x-0 z-10 text-center leading-none tracking-[0.033em]">
-          <p className="font-sans font-bold uppercase text-[#d3cbba] text-[44px] leading-none">
+          <h2 className="font-sans font-bold uppercase text-[#d3cbba] text-[44px] leading-none">
             {landingFeatures.headingTop}
-          </p>
-          <p className="font-sans font-bold uppercase text-[#d3cbba] text-[32px] leading-none">
+          </h2>
+          <h2 className="font-sans font-bold uppercase text-[#d3cbba] text-[32px] leading-none">
             {landingFeatures.headingBottom}
-          </p>
+          </h2>
         </div>
 
         {FEATURE_ASSETS.map((featureAsset, index) => {
@@ -135,9 +134,9 @@ export default async function FeaturesSection() {
                     sizes={`${featureAsset.figmaW}px`}
                   />
                 ) : (
-                  <p className="-mt-0.5 text-center font-sans text-[10px] font-extrabold uppercase leading-none tracking-[0.04em] text-[#d3cbba]">
+                  <h3 className="-mt-0.5 text-center font-sans text-[10px] font-extrabold uppercase leading-none tracking-[0.04em] text-[#d3cbba]">
                     {feature.title}
-                  </p>
+                  </h3>
                 )}
               </div>
 
@@ -168,7 +167,6 @@ export default async function FeaturesSection() {
             src="/assets/landing/FeatureSection/bg.png"
             alt=""
             fill
-            priority
             className="object-cover object-top opacity-[0.39]"
             sizes="100vw"
           />
