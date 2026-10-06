@@ -1,5 +1,6 @@
 import type { MetadataRoute } from 'next'
 import { COURSE_SLUGS } from '@/lib/data/course-slugs'
+import { BLOG_SLUGS } from '@/lib/data/blog-posts'
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://xclusiveacademy.com.au'
 
@@ -37,6 +38,16 @@ export default function sitemap(): MetadataRoute.Sitemap {
       url: `${siteUrl}/courses/${slug}`,
       changeFrequency: 'monthly' as const,
       priority: 0.8,
+    })),
+    {
+      url: `${siteUrl}/blog`,
+      changeFrequency: 'weekly',
+      priority: 0.7,
+    },
+    ...BLOG_SLUGS.map((slug) => ({
+      url: `${siteUrl}/blog/${slug}`,
+      changeFrequency: 'monthly' as const,
+      priority: 0.6,
     })),
   ]
 }
