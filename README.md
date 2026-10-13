@@ -21,10 +21,10 @@ instructions, including environment variables.
 | Document | Description |
 |----------|-------------|
 | [Architecture](docs/ARCHITECTURE.md) | Tech stack, rendering strategy, folder structure, patterns |
-| [Route map](docs/ROUTES.md) | Every route with auth, data flow, and component dependencies |
-| [Components](docs/COMPONENTS.md) | Full component inventory with props and relationships |
-| [Database](docs/DATABASE.md) | Schema, RLS, type contracts, data flow diagrams |
-| [Development](docs/DEVELOPMENT.md) | Setup, conventions, adding features, performance rules |
+| [Route map](docs/ROUTES.md) | Every route with auth, data flow, and component dependencies 
+| [Components](docs/COMPONENTS.md) | Full component inventory with props and relationships 
+| [Database](docs/DATABASE.md) | Schema, RLS, type contracts, data flow diagrams 
+| [Development](docs/DEVELOPMENT.md) | Setup, conventions, adding features, performance rules 
 
 ## Tech stack
 
