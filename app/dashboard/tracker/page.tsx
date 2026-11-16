@@ -7,7 +7,7 @@ import Image from 'next/image'
 import { SubmissionCard } from './SubmissionCard'
 import { SubmissionForm } from './SubmissionForm'
 import DashboardPageHeader from '@/components/headers/DashboardPageHeader'
-import { DashboardFooter } from '@/components/dashboard/DashboardFooter'
+import { DashboardFooterClient } from '@/components/dashboard/DashboardFooterClient'
 
 import { useLanguage } from '@/components/i18n/LanguageProvider'
 
@@ -219,7 +219,7 @@ export default function TrackerPage() {
       </div>
 
       {/* ── FOOTER — outside constrained container for full-width desktop layout ── */}
-      <DashboardFooter />
+      <DashboardFooterClient />
     </div>
   )
 }

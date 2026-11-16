@@ -4,7 +4,7 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { cn } from '@/lib/utils'
-import { DashboardFooter } from '@/components/dashboard/DashboardFooter'
+import { DashboardFooterClient } from '@/components/dashboard/DashboardFooterClient'
 import { useLanguage } from '@/components/i18n/LanguageProvider'
 import { interpolate } from '@/lib/i18n/dictionaries'
 import { pick } from '@/lib/i18n/localize'
@@ -188,7 +188,7 @@ export default function CourseListView({ modules, firstLessonMap }: CourseListPr
       </div>
 
       {/* FOOTER — outside constrained containers for full-width desktop layout */}
-      <DashboardFooter />
+      <DashboardFooterClient />
     </div>
   )
 }

@@ -188,9 +188,9 @@ export default async function ProgressPage() {
   const statuses = progressDict.statuses
   const competencyLabels = getCompetencyLabels(language)
   const localizedLevels = getProfessionalLevels(language)
-  const levelsByKey: Record<ProfessionalLevelKey, ProfessionalLevel> = Object.fromEntries(
+  const levelsByKey = Object.fromEntries(
     localizedLevels.map((l) => [l.key as ProfessionalLevelKey, l]),
-  )
+  ) as Record<ProfessionalLevelKey, ProfessionalLevel>
 
   const { student, competencies, metrics, currentLevel, nextLevel } = data
 
