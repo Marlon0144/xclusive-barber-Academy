@@ -1,21 +1,21 @@
 # PROJECT_CONTEXT.md
-> **Última actualización:** 2026-04-01 — Landing pricing section (reemplazo CTA final)
+> **Última actualización:** 2026-11-16 — Especificación i18n (ES/EN): SRS + 12 requisitos + migración de columnas `*_en`
 
 ## 1. Project Identity
 **Nombre:** Xclusive Barber Academy (LMS)
-**Fase:** Sprint 5 (Frontend Redesign & Polish)
+**Fase:** Sprint 6 (Progreso Profesional) + Sub-subsistema i18n (ES/EN) en especificación
 **Objetivo:** Plataforma educativa de barbería con roles (Estudiante/Instructor/Admin), feedback por IA y diseño "Premium Dark".
 **Supabase Project:** `xmyqswwitqlhrzznrscy` | Postgres 17.6 | Region: us-east-2
 
 ## 2. Tech Stack (Versiones Verificadas)
-* **Framework:** Next.js 15.1.6 (App Router)
+* **Framework:** Next.js 15.3 (App Router)
 * **Lenguaje:** TypeScript
-* **React:** 19.0.0-rc (Release Candidate)
+* **React:** 19.0.0 (stable)
 * **Styling:** 
   * Tailwind CSS v4 (`@tailwindcss/postcss: ^4`)
   * Lucide React 0.563.x (Iconos)
   * **Design System Utils:** `clsx`, `tailwind-merge`, `cva` (Class Variance Authority)
-  * **Fonts:** `Cinzel` (Serif Headers), `Montserrat` (Sans Body)
+  * **Fonts:** `Poppins` (Figma source of truth) — `--font-cinzel`/`--font-montserrat` son alias legacy mapeados a Poppins
 * **Backend as a Service:** Supabase
   * `@supabase/ssr: ^0.8.0` — Cliente de servidor y navegador (cookies)
   * `@supabase/supabase-js: ^2.91.0` — Cliente Admin (Service Role)
@@ -124,6 +124,53 @@ ADD COLUMN IF NOT EXISTS competency TEXT
 (Sin cambios recientes - Ver versión anterior para inventario de policies)
 
 ## 5. Estado del Sprint 6 (Progreso Profesional — Backend)
+
+### ✅ Especificación i18n (ES/EN) — SRS + desglose + migración (2026-11-16)
+
+**Objetivo:** especificar formalmente el subsistema de internacionalización
+bilingüe (ES/EN) de la app, documentando el estado real del código y
+desglosando los requerimientos para el agente ejecutor.
+
+#### Estado real verificado (código como fuente de verdad)
+- **Framework:** Next.js **15.3** (corrección: el header previo decía 15.1.6).
+- **React:** 19.0.0 stable (no RC).
+- **Fuente tipográfica:** **Poppins** (`next/font/google`); los tokens
+  `--font-cinzel`/`--font-montserrat` son alias legacy → Poppins.
+- **i18n existente:** diccionario tipado propio (sin librería externa):
+  - `lib/i18n/config.ts` — `Language`, `SUPPORTED_LANGUAGES` (`es`,`en`),
+    cookie `preferred_language`, parser de `accept-language`
+  - `lib/i18n/server.ts` — `getServerLanguage` / `getServerDictionary` (React.cache)
+  - `lib/i18n/dictionaries.ts` — `dictionaries.es/.en`, `getDictionary`, `interpolate`
+  - `components/i18n/` — `LanguageProvider`, `LanguageSwitcher`, `FloatingLanguageSwitcher`
+  - `app/i18n/actions.ts` — `setLanguagePreference` (cookie + `revalidatePath`)
+- **Resolución de idioma:** cookie (sin prefijo de URL). Cambio vía cookie.
+- **Cobertura:** superficie pública (landing, header, login, apply, qualify,
+  courses) ya traducida; interior del dashboard hardcodeado en español.
+
+#### Entregables generados (sin commitear)
+- `docs/specs/srs001.md` — SRS principal (28 requisitos + matriz + contratos + DDL)
+- `docs/specs/req001.md` … `req012.md` — desglose individual por requisito,
+  con inventario exacto de cadenas ES → claves del diccionario
+- `scripts/2026-11-16-i18n-content-titles.sql` — migración idempotente:
+  `modules.title_en`, `modules.description_en`, `lessons.title_en` (todas `text`, NULL)
+
+#### Decisiones de alcance
+- i18n = diccionario tipado + cookie; **sin** prefijo de URL, **sin** librería externa.
+- Traducir chrome UI + títulos de módulos/lecciones (vía columnas `*_en`).
+- **Diferido (no traducir):** HTML de lecciones (`lessons.content`), feedback de IA
+  (`submissions.feedback_ai`), `recommendations`/`cut_type` de submissions.
+
+#### Orden de implementación recomendado
+`req001` (DictionaryShape) → `req002` (helper pick) → `req009` (migración `_en`)
+→ `req003`…`req008` (UI) → `req010` (CRUD admin) → `req011` (competencias/niveles),
+con `req012` como checklist de cierre (perf/seguridad/accesibilidad/build/docs).
+
+#### Inconsistencias de esquema detectadas (avisar al ejecutor)
+- `modules`/`lessons` mezclan `order_index` (admin, listado) con `position`
+  (página de lección, `CourseSidebar`) — unificar y verificar columna real.
+- `lesson_progress` usa la columna **`is_completed`** (no `completed`).
+- `modules` y `lessons` tienen columna `description` (español) que
+  `docs/DATABASE.md` previamente omitía.
 
 ### ✅ Landing Pricing Section integrada (2026-04-01)
 
@@ -543,15 +590,24 @@ El contrato de datos (`StudentProgressData`) está listo y tipado.
 
 ### 🔄 Prioridad Inmediata
 
-1. **Sprint 6b — Diseño Visual Progreso Profesional (ALTA)**
+1. **Implementar i18n ES/EN (ALTA)**
+   - Ejecutar la especificación `docs/specs/srs001.md` + `req001.md`…`req012.md`
+   - Orden: `req001` → `req002` → `req009` (migración `*_en`) → `req003`…`req008`
+     → `req010` → `req011`, con `req012` como checklist de cierre
+   - Aplicar la migración `scripts/2026-11-16-i18n-content-titles.sql` en Supabase
+
+2. **Sprint 6b — Diseño Visual Progreso Profesional (ALTA)**
    - Implementar UI con Figma MCP sobre `app/dashboard/progreso_profesional/page.tsx`
    - El contrato de datos `StudentProgressData` ya está listo
    - Diseño: Dark Premium, mobile-first, ver imagen de referencia
 
-2. **Asignar competencias a módulos existentes (ALTA)**
+3. **Asignar competencias a módulos existentes (ALTA)**
    - Ir a `/dashboard/admin/courses` y asignar una competencia a cada módulo existente
    - Hasta que se haga esto, las competencias mostrarán 0% (datos correctos, sin módulos asignados)
 
-3. **RLS Policy Audit (HIGH)**
-4. **Formal Logging System (MEDIUM)**
-5. **Core Web Vitals Monitoring (LOW)**
+4. **Unificar columna de orden (`order_index` vs `position`) (HIGH)**
+   - Verificar columna real en Supabase y alinear página de lección + `CourseSidebar`
+
+5. **RLS Policy Audit (HIGH)**
+6. **Formal Logging System (MEDIUM)**
+7. **Core Web Vitals Monitoring (LOW)**

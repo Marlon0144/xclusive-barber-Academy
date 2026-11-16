@@ -149,6 +149,48 @@ export async function myAction(formData: FormData) {
 - **Utilities** go in `utils/` (application logic) or `lib/`
   (framework utilities).
 
+## Internationalization (i18n)
+
+The project localizes UI text with a custom **typed dictionary** — no
+external library (no next-intl/react-i18next). Full spec:
+`docs/specs/srs001.md`; per-requirement breakdown:
+`docs/specs/req001.md`–`req012.md`.
+
+### Key files
+
+| File | Purpose |
+|------|---------|
+| `lib/i18n/config.ts` | `Language`, `SUPPORTED_LANGUAGES` (`es`, `en`), cookie name/age, `accept-language` parser |
+| `lib/i18n/server.ts` | `getServerLanguage()` / `getServerDictionary()` (both `React.cache`) |
+| `lib/i18n/dictionaries.ts` | `dictionaries.es` / `dictionaries.en`, `getDictionary()`, `interpolate()` |
+| `components/i18n/LanguageProvider.tsx` | `useLanguage()` context for client components |
+| `app/i18n/actions.ts` | `setLanguagePreference()` server action (cookie + `revalidatePath('/', 'layout')`) |
+
+### Rules
+
+1. **RSC pages** read `const dict = await getServerDictionary()` and
+   pass strings down as props — never hardcode visible text.
+2. **Client components** read `const { dictionary, language } =
+   useLanguage()` (must be under `LanguageProvider`, which wraps the
+   root layout). Import `getDictionary` directly for leaf client
+   components only if the provider is not available — prefer the
+   context.
+3. **Add new strings in both branches.** The `es` and `en` objects in
+   `dictionaries.ts` must keep exact key parity. (The spec proposes a
+   single `DictionaryShape` to enforce this at compile time — see
+   `req001.md`.)
+4. **Interpolation** uses the existing `interpolate(template, values)`
+   helper with `{{key}}` placeholders.
+5. **Localized DB titles** (module/lesson `*_en` columns) must resolve
+   through a single fallback helper (spec: `pick(language, { es, en })`,
+   `req002.md`) — do not duplicate `title_en ?? title` inline.
+6. **Language setter** always goes through
+   `setLanguagePreference()` (cookie `preferred_language`,
+   `sameSite: 'lax'`, `secure` in production); never set the cookie
+   directly from client code.
+7. **No hardcoded Spanish** in new components. When you add UI text,
+   add it to the dictionary.
+
 ## Adding a new feature
 
 Follow this checklist when implementing a new feature:

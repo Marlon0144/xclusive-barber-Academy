@@ -447,10 +447,75 @@ a single route.
 |-----------|------|-------|
 | `page.tsx` table + native forms | RSC | `searchParams` filters |
 
+## Internationalization components (`components/i18n/`)
+
+The i18n subsystem is a custom typed dictionary (no external library).
+Language context flows from server (`getServerDictionary`) to client via
+`LanguageProvider`. See `docs/ARCHITECTURE.md` for the resolution model.
+
+### LanguageProvider
+
+**File:** `components/i18n/LanguageProvider.tsx`
+**Type:** Client context provider
+**Pattern:** React Context + `useMemo`
+
+**Props:**
+```typescript
+interface LanguageProviderProps {
+  initialLanguage: Language  // resolved server-side, passed from root layout
+  children: ReactNode
+}
+```
+
+**Context value (`useLanguage()`):**
+```typescript
+interface LanguageContextValue {
+  language: Language
+  dictionary: Dictionary
+  setLanguage: (language: Language) => void
+}
+```
+
+**Behavior:**
+- `useLanguage()` throws if used outside the provider.
+- `dictionary` is derived from `language` via `getDictionary()`.
+- Re-syncs when `initialLanguage` changes (e.g. after cookie update).
+
+### LanguageSwitcher
+
+**File:** `components/i18n/LanguageSwitcher.tsx`
+**Type:** Client component
+
+**Behavior:**
+- Renders the ES/EN toggle; calls `setLanguagePreference()` server
+  action (persists cookie + `revalidatePath('/', 'layout')`).
+- Reads labels from `dictionary.languageSwitcher`.
+
+### FloatingLanguageSwitcher
+
+**File:** `components/i18n/FloatingLanguageSwitcher.tsx`
+**Type:** Client component (floating, positioned overlay)
+
+**Behavior:**
+- Floating variant of `LanguageSwitcher`, rendered globally so the
+  toggle is reachable from any route.
+
+**Coverage status (2026-11-16):** the dictionary already localizes the
+public surface (`header`, `landing`, `loginPage`, `applyForm`,
+`qualifyPage`, `qualifyForm`, `coursesPage`, `courseDetailPage`,
+`dashboardHeader`, `dashboardPageHeader`, `dashboardQualifyPage`,
+`userMenu`, `actions`). The dashboard interior (`dashboard`,
+`dashboard.coursesList`, `dashboard.lesson`, `dashboard.tracker`,
+`dashboard.grading`, `dashboard.admin`, `dashboard.progress`,
+`competencies`, `levels`) is the pending scope of the i18n spec
+(`docs/specs/req003.md`–`req011.md`).
+
 ## Component dependency graph
 
 ```
 Root Layout
+├── LanguageProvider (client)  ← wraps everything, provides useLanguage()
+├── FloatingLanguageSwitcher (client)
 ├── HeaderWrapper (client)
 │   └── Header (RSC)
 │       └── getCurrentUser() cache

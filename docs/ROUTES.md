@@ -26,6 +26,26 @@ routes or modifying existing ones.
 | `/dashboard/progreso_profesional` | Yes | Any | RSC | 139 B |
 | `/qualify` | No | Any | Dynamic RSC + Client | Standard |
 
+## Internationalization coverage
+
+The language switcher (`FloatingLanguageSwitcher`) is rendered on all
+routes via the root layout; it persists `preferred_language` via the
+`setLanguagePreference` server action (`app/i18n/actions.ts`).
+
+| Surface | Status |
+|---------|--------|
+| Landing, header, login, apply, signup, qualify, public courses | ✅ Localized via dictionary |
+| `/dashboard` hub | ⏳ Hardcoded Spanish (pending `req003.md`) |
+| `/dashboard/courses` list | ⏳ Hardcoded Spanish + DB titles (pending `req004.md`) |
+| `/dashboard/courses/[courseId]/[lessonId]` | ⏳ Hardcoded Spanish (pending `req005.md`) |
+| `/dashboard/tracker` | ⏳ Hardcoded Spanish (pending `req006.md`) |
+| `/dashboard/grading` | ⏳ Hardcoded Spanish (pending `req007.md`) |
+| `/dashboard/admin/*` | ⏳ Hardcoded Spanish (pending `req008.md`) |
+| `/dashboard/progreso_profesional` | ⏳ Hardcoded Spanish + competency/level labels (pending `req011.md`) |
+
+> The dictionary keys for the pending dashboard strings are
+> inventoried in `docs/specs/req003.md`–`req008.md` and `req011.md`.
+
 ## Public routes
 
 ### `/` — Landing page

@@ -80,6 +80,38 @@ are required.
 | Dynamic import | Tiptap editor, `react-youtube` | Code splitting for heavy libraries |
 | `React.cache()` | `getUser`, `getProfile`, `getLessonById`, `getStudentProgress` | Deduplicate DB calls within a request |
 
+## Internationalization (i18n)
+
+The project uses a **custom, typed dictionary** (no external i18n library such
+as next-intl/react-i18next). Language resolves from the
+`preferred_language` cookie with fallback to the `accept-language` header;
+default is Spanish (`es`). Switching is **cookie-based** — there is no URL
+locale prefix (`/en/...`).
+
+| File | Responsibility |
+|------|----------------|
+| `lib/i18n/config.ts` | `Language` type, `SUPPORTED_LANGUAGES` (`es`, `en`), cookie name/age, `accept-language` parser |
+| `lib/i18n/server.ts` | `getServerLanguage()` / `getServerDictionary()` (RSC, `React.cache`) |
+| `lib/i18n/dictionaries.ts` | Typed dictionary `{ es, en }` — single source of UI strings |
+| `components/i18n/LanguageProvider.tsx` | React context `useLanguage()` for client components |
+| `components/i18n/LanguageSwitcher.tsx` + `FloatingLanguageSwitcher.tsx` | Switcher UI (floating, rendered on all routes) |
+| `app/i18n/actions.ts` | `setLanguagePreference()` server action — persists cookie + `revalidatePath('/', 'layout')` |
+
+**Resolution pattern (RSC → client):** server components read
+`const dict = await getServerDictionary()` and pass strings down as props;
+client components read `useLanguage()` (wrapped by `LanguageProvider` in the
+root layout).
+
+**Coverage status (2026-11-16):** the public surface (landing, headers, login,
+apply, qualify, `/courses`) is translated. The dashboard interior
+(`/dashboard`, course viewer, lesson player, tracker, grading, progress, admin)
+still contains hardcoded Spanish and is the pending scope of the i18n spec.
+
+**Content localization:** module/lesson *titles* are stored in Spanish in
+Supabase. The completion spec adds nullable `*_en` columns with a Spanish
+fallback (helper `pick()`). See `docs/specs/srs001.md` and the requirement
+files `docs/specs/req001.md`–`req012.md` for the full breakdown.
+
 ## Folder structure and conventions
 
 ```
@@ -92,6 +124,7 @@ are required.
 │   ├── auth/               # Shared auth actions
 │   ├── login/              # Login page
 │   ├── signup/             # Signup page (legacy)
+│   ├── i18n/               # Language preference server action
 │   └── dashboard/          # Protected area
 │       ├── page.tsx        # Dashboard hub
 │       ├── qualify/         # Lead qualification wizard (step 2)
@@ -108,9 +141,11 @@ are required.
 │   ├── courses/            # Video player, lesson content, sidebar
 │   ├── dashboard/          # Dashboard cards, header, footer
 │   ├── headers/            # DashboardGreenHeader, DashboardPageHeader
+│   ├── i18n/               # LanguageProvider, LanguageSwitcher, FloatingLanguageSwitcher
 │   └── landing/            # Landing page sections
 │
 ├── lib/                    # Framework utilities
+│   ├── i18n/               # Internationalization (config, server, dictionaries)
 │   └── utils.ts            # cn() helper (clsx + tailwind-merge)
 │
 ├── types/                  # Shared TypeScript types

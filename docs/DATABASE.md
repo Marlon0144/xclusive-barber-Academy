@@ -84,9 +84,18 @@ assigned a competency for professional progress tracking.
 | Column | Type | Constraints | Description |
 |--------|------|-------------|-------------|
 | `id` | `uuid` | PK, DEFAULT `gen_random_uuid()` | Module ID |
-| `title` | `text` | NOT NULL | Module display name |
+| `title` | `text` | NOT NULL | Module display name (Spanish) |
+| `description` | `text` | NULLABLE | Module description (Spanish); read in `CourseListView` |
 | `order_index` | `integer` | NOT NULL | Sort order |
 | `competency` | `text` | CHECK constraint | Competency category (nullable) |
+| `created_at` | `timestamptz` | DEFAULT `now()` | Creation timestamp |
+| `title_en` | `text` | **PENDING** (nullable) | English title — not yet migrated |
+| `description_en` | `text` | **PENDING** (nullable) | English description — not yet migrated |
+
+> **⚠️ Pending migration:** `title_en` and `description_en` do **not**
+> yet exist in production. They are part of the i18n spec
+> (`scripts/2026-11-16-i18n-content-titles.sql`, `docs/specs/req009.md`).
+> Do not reference them in code until the migration is applied.
 
 **Competency CHECK constraint:**
 ```sql
@@ -113,10 +122,25 @@ rich text editor.
 |--------|------|-------------|-------------|
 | `id` | `uuid` | PK, DEFAULT `gen_random_uuid()` | Lesson ID |
 | `module_id` | `uuid` | FK → `modules.id` | Parent module |
-| `title` | `text` | NOT NULL | Lesson title |
-| `content` | `text` | DEFAULT `''` | HTML content (Tiptap) |
+| `title` | `text` | NOT NULL | Lesson title (Spanish) |
+| `description` | `text` | NULLABLE | Lesson description (Spanish); rendered in lesson page |
+| `content` | `text` | DEFAULT `''` | HTML content (Tiptap) — NOT translated |
 | `video_url` | `text` | DEFAULT `''` | YouTube URL |
 | `order_index` | `integer` | NOT NULL | Sort order within module |
+| `title_en` | `text` | **PENDING** (nullable) | English title — not yet migrated |
+
+> **⚠️ Pending migration:** `title_en` does **not** yet exist in
+> production (`scripts/2026-11-16-i18n-content-titles.sql`). `content`
+> (HTML) is intentionally left out of translation scope (see
+> `docs/specs/srs001.md` §REQ-ML-001).
+
+**⚠️ Ordering column inconsistency:** the admin panel
+(`admin/courses/actions.ts`) and courses list page order/write
+`order_index`, but the lesson player page
+(`app/dashboard/courses/[courseId]/[lessonId]/page.tsx`) and
+`components/courses/CourseSidebar.tsx` `select(... 'position')` and
+`.order('position')`. One of these is a stale column reference — verify
+the real column in Supabase and unify to `order_index`.
 
 **Access patterns:**
 - `getLessonById(id)` — Cached helper
@@ -170,7 +194,7 @@ Tracks which lessons each student has completed.
 |--------|------|-------------|-------------|
 | `user_id` | `uuid` | FK → `profiles.id` | Student ID |
 | `lesson_id` | `uuid` | FK → `lessons.id` | Lesson ID |
-| `completed` | `boolean` | DEFAULT `false` | Completion status |
+| `is_completed` | `boolean` | DEFAULT `false` | Completion status |
 
 **Composite key:** (`user_id`, `lesson_id`)
 
@@ -531,6 +555,7 @@ is removed (prevents orphaned files).
 | `fetchProgressPageData` | `app/dashboard/progreso_profesional/actions.ts` | Yes | Any | Compute progress data |
 | `submitLeadQualification` | `app/dashboard/qualify/actions.ts` | Yes | student | Save answers + auto score |
 | `updateLeadReviewAction` | `app/dashboard/admin/leads/actions.ts` | Yes | admin | Manual review and override |
+| `setLanguagePreference` | `app/i18n/actions.ts` | No | — | Set `preferred_language` cookie + revalidate layout |
 
 ## Lead scoring
 
@@ -549,3 +574,30 @@ status instead of segment columns.
 | 1 | RLS | Admin policies inconsistently check JWT metadata vs. `profiles.role` | High |
 | 2 | Types | Some inline types could be extracted to `types/` for reuse | Low |
 | 3 | Validation | Not all Server Actions use Zod schemas (some use manual checks) | Medium |
+| 4 | Schema | `lessons`/`modules` ordering mixes `order_index` (admin, list) with `position` (lesson page, `CourseSidebar`) — stale column reference to be unified | High |
+| 5 | i18n | `title_en`/`description_en` columns are specified but not yet migrated (`scripts/2026-11-16-i18n-content-titles.sql` pending) | Medium |
+| 6 | i18n | Dashboard interior (`/dashboard`, course viewer, lesson player, tracker, grading, progress, admin) still hardcodes Spanish strings | Medium |
+
+## Internationalization data flow
+
+The i18n subsystem lives entirely client/server side with no DB
+dependency except the pending `*_en` content columns. See
+`docs/ARCHITECTURE.md` → "Internationalization (i18n)" and
+`docs/specs/srs001.md` for the full spec.
+
+```
+Request
+  │  (cookie `preferred_language` + `accept-language` header)
+  ▼
+getServerLanguage()  ── lib/i18n/server.ts (React.cache)
+  │
+  ▼
+getServerDictionary() ── returns dictionaries.es | dictionaries.en
+  │
+  ├── RSC pages: pass strings as props to components
+  └── Client components: LanguageProvider → useLanguage()
+```
+
+The data flow for module/lesson title localization (pending) will read
+`title_en`/`description_en` with a Spanish fallback helper (`pick()`),
+defined in `docs/specs/req002.md`.
