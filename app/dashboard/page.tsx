@@ -7,9 +7,14 @@ import { AdminToolsMenu } from '@/components/dashboard/AdminToolsMenu'
 import { DashboardFooter } from '@/components/dashboard/DashboardFooter'
 import DashboardGreenHeader from '@/components/headers/DashboardGreenHeader'
 import { createClient } from '@/utils/supabase/server'
+import { getServerDictionary } from '@/lib/i18n/server'
 
 export default async function DashboardPage() {
   const user = await getUser()
+
+  // REQ-FUNC-001: la carcasa del hub se renderiza desde el diccionario.
+  const dict = await getServerDictionary()
+  const hub = dict.dashboard.hub
 
   let userRole = 'student'
 
@@ -54,8 +59,8 @@ export default async function DashboardPage() {
           {/* 1. PROGRAMA DE FORMACIÓN — full width, tall variant */}
           <div className="md:col-span-2">
             <DashboardCard
-              title="Programa de Formación"
-              description="Accede al contenido académico, módulos prácticos y estructura oficial del programa alineado a los estándares del mercado australiano."
+              title={hub.trainingProgram.title}
+              description={hub.trainingProgram.description}
               href="/dashboard/courses"
               tall
             />
@@ -63,23 +68,23 @@ export default async function DashboardPage() {
 
           {/* 2. SEGUIMIENTO Y EVALUACIÓN — half width on tablet+ */}
           <DashboardCard
-            title="Seguimiento y Evaluación"
-            description="Revisa observaciones, evaluaciones y retroalimentación profesional sobre tu desempeño y evolución dentro del programa."
+            title={hub.tracking.title}
+            description={hub.tracking.description}
             href="/dashboard/tracker"
           />
 
           {/* 3. PROGRESO PROFESIONAL — half width on tablet+ */}
           <DashboardCard
-            title="Progreso Profesional"
-            description="Consulta tu avance, cumplimiento de etapas y desarrollo dentro del proceso formativo."
+            title={hub.progress.title}
+            description={hub.progress.description}
             href="/dashboard/progreso_profesional"
           />
 
           {/* 4. LA ACADEMIA — full width, dimmed (opacity-45 in Figma) */}
           <div className="md:col-span-2">
             <DashboardCard
-              title="La Academia"
-              description="Conoce nuestra metodología, fundamentos y estándares que rigen la formación profesional."
+              title={hub.academy.title}
+              description={hub.academy.description}
               disabled={true}
               dimmed
             />

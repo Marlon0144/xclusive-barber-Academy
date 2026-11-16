@@ -13,6 +13,14 @@ import { useFormStatus } from 'react-dom'
 import Image from 'next/image'
 import { Loader2 } from 'lucide-react'
 import { uploadSubmission } from './actions'
+import { useLanguage } from '@/components/i18n/LanguageProvider'
+import { getDictionary, interpolate } from '@/lib/i18n/dictionaries'
+
+/** Forma tipada de `dashboard.tracker.form` (derivada del diccionario). */
+type TrackerFormDict = ReturnType<typeof getDictionary>['dashboard']['tracker']['form']
+
+/** Tipos de corte en valor canónico + etiqueta localizada. */
+type CutType = { value: string; label: string }
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Seguridad client-side: primera línea de defensa (NO reemplaza la validación
@@ -37,33 +45,26 @@ const ALLOWED_EXTENSIONS = new Set([
 /** 15 MB */
 const MAX_FILE_SIZE_BYTES = 15 * 1024 * 1024
 
-function validateImageFile(file: File): string | null {
-  if (file.size === 0) return 'El archivo está vacío'
+function validateImageFile(
+  file: File,
+  formDict: TrackerFormDict,
+): string | null {
+  if (file.size === 0) return formDict.errorEmptyFile
   if (file.size > MAX_FILE_SIZE_BYTES)
-    return `El archivo supera el límite de ${MAX_FILE_SIZE_BYTES / 1024 / 1024} MB`
+    return interpolate(formDict.errorTooLarge, {
+      sizeMb: MAX_FILE_SIZE_BYTES / 1024 / 1024,
+    })
 
   const mimeType = file.type.toLowerCase()
   if (mimeType && !ALLOWED_MIME_TYPES.has(mimeType))
-    return `Tipo de archivo no permitido (${mimeType}). Solo imágenes.`
+    return interpolate(formDict.errorMime, { mimeType })
 
   const ext = file.name.split('.').pop()?.toLowerCase() ?? ''
   if (!ALLOWED_EXTENSIONS.has(ext))
-    return `Extensión no permitida (.${ext}). Solo imágenes.`
+    return interpolate(formDict.errorExtension, { ext })
 
   return null // ✅ válido
 }
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Config
-// ─────────────────────────────────────────────────────────────────────────────
-const CUT_TYPES = [
-  { value: 'Low Fade',    label: 'Low Fade' },
-  { value: 'Mid Fade',    label: 'Mid Fade' },
-  { value: 'High Fade',   label: 'High Fade' },
-  { value: 'Taper Fade',  label: 'Taper Fade' },
-  { value: 'Buzz Cut',    label: 'Buzz Cut' },
-  { value: 'Scissor Cut', label: 'Corte a Tijera' },
-]
 
 interface SubmissionFormProps {
   onSubmitSuccess: () => void
@@ -86,6 +87,8 @@ interface SubmissionFormProps {
 // ─────────────────────────────────────────────────────────────────────────────
 function SubmitButton() {
   const { pending } = useFormStatus()
+  const { dictionary } = useLanguage()
+  const formDict = dictionary.dashboard.tracker.form
 
   return (
     <div className="relative w-[360px] md:w-full mx-auto mt-2 md:mt-4 h-[41px] md:h-[50px]">
@@ -104,10 +107,10 @@ function SubmitButton() {
         {pending ? (
           <>
             <Loader2 className="animate-spin w-4 h-4" />
-            ENVIANDO...
+            {formDict.submitting}
           </>
         ) : (
-          'PRESENTAR PARA EVALUACIÓN'
+          formDict.submit
         )}
       </button>
     </div>
@@ -115,6 +118,16 @@ function SubmitButton() {
 }
 
 export function SubmissionForm({ onSubmitSuccess }: SubmissionFormProps) {
+  const { dictionary } = useLanguage()
+  const formDict = dictionary.dashboard.tracker.form
+  const cutTypes: CutType[] = [
+    { value: 'Low Fade',    label: formDict.cutTypes.lowFade },
+    { value: 'Mid Fade',    label: formDict.cutTypes.midFade },
+    { value: 'High Fade',   label: formDict.cutTypes.highFade },
+    { value: 'Taper Fade',  label: formDict.cutTypes.taperFade },
+    { value: 'Buzz Cut',    label: formDict.cutTypes.buzzCut },
+    { value: 'Scissor Cut', label: formDict.cutTypes.scissorCut },
+  ]
   const [preview, setPreview]         = useState<string | null>(null)
   const [selectedCut, setSelectedCut] = useState('')
   const [fileError, setFileError]     = useState<string | null>(null)
@@ -133,7 +146,7 @@ export function SubmissionForm({ onSubmitSuccess }: SubmissionFormProps) {
     if (!file) return
 
     // Validación client-side inmediata
-    const error = validateImageFile(file)
+    const error = validateImageFile(file, formDict)
     if (error) {
       setFileError(error)
       setPreview(null)
@@ -166,7 +179,7 @@ export function SubmissionForm({ onSubmitSuccess }: SubmissionFormProps) {
       onSubmitSuccess()
     } catch (err) {
       console.error(err)
-      const message = err instanceof Error ? err.message : 'Error al subir la práctica'
+      const message = err instanceof Error ? err.message : formDict.errorUpload
       alert(message)
     } finally {
       isSubmittingRef.current = false
@@ -193,13 +206,13 @@ export function SubmissionForm({ onSubmitSuccess }: SubmissionFormProps) {
             {/* ── TÍTULO ── */}
             {/* Figma: Poppins ExtraBold 24px, color #1e3a27 */}
             <h2 className="font-montserrat font-extrabold !text-[#1e3a27] text-[22px] md:text-[28px] lg:text-[32px] text-center leading-normal tracking-tight px-5">
-              ENTREGA DE EVIDENCIA
+              {formDict.title}
             </h2>
 
             {/* ── SUBTÍTULO ── */}
             {/* Figma: Poppins ExtraLight 9px, color #d3cbba, tracking 0.81px */}
             <p className="mt-[10px] md:mt-3 font-montserrat font-extralight text-[#d3cbba] text-[9px] md:text-xs text-center tracking-[0.81px]">
-              REGISTRO VISUAL
+              {formDict.subtitle}
             </p>
 
             {/* ══════════════════════════════════════════════════════════════
@@ -220,14 +233,14 @@ export function SubmissionForm({ onSubmitSuccess }: SubmissionFormProps) {
                       <Image
                         src="/assets/dashboard/tracker/SubmissionForm/icon-hombre-upload.png"
                         fill
-                        alt="Subir corte"
+                        alt={formDict.uploadAlt}
                         className="object-contain"
                       />
                     </div>
 
                     {/* Label "NUEVO CORTE" — Figma: Poppins Bold 14px, #161616 */}
                     <p className="font-montserrat font-extrabold text-[#161616] text-[clamp(10px,3.2vw,14px)] md:text-[16px] text-center leading-none">
-                      NUEVO CORTE
+                      {formDict.newCut}
                     </p>
 
                     {/* Botón "Subir archivo" — Figma: caja negra 21px + borde + texto 9px */}
@@ -249,7 +262,7 @@ export function SubmissionForm({ onSubmitSuccess }: SubmissionFormProps) {
                         style={{ border: '0.2px solid #161616' }}
                       >
                         <span className="font-montserrat text-[#161616] text-[8px] md:text-[11px] whitespace-nowrap">
-                          Subir archivo
+                          {formDict.uploadButton}
                         </span>
                       </div>
                     </div>
@@ -317,7 +330,7 @@ export function SubmissionForm({ onSubmitSuccess }: SubmissionFormProps) {
                   }}
                 >
                   <p className="font-montserrat font-medium text-[#d3cbba] text-[11px] md:text-sm text-center leading-[1.3] tracking-tight">
-                    TÉCNICA IMPLEMENTADA
+                    {formDict.techniqueHeader}
                   </p>
                 </div>
 
@@ -330,8 +343,8 @@ export function SubmissionForm({ onSubmitSuccess }: SubmissionFormProps) {
                   {/* Texto dinámico */}
                   <span className="font-montserrat font-light text-[#d3cbba] text-[8px] md:text-xs pointer-events-none">
                     {selectedCut
-                      ? CUT_TYPES.find(c => c.value === selectedCut)?.label ?? 'Selecciona Tipo de Corte'
-                      : 'Selecciona Tipo de Corte'}
+                      ? cutTypes.find(c => c.value === selectedCut)?.label ?? formDict.selectCut
+                      : formDict.selectCut}
                   </span>
                   {/* Flecha — Figma: icon-seleccionar rotado 90° */}
                   <div className="relative w-[6px] h-[6px] flex-shrink-0 pointer-events-none" style={{ transform: 'rotate(90deg)' }}>
@@ -350,8 +363,8 @@ export function SubmissionForm({ onSubmitSuccess }: SubmissionFormProps) {
                     onChange={e => setSelectedCut(e.target.value)}
                     className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
                   >
-                    <option value="" disabled>Selecciona Tipo de Corte</option>
-                    {CUT_TYPES.map(c => (
+                    <option value="" disabled>{formDict.selectCut}</option>
+                    {cutTypes.map(c => (
                       <option key={c.value} value={c.value}>{c.label}</option>
                     ))}
                   </select>
@@ -370,7 +383,7 @@ export function SubmissionForm({ onSubmitSuccess }: SubmissionFormProps) {
                   }}
                 >
                   <p className="font-montserrat font-medium text-[#d3cbba] text-[11px] md:text-sm text-center leading-[1.3]">
-                    NOTAS TÉCNICAS
+                    {formDict.notesHeader}
                   </p>
                 </div>
 
@@ -380,7 +393,7 @@ export function SubmissionForm({ onSubmitSuccess }: SubmissionFormProps) {
                   <textarea
                     name="description"
                     required
-                    placeholder="Describe brevemente el proceso realizado, herramientas utilizadas y consideraciones profesionales aplicadas..."
+                    placeholder={formDict.notesPlaceholder}
                     className="w-full min-h-[64px] md:min-h-[90px] bg-transparent text-[#1e3a27] text-[8px] md:text-xs font-montserrat font-normal p-2 md:p-3 focus:outline-none resize-none leading-relaxed placeholder:text-[#1e3a27]/50 text-justify tracking-[-0.4px]"
                   />
                 </div>

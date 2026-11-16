@@ -1,0 +1,29 @@
+# Test-only image — instala solo la toolchain de tests (vitest) y copia el
+# código fuente de i18n para verificar la lógica pura (sin Next/Supabase).
+# La SRS es un proyecto Next.js/TypeScript, no Maven; este contenedor ejecuta la
+# suite equivalente (`vitest run`) en lugar de `mvn test`.
+FROM node:22-alpine
+
+WORKDIR /app
+
+# Solo toolchain de pruebas (esbuild se instala como binario para alpine-musl)
+# Se instala en un paquete minimo (sin el package.json del monorepo app) para
+# evitar conflictos de peer deps con Next (@types/node). --legacy-peer-deps
+# evita el ERESOLVE al no instalar la App completa.
+RUN npm init -y && npm install vitest@5.1.0 vite@^7 typescript@^5
+
+COPY vitest.config.mjs ./
+COPY tsconfig.test.json ./
+COPY lib ./lib
+COPY types ./types
+COPY tests ./tests
+
+# Fuente de las pantallas para las pruebas estáticas de integración
+# (tests/screen-integration.test.ts lee app/, components/ y utils/).
+COPY app ./app
+COPY components ./components
+COPY utils ./utils
+COPY scripts ./scripts
+
+# Salud: verificación estática estricta (REQ-BUILD-001 / REQ-INT-001 via tsc) + tests
+CMD ["sh", "-c", "npx tsc --noEmit -p tsconfig.test.json && npx vitest run"]

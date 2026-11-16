@@ -4,6 +4,10 @@
  *
  * Server Component puro (bundle JS = 0). Todos los datos llegan del servidor.
  * Assets: /assets/progreso_profesional/ (5 archivos, sin descargas adicionales).
+ *
+ * i18n (REQ-FUNC-003 / REQ-FUNC-010): texto localizado vía diccionario del
+ * servidor; las etiquetas de competencias y niveles provienen de
+ * `lib/i18n/progress-localization.ts`.
  */
 
 import { redirect } from 'next/navigation'
@@ -12,7 +16,24 @@ import Link from 'next/link'
 import { fetchProgressPageData } from './actions'
 import DashboardGreenHeader from '@/components/headers/DashboardGreenHeader'
 import { DashboardFooter } from '@/components/dashboard/DashboardFooter'
-import type { CompetencyProgress } from '@/types/progress'
+import type { CompetencyProgress, ProfessionalLevel, ProfessionalLevelKey } from '@/types/progress'
+import {
+  PROFESSIONAL_LEVEL_KEYS,
+} from '@/types/progress'
+import { getServerDictionary, getServerLanguage } from '@/lib/i18n/server'
+import { interpolate } from '@/lib/i18n/dictionaries'
+import {
+  getCompetencyLabels,
+  getProfessionalLevels,
+} from '@/lib/i18n/progress-localization'
+
+/** Forma de las etiquetas de estado de progreso (del diccionario). */
+type ProgressStatuses = {
+  completed: string
+  competent: string
+  inProgress: string
+  notStarted: string
+}
 
 export const metadata = {
   title: 'Progreso Profesional | Xclusive Barber Academy',
@@ -20,11 +41,11 @@ export const metadata = {
 
 // ─── Helpers puramente computacionales (server-side, sin bundle) ──────────────
 
-function competencyStatus(pct: number): string {
-  if (pct === 100) return 'Completado'
-  if (pct >= 50) return 'Competente'
-  if (pct > 0) return 'En Progreso'
-  return 'Sin Iniciar'
+function competencyStatus(pct: number, statuses: ProgressStatuses): string {
+  if (pct === 100) return statuses.completed
+  if (pct >= 50) return statuses.competent
+  if (pct > 0) return statuses.inProgress
+  return statuses.notStarted
 }
 
 function modulesForNextLevel(
@@ -35,6 +56,16 @@ function modulesForNextLevel(
   const required = Math.ceil((minPct / 100) * totalModules)
   const remaining = Math.max(0, required - completedModules)
   return { required, remaining }
+}
+
+/** Parte una etiqueta (ej. "Profesional Xclusive") en dos líneas balanceadas. */
+function toTimelineLines(raw: string): [string, string] {
+  const words = raw.toUpperCase().split(/\s+/).filter(Boolean)
+  if (words.length <= 1) {
+    return [words[0] ?? '', '']
+  }
+  const half = Math.ceil(words.length / 2)
+  return [words.slice(0, half).join(' '), words.slice(half).join(' ')]
 }
 
 // ─── Sub-componente: Círculo de progreso (SVG inline — zero client JS) ─────────
@@ -71,15 +102,15 @@ function ProgressCircle({ pct }: { pct: number }) {
 
 // ─── Sub-componente: Timeline de niveles (SVG inline) ─────────────────────────
 const LEVEL_DOTS = [
-  { label: ['TALENTO EN', 'FORMACIÓN'],    cx: 60,  cy: 112, below: true  },
-  { label: ['TÉCNICO EN', 'DESARROLLO'],   cx: 158, cy: 44,  below: false },
-  { label: ['BARBERO', 'AVANZADO'],        cx: 250, cy: 75,  below: true  },
-  { label: ['PROFESIONAL', 'XCLUSIVE'],   cx: 344, cy: 57,  below: false },
+  { cx: 60,  cy: 112, below: true  },
+  { cx: 158, cy: 44,  below: false },
+  { cx: 250, cy: 75,  below: true  },
+  { cx: 344, cy: 57,  below: false },
 ]
 const TIMELINE_PATH = 'M60,112 C90,112 128,44 158,44 S215,72 250,75 S315,57 344,57'
 const ACTIVE_OFFSETS = [1000, 680, 380, 0]
 
-function LevelTimeline({ idx }: { idx: number }) {
+function LevelTimeline({ idx, lines }: { idx: number; lines: [string, string][] }) {
   return (
     <svg viewBox="0 0 402 160" className="w-full h-[160px] md:h-[200px]" aria-hidden="true">
       <path d={TIMELINE_PATH} fill="none" stroke="#2a2a2a" strokeWidth="1.5" />
@@ -100,17 +131,18 @@ function LevelTimeline({ idx }: { idx: number }) {
         const tColor = active ? '#d3cbba' : '#2b2b2b'
         const y1 = dot.below ? dot.cy + 18 : dot.cy - 18
         const y2 = dot.below ? dot.cy + 27 : dot.cy - 9
+        const [line1, line2] = lines[i] ?? ['', '']
         return (
           <g key={i}>
             {active && <circle cx={dot.cx} cy={dot.cy} r="9" fill="none" stroke="#D4AF37" strokeWidth="1.5" />}
             <circle cx={dot.cx} cy={dot.cy} r="5" fill={fill} />
             <text x={dot.cx} y={y1} textAnchor="middle" fill={tColor}
               fontSize="7" fontWeight="700" fontFamily="sans-serif" letterSpacing="0.05em">
-              {dot.label[0]}
+              {line1}
             </text>
             <text x={dot.cx} y={y2} textAnchor="middle" fill={tColor}
               fontSize="7" fontWeight="700" fontFamily="sans-serif" letterSpacing="0.05em">
-              {dot.label[1]}
+              {line2}
             </text>
           </g>
         )
@@ -121,8 +153,14 @@ function LevelTimeline({ idx }: { idx: number }) {
 
 // ─── Sub-componente: Fila de competencia ──────────────────────────────────────
 // Sobre fondo crema (#d3cbba), todo el texto usa verde oscuro (#1e3a27)
-function CompetencyRow({ comp }: { comp: CompetencyProgress }) {
-  const status = competencyStatus(comp.percentage)
+function CompetencyRow({
+  comp,
+  statuses,
+}: {
+  comp: CompetencyProgress
+  statuses: ProgressStatuses
+}) {
+  const status = competencyStatus(comp.percentage, statuses)
   return (
     <div className="text-center">
       <p className="text-[9px] md:text-xs lg:text-sm font-bold uppercase tracking-widest leading-tight text-[#1e3a27]">
@@ -135,17 +173,45 @@ function CompetencyRow({ comp }: { comp: CompetencyProgress }) {
 
 // ─── Página principal ─────────────────────────────────────────────────────────
 export default async function ProgressPage() {
-  const data = await fetchProgressPageData()
+  const languagePromise = getServerLanguage()
+  const dictionaryPromise = getServerDictionary()
+  const dataPromise = fetchProgressPageData()
+
+  const [language, dictionary, data] = await Promise.all([
+    languagePromise,
+    dictionaryPromise,
+    dataPromise,
+  ])
   if (!data) redirect('/login')
+
+  const progressDict = dictionary.dashboard.progress
+  const statuses = progressDict.statuses
+  const competencyLabels = getCompetencyLabels(language)
+  const localizedLevels = getProfessionalLevels(language)
+  const levelsByKey: Record<ProfessionalLevelKey, ProfessionalLevel> = Object.fromEntries(
+    localizedLevels.map((l) => [l.key as ProfessionalLevelKey, l]),
+  )
 
   const { student, competencies, metrics, currentLevel, nextLevel } = data
 
-  const levelKeys = ['talento', 'tecnico', 'avanzado', 'profesional']
+  // Re-localiza etiquetas (los datos llegan en español por defecto).
+  const localizedCompetencies: CompetencyProgress[] = competencies.map((comp) => ({
+    ...comp,
+    label: competencyLabels[comp.key],
+  }))
+  const localizedCurrent = levelsByKey[currentLevel.key]
+  const localizedNext = nextLevel ? levelsByKey[nextLevel.key] : null
+
+  const levelKeys = PROFESSIONAL_LEVEL_KEYS
   const currentLevelIndex = levelKeys.indexOf(currentLevel.key)
 
-  const nextLevelInfo = nextLevel
-    ? modulesForNextLevel(nextLevel.minPercentage, metrics.totalModules, metrics.completedModules)
+  const nextLevelInfo = localizedNext
+    ? modulesForNextLevel(localizedNext.minPercentage, metrics.totalModules, metrics.completedModules)
     : null
+
+  const timelineLines: [string, string][] = levelKeys.map((key) =>
+    toTimelineLines(levelsByKey[key].label),
+  )
 
   const enrolledDate = new Date(student.enrolledAt).toLocaleDateString('es-CO', {
     day: '2-digit', month: 'long', year: 'numeric',
@@ -164,7 +230,7 @@ export default async function ProgressPage() {
               <div className="relative w-[28px] h-[20px] md:w-[36px] md:h-[26px]">
                 <Image
                   src="/assets/progreso_profesional/back-row.png"
-                  alt="Volver al Dashboard"
+                  alt={progressDict.backToDashboard}
                   fill
                   className="object-contain"
                   sizes="28px"
@@ -182,7 +248,7 @@ export default async function ProgressPage() {
                 <div className="relative w-[108px] h-[153px] md:w-[170px] md:h-[240px] lg:w-[230px] lg:h-[325px] mx-auto mt-5 md:mt-8">
                   <Image
                     src="/assets/progreso_profesional/foto-estudiante.png"
-                    alt="Foto del estudiante"
+                    alt={progressDict.photoAlt}
                     fill className="object-cover" sizes="(max-width: 767px) 108px, (max-width: 1023px) 170px, 230px"
                   />
                 </div>
@@ -190,9 +256,9 @@ export default async function ProgressPage() {
               {/* Título */}
               <div className="flex-1 pt-6 md:pt-10 lg:pt-14 pr-4 md:pr-6 lg:pr-8 pl-3 md:pl-5 lg:pl-6">
                 <h1
-                  className="font-serif font-black uppercase leading-none text-[#d3cbba] text-[clamp(22px,7vw,30px)] md:text-4xl lg:text-5xl"
+                  className="font-serif font-black uppercase leading-none text-[#d3cbba] text-[clamp(22px,7vw,30px)] md:text-4xl lg:text-5xl whitespace-pre-line"
                 >
-                  PROGRESO<br />PROFESIONAL
+                  {progressDict.heroTitle}
                 </h1>
                 {/* Divider dorado — asset real del diseño Figma */}
                 <div className="relative w-full h-[4px] md:h-[6px] my-2 md:my-3">
@@ -205,7 +271,7 @@ export default async function ProgressPage() {
                   />
                 </div>
                 <p className="text-[10px] md:text-sm lg:text-base text-[#d3cbba] leading-tight md:leading-relaxed">
-                  Seguimiento de tu desarrollo dentro del programa formativo.
+                  {progressDict.heroSubtitle}
                 </p>
               </div>
             </div>
@@ -216,10 +282,10 @@ export default async function ProgressPage() {
             {/* Columna izquierda */}
             <div className="w-[142px] md:w-[220px] lg:w-[300px] flex-shrink-0 bg-[#1d1d1d] px-6 md:px-8 lg:px-10 py-6 md:py-8 lg:py-10 space-y-5 md:space-y-6">
               {[
-                { label: 'Estudiante',    value: student.name,       valueColor: '#d3cbba' },
-                { label: 'Correo',        value: student.email,      valueColor: '#d3cbba' },
-                { label: 'Fecha de Inicio', value: enrolledDate,     valueColor: '#d3cbba' },
-                { label: 'Estado Actual', value: student.status,     valueColor: '#d3cbba' },
+                { label: progressDict.student,    value: student.name,       valueColor: '#d3cbba' },
+                { label: progressDict.email,        value: student.email,      valueColor: '#d3cbba' },
+                { label: progressDict.startDate, value: enrolledDate,     valueColor: '#d3cbba' },
+                { label: progressDict.currentStatus, value: progressDict.studentActive, valueColor: '#d3cbba' },
               ].map(({ label, value, valueColor }) => (
                 <div key={label}>
                   <p className="text-[8px] md:text-[11px] lg:text-xs font-bold uppercase tracking-[0.15em] text-[#d3cbba]">
@@ -237,11 +303,11 @@ export default async function ProgressPage() {
               <h2
                 className="font-serif font-black text-center uppercase leading-tight mb-4 md:mb-6 text-[#1e3a27] text-[13px] md:text-base lg:text-lg"
               >
-                DESARROLLO DE<br />COMPETENCIAS
+                {progressDict.competencyDevelopment}
               </h2>
               <div className="flex-1 space-y-[14px] md:space-y-5 lg:space-y-6">
-                {competencies.map((comp) => (
-                  <CompetencyRow key={comp.key} comp={comp} />
+                {localizedCompetencies.map((comp) => (
+                  <CompetencyRow key={comp.key} comp={comp} statuses={statuses} />
                 ))}
               </div>
             </div>
@@ -251,7 +317,7 @@ export default async function ProgressPage() {
           <section className="bg-[#1d1d1d] mt-4 md:mt-6 px-4 md:px-8 lg:px-12 py-5 md:py-8 lg:py-10">
             {/* Labels */}
             <div className="grid grid-cols-3 text-center mb-3 md:mb-5">
-              {['Progreso\nGeneral', 'Módulos\nCompletados', 'Prácticas\nEnviadas'].map((lbl) => (
+              {[progressDict.metricGeneral, progressDict.metricModules, progressDict.metricPractices].map((lbl) => (
                 <p key={lbl} className="text-[8px] md:text-[11px] lg:text-xs font-bold uppercase tracking-widest text-[#d3cbba] leading-tight whitespace-pre-line">
                   {lbl}
                 </p>
@@ -266,7 +332,7 @@ export default async function ProgressPage() {
                 <span className="font-serif font-black text-[#d3cbba] text-[28px] md:text-[36px] lg:text-[44px]">
                   {metrics.completedModules}
                 </span>
-                <span className="text-[#1e3a27] font-bold mx-1 text-sm md:text-base lg:text-lg">DE</span>
+                <span className="text-[#1e3a27] font-bold mx-1 text-sm md:text-base lg:text-lg">{progressDict.of}</span>
                 <span className="font-serif font-black text-[#d3cbba] text-[28px] md:text-[36px] lg:text-[44px]">
                   {metrics.totalModules}
                 </span>
@@ -293,31 +359,39 @@ export default async function ProgressPage() {
             <div className="relative w-[266px] h-[18px] md:w-[380px] md:h-[26px] lg:w-[480px] lg:h-[32px] mb-6 md:mb-8">
               <Image
                 src="/assets/progreso_profesional/recurso-texto.png"
-                alt="Avance Profesional" fill
+                alt={progressDict.avanceAlt} fill
                 className="object-contain" sizes="(max-width: 767px) 266px, (max-width: 1023px) 380px, 480px"
               />
             </div>
             {/* Timeline */}
             <div className="w-full">
-              <LevelTimeline idx={currentLevelIndex} />
+              <LevelTimeline idx={currentLevelIndex} lines={timelineLines} />
             </div>
           </section>
 
           {/* ── PRÓXIMO NIVEL ───────────────────────────────────────────────── */}
-          {nextLevel && nextLevelInfo && (
+          {localizedNext && nextLevelInfo && (
             <section className="px-4 md:px-8 lg:px-12 pb-6 md:pb-8">
               <div className="relative border border-[#1c3122]/60 bg-[rgba(28,49,34,0.64)] rounded-sm px-4 md:px-8 lg:px-10 pt-8 md:pt-10 pb-4 md:pb-6 shadow-md">
                 <p className="absolute top-3 md:top-4 left-0 right-0 text-center text-[10px] md:text-xs lg:text-sm font-bold uppercase tracking-[0.3em] text-[#d3cbba]">
-                  PRÓXIMO NIVEL:
+                  {progressDict.nextLevelLabel}
                 </p>
                 <p className="text-center font-serif font-black uppercase text-[#d3cbba] text-[15px] md:text-xl lg:text-2xl tracking-[0.05em]">
-                  {nextLevel.label}
+                  {localizedNext.label}
                 </p>
                 <p className="text-center mt-2 md:mt-3 text-[8px] md:text-[11px] lg:text-xs uppercase tracking-widest leading-relaxed text-[#d3cbba]">
-                  REQUIERE: {nextLevelInfo.required} DE {metrics.totalModules} MÓDULOS COMPLETADOS
+                  {interpolate(progressDict.requiresModules, {
+                    required: nextLevelInfo.required,
+                    total: metrics.totalModules,
+                  })}
                   <br />
-                  FALTAN: {nextLevelInfo.remaining}{' '}
-                  {nextLevelInfo.remaining === 1 ? 'MÓDULO' : 'MÓDULOS'}
+                  {interpolate(progressDict.missingModules, {
+                    remaining: nextLevelInfo.remaining,
+                    moduleWord:
+                      nextLevelInfo.remaining === 1
+                        ? progressDict.moduleWordSingular
+                        : progressDict.moduleWordPlural,
+                  })}
                 </p>
               </div>
             </section>
@@ -328,16 +402,18 @@ export default async function ProgressPage() {
             <h2
               className="font-serif font-black uppercase leading-tight text-[#d3cbba] text-[clamp(20px,7vw,28px)] md:text-4xl lg:text-5xl"
             >
-              ¡ESTÁS AVANZANDO CON CONSISTENCIA!
+              {progressDict.ctaTitle}
             </h2>
             <p className="text-[11px] md:text-sm lg:text-base font-bold uppercase tracking-widest leading-relaxed text-[#d3cbba]">
-              Mantén el ritmo para alcanzar<br />tu máximo potencial.
+              {progressDict.ctaBodyLine1}
+              <br />
+              {progressDict.ctaBodyLine2}
             </p>
             <Link
               href="/dashboard/courses"
               className="inline-block mt-2 bg-[#d3cbba] text-[#1e3a27] font-bold uppercase tracking-[0.2em] text-[11px] md:text-sm px-8 md:px-12 py-3 md:py-4 hover:bg-[#c8c0b0] transition-colors duration-200"
             >
-              ¡SIGUE APRENDIENDO!
+              {progressDict.ctaButton}
             </Link>
           </section>
 

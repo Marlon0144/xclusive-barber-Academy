@@ -9,6 +9,7 @@ import YouTube from 'react-youtube'
 import { Save, Loader2, Video, ArrowLeft, MonitorPlay } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { useLanguage } from '@/components/i18n/LanguageProvider'
 
 // Lazy load RichTextEditor (heavy Tiptap bundle ~50KB) - only on admin pages
 const RichTextEditor = dynamic(() => import('@/components/admin/RichTextEditor'), {
@@ -20,13 +21,17 @@ const RichTextEditor = dynamic(() => import('@/components/admin/RichTextEditor')
 interface LessonData {
     id: string
     title: string
+    title_en: string | null
     content: string | null
     video_url: string | null
 }
 
 export default function EditLessonForm({ lesson }: { lesson: LessonData }) {
+    const { dictionary } = useLanguage()
+    const editDict = dictionary.dashboard.admin.editLesson
     const [content, setContent] = useState(lesson.content || '')
     const [videoUrl, setVideoUrl] = useState(lesson.video_url || '')
+    const [titleEn, setTitleEn] = useState(lesson.title_en || '')
 
     const [isPending, startTransition] = useTransition()
     const router = useRouter()
@@ -42,11 +47,13 @@ export default function EditLessonForm({ lesson }: { lesson: LessonData }) {
 
     const handleSave = () => {
         startTransition(async () => {
-            const result = await updateLessonContent(lesson.id, content, videoUrl)
+            const result = await updateLessonContent(lesson.id, content, videoUrl, {
+                title_en: titleEn || null,
+            })
             if (result.error) {
-                alert('Error: ' + result.error)
+                alert(editDict.errorTitle + result.error)
             } else {
-                alert('¡Guardado correctamente!')
+                alert(editDict.saved)
                 router.refresh()
             }
         })
@@ -68,7 +75,7 @@ export default function EditLessonForm({ lesson }: { lesson: LessonData }) {
                         <div>
                             <div className="flex items-center gap-2">
                                 <span className="w-1.5 h-1.5 rounded-full bg-gold-500 animate-pulse"></span>
-                                <p className="text-[10px] text-gold-500 uppercase tracking-widest font-bold">Modo Editor</p>
+                                <p className="text-[10px] text-gold-500 uppercase tracking-widest font-bold">{editDict.editorMode}</p>
                             </div>
                             <h1 className="font-serif text-xl text-white tracking-wide">{lesson.title}</h1>
                         </div>
@@ -80,7 +87,7 @@ export default function EditLessonForm({ lesson }: { lesson: LessonData }) {
                         className="bg-gold-500 hover:bg-gold-600 text-black font-bold tracking-widest min-w-[140px]"
                     >
                         {isPending ? <Loader2 className="animate-spin mr-2" size={18} /> : <Save className="mr-2" size={18} />}
-                        {isPending ? 'GUARDANDO...' : 'GUARDAR'}
+                        {isPending ? editDict.saving : editDict.save}
                     </Button>
                 </div>
 
@@ -93,11 +100,28 @@ export default function EditLessonForm({ lesson }: { lesson: LessonData }) {
                                 <Edit2IconDecorator />
                             </div>
                             <h2 className="text-lg font-serif text-white mb-6 border-b border-white/10 pb-2 flex items-center gap-2">
-                                Contenido Escrito
+                                {editDict.writtenContent}
                             </h2>
                             <div className="bg-black/30 rounded-sm border border-white/5 min-h-[400px]">
                                 <RichTextEditor content={content} onChange={setContent} />
                             </div>
+                        </div>
+
+                        {/* ── TRADUCCIÓN AL INGLÉS (REQ-FUNC-008) ── */}
+                        <div className="bg-surface border border-white/5 rounded-sm p-6 relative group hover:border-white/10 transition-colors">
+                            <h2 className="text-lg font-serif text-white mb-6 border-b border-white/10 pb-2 flex items-center gap-2">
+                                {editDict.titleEnSection}
+                            </h2>
+                            <label className="text-xs text-zinc-500 uppercase tracking-wider font-bold ml-1">
+                                EN
+                            </label>
+                            <Input
+                                type="text"
+                                value={titleEn || ''}
+                                onChange={(e) => setTitleEn(e.target.value)}
+                                className="mt-2 bg-black/50 border-white/10 focus:border-gold-500 text-xs"
+                                placeholder={editDict.titleEnHelper}
+                            />
                         </div>
                     </div>
 
@@ -106,7 +130,7 @@ export default function EditLessonForm({ lesson }: { lesson: LessonData }) {
                         <div className="bg-surface border border-white/5 rounded-sm p-6 sticky top-28 group hover:border-gold-500/30 transition-colors">
                             <div className="flex items-center gap-2 mb-6 border-b border-white/10 pb-2">
                                 <MonitorPlay className="w-4 h-4 text-gold-500" />
-                                <h2 className="text-lg font-serif text-white">Configuración de Video</h2>
+                                <h2 className="text-lg font-serif text-white">{editDict.videoConfig}</h2>
                             </div>
 
                             {/* PREVIEW DEL VIDEO */}
@@ -125,36 +149,36 @@ export default function EditLessonForm({ lesson }: { lesson: LessonData }) {
                                         <div className="p-4 rounded-full bg-white/5 border border-white/5">
                                             <Video size={32} />
                                         </div>
-                                        <p className="text-xs uppercase tracking-widest">Sin video asignado</p>
+                                        <p className="text-xs uppercase tracking-widest">{editDict.noVideo}</p>
                                     </div>
                                 )}
                             </div>
 
                             {/* INPUT URL */}
                             <div className="space-y-2">
-                                <label className="text-xs text-zinc-500 uppercase tracking-wider font-bold ml-1">Enlace de YouTube</label>
+                                <label className="text-xs text-zinc-500 uppercase tracking-wider font-bold ml-1">{editDict.youtubeLabel}</label>
                                 <div className="relative">
                                     <Input
                                         type="text"
                                         value={videoUrl || ''}
                                         onChange={(e) => setVideoUrl(e.target.value)}
                                         className="pl-9 bg-black/50 border-white/10 focus:border-gold-500 text-xs font-mono text-gold-500"
-                                        placeholder="https://youtube.com/watch?v=..."
+                                        placeholder={editDict.youtubePlaceholder}
                                     />
                                     <Video className="w-4 h-4 text-zinc-500 absolute left-3 top-2.5" />
                                 </div>
                                 <p className="text-[10px] text-zinc-600 pl-1">
-                                    Pega la URL completa del video. Se extraerá el ID automáticamente.
+                                    {editDict.youtubeHelper}
                                 </p>
                             </div>
 
                             {/* ESTADO */}
                             <div className="mt-6 pt-6 border-t border-white/5">
                                 <div className="flex justify-between items-center text-xs">
-                                    <span className="text-zinc-500">Estado del contenido:</span>
+                                    <span className="text-zinc-500">{editDict.contentStatus}</span>
                                     <span className="text-green-500 font-bold flex items-center gap-1">
                                         <span className="w-1.5 h-1.5 rounded-full bg-green-500"></span>
-                                        Activo
+                                        {editDict.active}
                                     </span>
                                 </div>
                             </div>

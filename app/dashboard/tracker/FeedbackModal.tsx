@@ -1,6 +1,7 @@
 'use client'
 
 import { Submission, Scores } from '@/types/submissions'
+import { useLanguage } from '@/components/i18n/LanguageProvider'
 
 interface FeedbackModalProps {
   submission: Submission
@@ -32,6 +33,8 @@ const ScoreBar = ({ label, value }: { label: string; value: number }) => (
 )
 
 export default function FeedbackModal({ submission }: FeedbackModalProps) {
+  const { dictionary } = useLanguage()
+  const modalDict = dictionary.dashboard.tracker.feedbackModal
   if (!submission) return null
 
   const scores = submission.scores as Scores
@@ -44,7 +47,7 @@ export default function FeedbackModal({ submission }: FeedbackModalProps) {
         <p
           className="font-bold text-[9px] md:text-xs uppercase tracking-[0.3em] text-[#5A7A66]"
         >
-          PROFE JULIÁN
+          {modalDict.heading}
         </p>
       </div>
 
@@ -53,7 +56,7 @@ export default function FeedbackModal({ submission }: FeedbackModalProps) {
 
         {/* Feedback IA */}
         <p className="text-[#D3CBBA]/80 text-[11px] md:text-sm leading-relaxed mb-5 md:mb-6">
-          {submission.feedback_ai ?? 'Sin retroalimentación disponible.'}
+          {submission.feedback_ai ?? modalDict.noFeedback}
         </p>
 
         {/* Puntuaciones — solo si existen */}
@@ -62,12 +65,12 @@ export default function FeedbackModal({ submission }: FeedbackModalProps) {
             <p
               className="font-bold text-[9px] md:text-xs uppercase mb-3 md:mb-4 tracking-[0.3em] text-[#5A7A66]"
             >
-              PUNTUACIONES
+              {modalDict.scores}
             </p>
-            <ScoreBar label="Fade / Desvanecido" value={scores.fade} />
-            <ScoreBar label="Limpieza"           value={scores.cleanliness} />
-            <ScoreBar label="Técnica"            value={scores.technique} />
-            <ScoreBar label="Simetría"           value={scores.symmetry} />
+            <ScoreBar label={modalDict.fade}    value={scores.fade} />
+            <ScoreBar label={modalDict.cleanliness} value={scores.cleanliness} />
+            <ScoreBar label={modalDict.technique} value={scores.technique} />
+            <ScoreBar label={modalDict.symmetry} value={scores.symmetry} />
           </div>
         )}
 

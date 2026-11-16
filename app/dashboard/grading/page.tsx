@@ -4,9 +4,13 @@ import GradingCard from './GradingCard'
 import { GraduationCap, Inbox, Star } from 'lucide-react'
 import DashboardPageHeader from '@/components/headers/DashboardPageHeader'
 import { DashboardFooter } from '@/components/dashboard/DashboardFooter'
+import { getServerDictionary } from '@/lib/i18n/server'
 
 export default async function GradingPage() {
   const supabase = await createClient()
+  const dictPromise = getServerDictionary()
+  const [dictionary] = await Promise.all([dictPromise])
+  const gradingDict = dictionary.dashboard.grading
 
   // 1. SEGURIDAD: Obtener usuario y rol
   const { data: { user } } = await supabase.auth.getUser()
@@ -26,9 +30,9 @@ export default async function GradingPage() {
       <div className="min-h-screen flex items-center justify-center p-10 text-center bg-black">
         <div className="max-w-md space-y-4">
           <div className="text-red-500 text-6xl">🚫</div>
-          <h1 className="text-3xl font-serif text-white">Acceso Restringido</h1>
-          <p className="text-zinc-500">Esta zona está reservada exclusivamente para instructores y personal administrativo.</p>
-          <a href="/dashboard" className="text-gold-500 hover:underline block mt-4 text-sm uppercase tracking-widest">Volver al Dashboard</a>
+          <h1 className="text-3xl font-serif text-white">{gradingDict.restrictedTitle}</h1>
+          <p className="text-zinc-500">{gradingDict.restrictedBody}</p>
+          <a href="/dashboard" className="text-gold-500 hover:underline block mt-4 text-sm uppercase tracking-widest">{gradingDict.backToDashboard}</a>
         </div>
       </div>
     )
@@ -43,7 +47,7 @@ export default async function GradingPage() {
 
   return (
     <>
-      <DashboardPageHeader title="Evaluación" />
+      <DashboardPageHeader title={gradingDict.headerTitle} />
       <div className="min-h-screen p-8 max-w-6xl mx-auto space-y-12">
 
       {/* HEADER */}
@@ -54,19 +58,19 @@ export default async function GradingPage() {
         <div className="relative z-10">
           <div className="flex items-center gap-3 mb-2">
             <Star className="w-5 h-5 text-green-500 fill-green-500" />
-            <h2 className="text-green-500 text-xs tracking-[0.3em] uppercase font-bold">Panel de Instructor</h2>
+            <h2 className="text-green-500 text-xs tracking-[0.3em] uppercase font-bold">{gradingDict.instructorPanel}</h2>
           </div>
           <h1 className="text-4xl md:text-5xl font-serif text-white mb-4">
-            Evaluación de Prácticas
+            {gradingDict.pageTitle}
           </h1>
           <p className="text-zinc-400 max-w-xl text-lg font-light">
-            Revisa, califica y guía a los estudiantes hacia la perfección técnica.
+            {gradingDict.pageDescription}
           </p>
         </div>
 
         {/* Counter Badge */}
         <div className="mt-6 flex items-center gap-2">
-          <span className="text-sm text-zinc-500 uppercase tracking-widest">Pendientes:</span>
+          <span className="text-sm text-zinc-500 uppercase tracking-widest">{gradingDict.pendingLabel}</span>
           <span className="bg-green-900/30 text-green-400 border border-green-500/30 px-3 py-1 rounded-full text-sm font-bold shadow-[0_0_10px_rgba(34,197,94,0.1)]">
             {submissions?.length || 0}
           </span>
@@ -79,9 +83,9 @@ export default async function GradingPage() {
             <div className="bg-black/50 w-20 h-20 rounded-full flex items-center justify-center mb-6 text-green-600 border border-white/5">
               <Inbox size={32} />
             </div>
-            <h3 className="text-xl font-serif text-white mb-2">¡Todo al día!</h3>
+            <h3 className="text-xl font-serif text-white mb-2">{gradingDict.emptyTitle}</h3>
             <p className="text-zinc-500 max-w-md mx-auto">
-              No hay tareas pendientes de revisión en este momento. Buen trabajo, instructor.
+              {gradingDict.emptyBody}
             </p>
           </div>
         ) : (
@@ -93,7 +97,7 @@ export default async function GradingPage() {
         )}
       </div>
       </div>
-      <DashboardFooter tagline="Panel de evaluación — Xclusive Barber Academy." />
+      <DashboardFooter tagline={gradingDict.footerTagline} />
     </>
   )
 }

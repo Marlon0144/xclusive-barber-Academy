@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import dynamic from 'next/dynamic'
 import { createClient } from '@/utils/supabase/client'
 import { getYouTubeID } from '@/utils/get-youtube-id' // La función que creamos en el paso 2
+import { useLanguage } from '@/components/i18n/LanguageProvider'
 
 // load the heavy YouTube iframe player only on the client once
 const YouTube = dynamic(() => import('react-youtube'), {
@@ -16,6 +17,8 @@ interface VideoPlayerProps {
 }
 
 export default function VideoPlayer({ url, lessonId }: VideoPlayerProps) {
+  const { dictionary } = useLanguage()
+  const videoDict = dictionary.dashboard.lesson.video
   const [isCompleted, setIsCompleted] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState(false)
@@ -76,7 +79,7 @@ const videoId = getYouTubeID(url) // Extraemos el ID limpio
   }
 
   if (!videoId) {
-    return <div className="p-10 bg-gray-900 text-gray-400 text-center rounded-xl">URL de video no válida</div>
+    return <div className="p-10 bg-gray-900 text-gray-400 text-center rounded-xl">{videoDict.invalidUrl}</div>
   }
 
   return (
@@ -84,7 +87,7 @@ const videoId = getYouTubeID(url) // Extraemos el ID limpio
       <div className="absolute top-0 left-0 w-full h-full">
         {error ? (
           <div className="flex h-full items-center justify-center text-red-400 bg-gray-900">
-            ❌ Video no disponible
+            ❌ {videoDict.unavailable}
           </div>
         ) : (
           <YouTube
@@ -108,7 +111,7 @@ const videoId = getYouTubeID(url) // Extraemos el ID limpio
         {isCompleted && (
           <div className="absolute top-4 right-4 z-20 animate-in fade-in zoom-in duration-500">
             <div className="bg-green-600/90 backdrop-blur-md text-white px-4 py-2 rounded-full shadow-lg flex items-center gap-2 font-bold text-sm border border-green-400/30">
-              <span>✓ Lección Completada</span>
+              <span>{videoDict.completed}</span>
             </div>
           </div>
         )}

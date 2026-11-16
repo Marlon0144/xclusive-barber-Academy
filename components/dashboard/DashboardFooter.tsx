@@ -1,18 +1,15 @@
 import React from 'react'
 import Image from 'next/image'
 import { TrackedLink } from '@/components/analytics/TrackedLink'
+import { getServerDictionary } from '@/lib/i18n/server'
 
 const INSTAGRAM_URL = 'https://www.instagram.com/xclusiveacademy_au?igsh=bms4MHQ4bzB4a3Jy'
 const INSTAGRAM_HANDLE = '@xclusiveacademy_au'
 const WHATSAPP_NUMBER = '61413891977'
 const WHATSAPP_LABEL = '+61 413 891 977'
-const WHATSAPP_MESSAGE = encodeURIComponent(
-  'Hola equipo de Xclusive Barber Academy, vengo desde la plataforma y quiero recibir ayuda.'
-)
-const WHATSAPP_URL = `https://wa.me/${WHATSAPP_NUMBER}?text=${WHATSAPP_MESSAGE}`
 
 interface DashboardFooterProps {
-  /** Optional tagline. Defaults to the standard academic tagline. */
+  /** Optional tagline. Defaults to the localized academic tagline. */
   tagline?: string
 }
 
@@ -25,9 +22,14 @@ interface DashboardFooterProps {
  *  - Fila logo + Instagram (izquierda) + Teléfono (derecha)
  *  - Divisor inferior con gradiente
  */
-export function DashboardFooter({
-  tagline = 'Plataforma oficial de desarrollo académico.',
-}: DashboardFooterProps) {
+export async function DashboardFooter({ tagline }: DashboardFooterProps) {
+  // REQ-FUNC-001: tagline, aria-labels y mensaje de WhatsApp localizados.
+  const dict = await getServerDictionary()
+  const footerDict = dict.dashboard.footer
+  const resolvedTagline = tagline ?? footerDict.defaultTagline
+  const WHATSAPP_MESSAGE = encodeURIComponent(footerDict.whatsappMessage)
+  const WHATSAPP_URL = `https://wa.me/${WHATSAPP_NUMBER}?text=${WHATSAPP_MESSAGE}`
+
   return (
     <>
       {/* ============================================================
@@ -37,7 +39,7 @@ export function DashboardFooter({
 
         {/* Tagline */}
         <p className="font-sans font-medium text-[11px] text-[#d3cbba] text-center tracking-[0.09em] mb-6">
-          {tagline}
+          {resolvedTagline}
         </p>
 
         {/* Logo + Social Row */}
@@ -50,7 +52,7 @@ export function DashboardFooter({
             external
             target="_blank"
             rel="noopener noreferrer"
-            aria-label="Abrir Instagram de Xclusive Barber Academy"
+            aria-label={footerDict.instagramAria}
             className="absolute left-0 flex items-center gap-2 opacity-90 transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#d3cbba]/70 rounded-sm"
           >
             <div className="w-[26px] h-[26px] opacity-70">
@@ -81,7 +83,7 @@ export function DashboardFooter({
             external
             target="_blank"
             rel="noopener noreferrer"
-            aria-label="Abrir chat de WhatsApp con el equipo de Xclusive"
+            aria-label={footerDict.whatsappAria}
             className="absolute right-0 flex items-center gap-1.5 opacity-90 transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#d3cbba]/70 rounded-sm"
           >
             <div className="w-[14px] h-[15px] opacity-70">
@@ -118,7 +120,7 @@ export function DashboardFooter({
                      text-[11px] lg:text-xs xl:text-sm
                      tracking-[0.09em] mb-6 lg:mb-8 xl:mb-10"
         >
-          {tagline}
+          {resolvedTagline}
         </p>
 
         {/* Logo + Social Row */}
@@ -133,7 +135,7 @@ export function DashboardFooter({
             external
             target="_blank"
             rel="noopener noreferrer"
-            aria-label="Abrir Instagram de Xclusive Barber Academy"
+            aria-label={footerDict.instagramAria}
             className="absolute left-0 flex items-center gap-2 lg:gap-3 opacity-90 transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#d3cbba]/70 rounded-sm"
           >
             <div className="opacity-70 w-[28px] h-[28px] lg:w-[32px] lg:h-[32px] xl:w-[36px] xl:h-[36px]">
@@ -167,7 +169,7 @@ export function DashboardFooter({
             external
             target="_blank"
             rel="noopener noreferrer"
-            aria-label="Abrir chat de WhatsApp con el equipo de Xclusive"
+            aria-label={footerDict.whatsappAria}
             className="absolute right-0 flex items-center gap-1.5 lg:gap-2 opacity-90 transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#d3cbba]/70 rounded-sm"
           >
             <div className="opacity-70 w-[18px] h-[19px] lg:w-[22px] lg:h-[23px] xl:w-[26px] xl:h-[27px]">

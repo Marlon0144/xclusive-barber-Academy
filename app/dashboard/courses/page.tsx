@@ -1,9 +1,14 @@
 import { createClient } from '@/utils/supabase/server'
 import CourseListView from '@/components/dashboard/courses/CourseListView'
 import DashboardPageHeader from '@/components/headers/DashboardPageHeader'
+import { getServerDictionary } from '@/lib/i18n/server'
 
 export default async function CoursesIndexPage() {
   const supabase = await createClient()
+
+  // REQ-FUNC-002: título del header localizado.
+  const dict = await getServerDictionary()
+  const coursesIndex = dict.dashboard.coursesIndex
 
   // 1. Obtenemos los módulos ordenados
   const { data: modules } = await supabase
@@ -31,7 +36,7 @@ export default async function CoursesIndexPage() {
 
   return (
     <>
-      <DashboardPageHeader title="Módulos" bgColor="#161616" />
+      <DashboardPageHeader title={coursesIndex.headerTitle} bgColor="#161616" />
       <CourseListView 
         modules={modules || []} 
         firstLessonMap={firstLessonMap} 

@@ -7,6 +7,9 @@ import VideoPlayer from '@/components/courses/VideoPlayer'
 import { cn } from '@/lib/utils'
 import DashboardPageHeader from '@/components/headers/DashboardPageHeader'
 import { DashboardFooter } from '@/components/dashboard/DashboardFooter'
+import { getServerDictionary, getServerLanguage } from '@/lib/i18n/server'
+import { interpolate } from '@/lib/i18n/dictionaries'
+import { pick } from '@/lib/i18n/localize'
 
 interface LessonPageProps {
   params: Promise<{
@@ -30,10 +33,16 @@ export default async function LessonPage({ params }: LessonPageProps) {
   const userPromise = getUser()
   const lessonPromise = getLessonById(lessonId)
 
-  const [supabase, user, lessonResult] = await Promise.all([
+  // REQ-FUNC-003: diccionario + idioma para localizar la carcasa y el contenido.
+  const dictionaryPromise = getServerDictionary()
+  const languagePromise = getServerLanguage()
+
+  const [supabase, user, lessonResult, dictionary, language] = await Promise.all([
     supabasePromise,
     userPromise,
     lessonPromise,
+    dictionaryPromise,
+    languagePromise,
   ])
 
   if (!user) redirect('/login')
@@ -44,16 +53,18 @@ export default async function LessonPage({ params }: LessonPageProps) {
     return notFound()
   }
 
-  // Fetch navigation lessons + module info in parallel
+  const lessonDict = dictionary.dashboard.lesson
+
+  // Fetch navigation lessons + module info in parallel (REQ-INT-003: con `_en`)
   const [{ data: allLessons }, { data: moduleData }] = await Promise.all([
     supabase
       .from('lessons')
-      .select('id, title, position')
+      .select('id, title, title_en, position')
       .eq('module_id', lesson.module_id)
       .order('position', { ascending: true }),
     supabase
       .from('modules')
-      .select('title, position')
+      .select('title, title_en, description, description_en, position')
       .eq('id', lesson.module_id)
       .single(),
   ])
@@ -62,7 +73,14 @@ export default async function LessonPage({ params }: LessonPageProps) {
   const currentLessonIndex = lessons.findIndex((l) => l.id === lessonId)
   const prevLesson = lessons[currentLessonIndex - 1]
   const nextLesson = lessons[currentLessonIndex + 1]
-  const moduleTitle = moduleData?.title ?? 'FUNDAMENTOS TÉCNICOS'
+  const moduleTitle = pick(language, {
+    es: moduleData?.title ?? '',
+    en: moduleData?.title_en ?? null,
+  })
+  const moduleDescription = pick(language, {
+    es: moduleData?.description ?? '',
+    en: moduleData?.description_en ?? null,
+  })
   const moduleNumber = moduleData?.position ?? 1
 
   // ── Asset paths (all from /assets/dashboard/courses/lessons/) ────────────────
@@ -78,7 +96,7 @@ export default async function LessonPage({ params }: LessonPageProps) {
     <div className="min-h-screen bg-[#161616] text-[#D3CBBA] font-sans overflow-x-hidden">
 
       {/* ── STICKY HEADER ────────────────────────────────────────────────────── */}
-      <DashboardPageHeader title="LECCIONES" />
+      <DashboardPageHeader title={lessonDict.lessons} />
 
       {/* ── BACK ARROW ROW ───────────────────────────────────────────────────── */}
       {/* Positioned below header, left-aligned, mirroring Figma top-87 placement */}
@@ -88,7 +106,7 @@ export default async function LessonPage({ params }: LessonPageProps) {
           className="inline-flex items-start"
         >
           <div className="w-[29.6px] md:w-[36px] h-[9.2px] md:h-[11px] relative">
-            <Image src={A.backRow} alt="Volver" fill className="object-contain" />
+            <Image src={A.backRow} alt={lessonDict.back} fill className="object-contain" />
           </div>
         </Link>
       </div>
@@ -113,7 +131,7 @@ export default async function LessonPage({ params }: LessonPageProps) {
             className="text-[#D3CBBA] text-[11px] md:text-[13px] lg:text-[15px] font-extralight text-center uppercase leading-normal px-2"
             style={{ letterSpacing: '0.99px' }}
           >
-            FORMACIÓN PROFESIONAL EN BARBERÍA
+            {dictionary.dashboard.coursesIndex.bannerSubtitle}
           </p>
         </div>
       </section>
@@ -131,7 +149,7 @@ export default async function LessonPage({ params }: LessonPageProps) {
           className="text-[#D3CBBA] text-[8px] md:text-[11px] lg:text-[13px] font-extralight uppercase leading-normal"
           style={{ letterSpacing: '0.72px' }}
         >
-          MÓDULO {moduleNumber}
+          {interpolate(lessonDict.module, { n: moduleNumber })}
         </p>
 
         <h2 className="text-[#D3CBBA] text-[17px] md:text-[24px] lg:text-[30px] font-extrabold uppercase leading-normal mt-2 tracking-tight">
@@ -145,7 +163,7 @@ export default async function LessonPage({ params }: LessonPageProps) {
         />
 
         <p className="text-[#D3CBBA] text-[6px] md:text-[10px] lg:text-[12px] font-light text-center leading-[1.3] mt-2 w-[336px] md:w-[500px] lg:w-[600px] max-w-full opacity-70">
-          Bases esenciales de técnica, herramientas y precisión profesional.
+          {moduleDescription}
         </p>
       </div>
 
@@ -192,7 +210,7 @@ export default async function LessonPage({ params }: LessonPageProps) {
           className="text-[#D3CBBA] text-[8px] md:text-[11px] lg:text-[13px] font-extralight text-center uppercase leading-normal mt-2"
           style={{ letterSpacing: '2.4px' }}
         >
-          LECCIONES
+          {lessonDict.lessons}
         </p>
       </div>
 
@@ -209,14 +227,20 @@ export default async function LessonPage({ params }: LessonPageProps) {
         <h1
           className="text-[#D3CBBA] text-[24px] md:text-[32px] lg:text-[40px] font-extrabold text-center uppercase leading-normal w-full"
         >
-          {lesson.title.toUpperCase()}
+          {pick(language, {
+            es: lesson.title,
+            en: lesson.title_en ?? null,
+          }).toUpperCase()}
         </h1>
 
         {/* Micro label (left) + Subtitle (right) on same row */}
         <div className="flex items-start justify-between mt-2">
           {lesson.description && (
             <span className="text-[#D3CBBA] text-[13px] md:text-[16px] lg:text-[18px] font-medium text-right leading-normal uppercase">
-              {lesson.description}
+              {pick(language, {
+                es: lesson.description,
+                en: lesson.description_en ?? null,
+              })}
             </span>
           )}
         </div>
@@ -256,10 +280,10 @@ export default async function LessonPage({ params }: LessonPageProps) {
         {/* Below-video captions */}
         <div className="w-[343px] md:w-[540px] lg:w-[680px] max-w-full flex justify-between mt-[3px] px-0">
           <p className="text-[#D3CBBA] text-[5px] md:text-[8px] lg:text-[10px] font-light italic leading-[1.3]">
-            Micro texto Opcional
+            {lessonDict.microOptional}
           </p>
           <p className="text-[#D3CBBA] text-[5px] md:text-[8px] lg:text-[10px] font-extralight leading-[1.3]">
-            Unidad Audiovisual
+            {lessonDict.audiovisualUnit}
           </p>
         </div>
       </div>
@@ -275,7 +299,7 @@ export default async function LessonPage({ params }: LessonPageProps) {
           {lesson.content ? (
             <div dangerouslySetInnerHTML={{ __html: lesson.content }} />
           ) : (
-            <p>Sin descripción disponible.</p>
+            <p>{lessonDict.noDescription}</p>
           )}
         </div>
       </div>
@@ -288,7 +312,7 @@ export default async function LessonPage({ params }: LessonPageProps) {
       */}
       <div className="w-full max-w-[402px] md:max-w-[650px] lg:max-w-[800px] mx-auto mt-10 md:mt-14 px-[30px] md:px-10">
         <p className="text-[#D3CBBA] text-[7px] md:text-[10px] lg:text-[12px] font-extralight text-right leading-[1.3] tracking-wide mb-2">
-          Referencias Visuales
+          {lessonDict.visualReferences}
         </p>
         <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-[5px] md:gap-3 lg:gap-4">
           {Array.from({ length: 9 }).map((_, i) => (
@@ -323,7 +347,7 @@ export default async function LessonPage({ params }: LessonPageProps) {
             {prevLesson ? (
               <Link href={`/dashboard/courses/${courseId}/${prevLesson.id}`}>
                 <div className="w-[29px] md:w-[36px] h-[9px] md:h-[11px] relative">
-                  <Image src={A.backRow} alt="Lección anterior" fill className="object-contain" />
+                  <Image src={A.backRow} alt={lessonDict.previousLesson} fill className="object-contain" />
                 </div>
               </Link>
             ) : (
@@ -338,7 +362,7 @@ export default async function LessonPage({ params }: LessonPageProps) {
                 className="text-[#D3CBBA] text-[8px] md:text-[12px] lg:text-[14px] font-semibold uppercase text-right leading-[20px]"
                 style={{ letterSpacing: '0.48px' }}
               >
-                SIGUIENTE LECCIÓN
+                {lessonDict.nextLesson}
               </span>
             </Link>
           ) : (
@@ -364,7 +388,7 @@ export default async function LessonPage({ params }: LessonPageProps) {
                 className="text-[#D3CBBA] text-[8px] md:text-[12px] lg:text-[14px] font-semibold uppercase leading-[20px]"
                 style={{ letterSpacing: '0.48px' }}
               >
-                LECCIÓN ANTERIOR
+                {lessonDict.previousLesson}
               </span>
             </Link>
           ) : (
@@ -376,12 +400,12 @@ export default async function LessonPage({ params }: LessonPageProps) {
             {nextLesson ? (
               <Link href={`/dashboard/courses/${courseId}/${nextLesson.id}`}>
                 <div className="w-[29.6px] md:w-[36px] h-[9.2px] md:h-[11px] relative">
-                  <Image src={A.nextRow} alt="Siguiente lección" fill className="object-contain" />
+                  <Image src={A.nextRow} alt={lessonDict.nextLesson} fill className="object-contain" />
                 </div>
               </Link>
             ) : (
               <span className="text-[#D3CBBA] text-[8px] md:text-[12px] lg:text-[14px] font-extralight uppercase tracking-widest opacity-40">
-                Fin del módulo
+                {lessonDict.endOfModule}
               </span>
             )}
           </div>

@@ -50,6 +50,14 @@ export type ProfessionalLevelKey =
   | 'avanzado'
   | 'profesional'
 
+/** Todas las claves de nivel profesional en orden canónico ascendente */
+export const PROFESSIONAL_LEVEL_KEYS: ProfessionalLevelKey[] = [
+  'talento',
+  'tecnico',
+  'avanzado',
+  'profesional',
+]
+
 export interface ProfessionalLevel {
   key: ProfessionalLevelKey
   label: string

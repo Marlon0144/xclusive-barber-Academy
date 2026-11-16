@@ -6,8 +6,12 @@ import { submitGrade } from './actions'
 import { Loader2, Save, Star } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { Submission } from '@/types/submissions'
+import { useLanguage } from '@/components/i18n/LanguageProvider'
 
 export default function GradingCard({ submission }: { submission: Submission }) {
+  const { dictionary } = useLanguage()
+  const gradingDict = dictionary.dashboard.grading
+  const criteriaLabels: Record<string, string> = gradingDict.criteria
   const [loading, setLoading] = useState(false)
   const [scores, setScores] = useState({
     fade: 5,
@@ -21,7 +25,7 @@ export default function GradingCard({ submission }: { submission: Submission }) 
     try {
       await submitGrade(submission.id, scores)
     } catch {
-      alert('Error al calificar')
+      alert(gradingDict.errorSaving)
       setLoading(false)
     }
   }
@@ -30,18 +34,18 @@ export default function GradingCard({ submission }: { submission: Submission }) 
     <div className="bg-surface border border-white/5 rounded-sm overflow-hidden flex flex-col md:flex-row group hover:border-green-500/30 transition-all duration-300 shadow-lg">
       {/* 1. La Foto del Estudiante */}
       <div className="md:w-1/2 relative min-h-[300px] md:h-auto overflow-hidden">
-        <Image src={submission.image_url} alt="Corte del estudiante" fill className="object-cover transition-transform duration-700 group-hover:scale-105" />
+        <Image src={submission.image_url} alt={gradingDict.photoAlt} fill className="object-cover transition-transform duration-700 group-hover:scale-105" />
         <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent"></div>
 
         <div className="absolute bottom-0 left-0 p-6 w-full">
           <div className="flex items-center gap-2 mb-2">
             <span className="bg-green-900/80 text-green-400 text-[10px] font-bold px-2 py-1 rounded backdrop-blur-md border border-green-500/20 uppercase tracking-wider">
-              Estudiante
+              {gradingDict.studentBadge}
             </span>
           </div>
           <p className="font-serif text-2xl text-white mb-2">{submission.cut_type}</p>
           <p className="text-sm text-zinc-300 font-light leading-relaxed bg-black/40 p-3 rounded backdrop-blur-sm border border-white/5">
-            {submission.description || "Sin descripción proporcionada."}
+            {submission.description || gradingDict.noDescription}
           </p>
         </div>
       </div>
@@ -51,16 +55,16 @@ export default function GradingCard({ submission }: { submission: Submission }) 
         <div className="flex items-center justify-between border-b border-white/10 pb-4">
           <h3 className="font-serif text-white text-lg flex items-center gap-2">
             <Star className="w-4 h-4 text-gold-500" />
-            Evaluación Técnica
+            {gradingDict.technicalEvaluation}
           </h3>
-          <span className="text-xs text-zinc-500 uppercase tracking-widest">Escala 1-10</span>
+          <span className="text-xs text-zinc-500 uppercase tracking-widest">{gradingDict.scale}</span>
         </div>
 
         <div className="space-y-5">
           {['fade', 'cleanliness', 'technique', 'symmetry'].map((criteria) => (
             <div key={criteria} className="space-y-2">
               <div className="flex justify-between text-xs uppercase tracking-wider font-bold">
-                <span className="text-zinc-400">{criteria}</span>
+                <span className="text-zinc-400">{criteriaLabels[criteria] ?? criteria}</span>
                 <span className="text-gold-500 bg-gold-500/10 px-2 rounded">{scores[criteria as keyof typeof scores]}/10</span>
               </div>
               <input
@@ -81,7 +85,7 @@ export default function GradingCard({ submission }: { submission: Submission }) 
             className="w-full font-bold tracking-widest bg-green-600 hover:bg-green-700 text-white border-none shadow-[0_0_15px_rgba(22,163,74,0.2)] md:h-12"
           >
             {loading ? <Loader2 className="animate-spin mr-2" size={18} /> : <Save className="mr-2" size={18} />}
-            {loading ? 'GUARDANDO...' : 'CALIFICAR ENTREGA'}
+            {loading ? gradingDict.saving : gradingDict.save}
           </Button>
         </div>
       </div>

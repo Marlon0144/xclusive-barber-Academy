@@ -25,6 +25,8 @@ import { cn } from '@/lib/utils'
 import { Submission } from '@/types/submissions'
 import FeedbackModal from './FeedbackModal'
 import { deleteSubmission } from './actions'
+import { useLanguage } from '@/components/i18n/LanguageProvider'
+import { interpolate } from '@/lib/i18n/dictionaries'
 
 interface SubmissionCardProps {
   submission: Submission
@@ -34,6 +36,8 @@ interface SubmissionCardProps {
 }
 
 export function SubmissionCard({ submission, index, total, onDelete }: SubmissionCardProps) {
+  const { dictionary } = useLanguage()
+  const cardDict = dictionary.dashboard.tracker.card
   const isReviewed = submission.status === 'reviewed'
   const practiceNumber = total - index
 
@@ -70,7 +74,7 @@ export function SubmissionCard({ submission, index, total, onDelete }: Submissio
         <button
           onClick={handleDelete}
           disabled={isPending}
-          aria-label="Eliminar práctica"
+          aria-label={cardDict.deleteAria}
           className="absolute top-4 right-7 z-30 w-5 h-5 flex items-center justify-center rounded-full bg-black/40 text-white/60 hover:bg-red-700/80 hover:text-white transition-all duration-200 text-[11px] font-bold leading-none"
         >
           {isPending ? (
@@ -99,7 +103,10 @@ export function SubmissionCard({ submission, index, total, onDelete }: Submissio
           {submission.image_url ? (
             <Image
               src={submission.image_url}
-              alt={`Práctica ${practiceNumber} – ${submission.cut_type}`}
+              alt={interpolate(cardDict.photoAlt, {
+                n: practiceNumber,
+                cutType: submission.cut_type ?? '',
+              })}
               fill
               className="object-cover"
               sizes="(min-width: 1024px) 130px, (min-width: 768px) 110px, 81px"
@@ -107,7 +114,7 @@ export function SubmissionCard({ submission, index, total, onDelete }: Submissio
           ) : (
             <div className="w-full h-full bg-[#2A2A2A] flex items-center justify-center">
               <span className="text-white/20 text-[9px] uppercase tracking-wider text-center leading-tight px-1">
-                Sin foto
+                {cardDict.noPhoto}
               </span>
             </div>
           )}
@@ -123,14 +130,14 @@ export function SubmissionCard({ submission, index, total, onDelete }: Submissio
           <span
             className="font-extralight text-[10px] md:text-xs uppercase leading-normal tracking-[0.9px] text-[#1E3A27]"
           >
-            PRÁCTICA {practiceNumber}
+            {interpolate(cardDict.practice, { n: practiceNumber })}
           </span>
 
           {/* Título principal — ExtraBold 17px */}
           <h3
             className="font-extrabold text-[17px] md:text-xl lg:text-2xl uppercase leading-tight mt-0.5 text-[#1E3A27]"
           >
-            TÉCNICA IMPLEMENTADA
+            {cardDict.techniqueImplemented}
           </h3>
 
           {/* Subtítulo — tipo de corte (bold pequeño para no perder el dato) */}
@@ -162,7 +169,7 @@ export function SubmissionCard({ submission, index, total, onDelete }: Submissio
           <span
             className="font-extrabold text-[8px] md:text-[10px] uppercase text-center tracking-[0.06em] text-[#1E3A27]"
           >
-            {isReviewed ? 'RETROALIMENTACIÓN' : 'EN PROCESO DE REVISIÓN'}
+            {isReviewed ? cardDict.feedback : cardDict.inReview}
           </span>
 
         </button>

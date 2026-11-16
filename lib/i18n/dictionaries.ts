@@ -392,6 +392,10 @@ export const dictionaries = {
       },
       adminCourses: {
         createModuleError: 'No se pudo crear el módulo.',
+        createLessonError: 'No se pudo crear la lección.',
+        updateModuleTitleError: 'No se pudo actualizar el módulo.',
+        updateLessonTitleError: 'No se pudo actualizar la lección.',
+        updateModuleCompetencyError: 'No se pudo actualizar la competencia.',
         reorderInvalidData: 'Datos inválidos para reordenar lecciones.',
         reorderDuplicate: 'Hay lecciones duplicadas en el nuevo orden.',
         reorderMismatch: 'El orden recibido no coincide con el módulo seleccionado.',
@@ -412,6 +416,311 @@ export const dictionaries = {
         fallbackShort: 'Sigue practicando, buen trabajo.',
         fallbackDetailed:
           'Excelente esfuerzo. Revisa los detalles de simetría y limpieza para la próxima.',
+      },
+    },
+
+    // ─── Dashboard (UI chrome) ──────────────────────────────────────────────
+    dashboard: {
+      hub: {
+        trainingProgram: {
+          title: 'Programa de Formación',
+          description:
+            'Completa los módulos teóricos y prácticos del programa de barbería, paso a paso.',
+        },
+        tracking: {
+          title: 'Seguimiento y Evaluación',
+          description:
+            'Envía tus prácticas y recibe evaluación y feedback de tus instructores.',
+        },
+        progress: {
+          title: 'Progreso Profesional',
+          description:
+            'Revisa tu dominio de las cuatro competencias centrales de la profesión.',
+        },
+        academy: {
+          title: 'La Academia',
+          description:
+            'Descubre Xclusive Barber Academy, sus valores y la comunidad detrás del proyecto.',
+        },
+        adminPanel: 'Panel de Gestión',
+      },
+      coursesList: {
+        heading: 'PROGRAMA DE FORMACIÓN',
+        subtitle: 'Avanza a través de los módulos de tu formación profesional.',
+        module: 'MÓDULO {{n}}',
+        status: 'ESTADO:',
+        inProgress: 'En progreso',
+        locked: 'Bloqueado',
+        empty: 'No hay módulos disponibles aún.',
+        descriptionFallback: 'Contenido esencial para tu formación.',
+        cta: 'PONER EN PRÁCTICA MI FORMACIÓN',
+      },
+      lesson: {
+        lessons: 'LECCIONES',
+        module: 'MÓDULO {{n}}',
+        microOptional: 'Micro texto Opcional',
+        audiovisualUnit: 'Unidad Audiovisual',
+        noDescription: 'Sin descripción disponible.',
+        visualReferences: 'Referencias Visuales',
+        nextLesson: 'SIGUIENTE LECCIÓN',
+        previousLesson: 'LECCIÓN ANTERIOR',
+        endOfModule: 'Fin del módulo',
+        back: 'Volver',
+        sidebar: {
+          backToCourses: 'Volver a Cursos',
+          moduleContent: 'Contenido del Módulo',
+          yourProgress: 'Tu progreso',
+          loading: 'Cargando...',
+        },
+        video: {
+          invalidUrl: 'URL de video no válida',
+          unavailable: 'Video no disponible',
+          completed: '✓ Lección Completada',
+        },
+      },
+      progress: {
+        statuses: {
+          completed: 'Completado',
+          competent: 'Competente',
+          inProgress: 'En Progreso',
+          notStarted: 'Sin Iniciar',
+        },
+        nextLevel: 'PRÓXIMO NIVEL',
+        requires: 'REQUIERE',
+        remaining: 'FALTAN',
+        nextLevelLabel: 'PRÓXIMO NIVEL:',
+        requiresModules: 'REQUIERE: {{required}} DE {{total}} MÓDULOS COMPLETADOS',
+        missingModules: 'FALTAN: {{remaining}} {{moduleWord}}',
+        moduleWordSingular: 'MÓDULO',
+        moduleWordPlural: 'MÓDULOS',
+        student: 'Estudiante',
+        email: 'Correo',
+        startDate: 'Fecha de Inicio',
+        currentStatus: 'Estado Actual',
+        studentActive: 'Activo',
+        backToDashboard: 'Volver al Dashboard',
+        heroTitle: 'PROGRESO\nPROFESIONAL',
+        photoAlt: 'Foto del estudiante',
+        avanceAlt: 'Avance Profesional',
+        heroSubtitle:
+          'Seguimiento de tu desarrollo dentro del programa formativo.',
+        competencyDevelopment: 'DESARROLLO DE\nCOMPETENCIAS',
+        metricGeneral: 'Progreso\nGeneral',
+        metricModules: 'Módulos\nCompletados',
+        metricPractices: 'Prácticas\nEnviadas',
+        of: 'DE',
+        ctaTitle: '¡ESTÁS AVANZANDO CON CONSISTENCIA!',
+        ctaBodyLine1: 'Mantén el ritmo para alcanzar',
+        ctaBodyLine2: 'tu máximo potencial.',
+        ctaButton: '¡SIGUE APRENDIENDO!',
+      },
+      competencyLabels: {
+        desarrollo_tecnico: 'Desarrollo Técnico',
+        aplicacion_estandares: 'Aplicación de Estándares',
+        atencion_cliente: 'Atención al Cliente',
+        mentalidad_profesional: 'Mentalidad Profesional',
+      },
+      professionalLevels: {
+        talento: { label: 'Talento en Formación', subtitle: 'Comenzando el camino' },
+        tecnico: { label: 'Técnico en Desarrollo', subtitle: 'Construyendo habilidades' },
+        avanzado: { label: 'Barbero Avanzado', subtitle: 'Dominando el oficio' },
+        profesional: { label: 'Profesional Xclusive', subtitle: 'Excelencia alcanzada' },
+      },
+      header: {
+        tagline: 'Tu proceso de formación comienza aquí',
+        title: 'Área Académica',
+        description:
+          'Espacio oficial de formación y seguimiento profesional dentro de la academia.',
+      },
+      footer: {
+        defaultTagline: 'Plataforma oficial de desarrollo académico.',
+        instagramAria: 'Abrir Instagram de Xclusive Barber Academy',
+        whatsappAria: 'Abrir chat de WhatsApp con el equipo de Xclusive',
+        whatsappMessage:
+          'Hola equipo de Xclusive Barber Academy, vengo desde la plataforma y quiero recibir ayuda.',
+      },
+      coursesIndex: {
+        headerTitle: 'Módulos',
+        bannerSubtitle: 'FORMACIÓN PROFESIONAL EN BARBERÍA',
+      },
+      adminMenu: {
+        panel: 'Panel de Gestión',
+        roleBadgeAdmin: 'Admin',
+        roleBadgeInstructor: 'Instructor',
+        gradeStudents: {
+          title: 'Evaluar Estudiantes',
+          description:
+            'Revisar entregas, calificar cortes y proporcionar retroalimentación técnica.',
+        },
+        manageCourses: {
+          title: 'Gestión de Cursos',
+          description:
+            'Administrar catálogo, editar lecciones y configurar módulos de aprendizaje.',
+        },
+        manageUsers: {
+          title: 'Gestión de Usuarios',
+          description:
+            'Crear codigos de acceso de un solo uso y administrar roles de usuarios.',
+        },
+        manageLeads: {
+          title: 'Gestión de Leads',
+          description:
+            'Revisar score automatico, gestionar etapas CRM y dar seguimiento comercial.',
+        },
+      },
+      tracker: {
+        headerTitle: 'Evolución Profesional',
+        backAria: 'Volver',
+        backAlt: 'Volver',
+        bannerSubtitle: 'Formación Profesional en Barbería',
+        title: 'SEGUIMIENTO Y EVALUACIÓN',
+        description:
+          'Revisa observaciones, evaluaciones y retroalimentación profesional sobre tu desempeño y evolución dentro del programa.',
+        subtitle:
+          'ENVÍA TU PRÁCTICA, RECIBE EVALUACIÓN PROFESIONAL Y ELEVA TU ESTÁNDAR TÉCNICO',
+        sectionTitle: 'PRÁCTICAS ENVIADAS',
+        sectionSubtitle: 'Seguimiento de envíos y estado de revisión.',
+        empty: 'No hay prácticas registradas',
+        form: {
+          title: 'ENTREGA DE EVIDENCIA',
+          subtitle: 'REGISTRO VISUAL',
+          uploadAlt: 'Subir corte',
+          newCut: 'NUEVO CORTE',
+          uploadButton: 'Subir archivo',
+          selectCut: 'Selecciona Tipo de Corte',
+          techniqueHeader: 'TÉCNICA IMPLEMENTADA',
+          notesHeader: 'NOTAS TÉCNICAS',
+          notesPlaceholder:
+            'Describe brevemente el proceso realizado, herramientas utilizadas y consideraciones profesionales aplicadas...',
+          submitting: 'ENVIANDO...',
+          submit: 'PRESENTAR PARA EVALUACIÓN',
+          errorEmptyFile: 'El archivo está vacío',
+          errorTooLarge: 'El archivo supera el límite de {{sizeMb}} MB',
+          errorMime:
+            'Tipo de archivo no permitido ({{mimeType}}). Solo imágenes.',
+          errorExtension:
+            'Extensión no permitida (.{{ext}}). Solo imágenes.',
+          errorUpload: 'Error al subir la práctica',
+          cutTypes: {
+            lowFade: 'Low Fade',
+            midFade: 'Mid Fade',
+            highFade: 'High Fade',
+            taperFade: 'Taper Fade',
+            buzzCut: 'Buzz Cut',
+            scissorCut: 'Corte a Tijera',
+          },
+        },
+        card: {
+          practice: 'PRÁCTICA {{n}}',
+          techniqueImplemented: 'TÉCNICA IMPLEMENTADA',
+          noPhoto: 'Sin foto',
+          feedback: 'RETROALIMENTACIÓN',
+          inReview: 'EN PROCESO DE REVISIÓN',
+          deleteAria: 'Eliminar práctica',
+          photoAlt: 'Práctica {{n}} – {{cutType}}',
+        },
+        feedbackModal: {
+          heading: 'PROFE JULIÁN',
+          noFeedback: 'Sin retroalimentación disponible.',
+          scores: 'PUNTUACIONES',
+          fade: 'Fade / Desvanecido',
+          cleanliness: 'Limpieza',
+          technique: 'Técnica',
+          symmetry: 'Simetría',
+        },
+      },
+      grading: {
+        headerTitle: 'Evaluación',
+        restrictedTitle: 'Acceso Restringido',
+        restrictedBody:
+          'Esta zona está reservada exclusivamente para instructores y personal administrativo.',
+        backToDashboard: 'Volver al Dashboard',
+        instructorPanel: 'Panel de Instructor',
+        pageTitle: 'Evaluación de Prácticas',
+        pageDescription:
+          'Revisa, califica y guía a los estudiantes hacia la perfección técnica.',
+        pendingLabel: 'Pendientes:',
+        emptyTitle: '¡Todo al día!',
+        emptyBody:
+          'No hay tareas pendientes de revisión en este momento. Buen trabajo, instructor.',
+        footerTagline: 'Panel de evaluación — Xclusive Barber Academy.',
+        photoAlt: 'Corte del estudiante',
+        studentBadge: 'Estudiante',
+        noDescription: 'Sin descripción proporcionada.',
+        technicalEvaluation: 'Evaluación Técnica',
+        scale: 'Escala 1-10',
+        criteria: {
+          fade: 'Fade',
+          cleanliness: 'Limpieza',
+          technique: 'Técnica',
+          symmetry: 'Simetría',
+        },
+        saving: 'GUARDANDO...',
+        save: 'CALIFICAR ENTREGA',
+        errorSaving: 'Error al calificar',
+      },
+      admin: {
+        headerTitle: 'Administración',
+        panelLabel: 'Panel de Administración',
+        courseManagement: 'Gestión del Curso',
+        courseManagementDescription:
+          'Estructura el contenido de la academia. Crea módulos, organiza lecciones y mantén el plan de estudios actualizado.',
+        createModule: 'CREAR MÓDULO',
+        moduleNumber: 'Módulo 0{{n}}',
+        lessonsCount: '{{n}} lecciones',
+        noCompetency: 'Sin competencia',
+        lessonNumber: 'Lección 0{{n}}',
+        edit: 'Editar',
+        deleteModuleTitle: 'Eliminar Módulo',
+        deleteLessonTitle: 'Borrar Lección',
+        addLesson: 'Agregar lección',
+        emptyModule: 'Este módulo está vacío.',
+        emptyCourse: 'Curso vacío',
+        emptyCourseBody:
+          'Aún no has creado ningún módulo. Comienza tu plan de estudios ahora.',
+        renameTitle: 'Renombrar',
+        titleEnPlaceholder: 'Título EN',
+        loadError: 'Error cargando el curso. Revisa la consola del servidor.',
+        prompts: {
+          newModule: 'Nombre del nuevo Módulo (Ej: Corte Clásico):',
+          deleteModuleConfirm:
+            '¿Estás seguro de borrar este módulo y todas sus lecciones?',
+          newLesson: 'Título de la Lección:',
+          deleteLessonConfirm: '¿Borrar esta lección permanentemente?',
+          newModuleEn: 'Título del Módulo en inglés (opcional):',
+          newLessonEn: 'Título de la Lección en inglés (opcional):',
+        },
+        editLesson: {
+          editorMode: 'Modo Editor',
+          saving: 'GUARDANDO...',
+          save: 'GUARDAR',
+          saved: '¡Guardado correctamente!',
+          writtenContent: 'Contenido Escrito',
+          videoConfig: 'Configuración de Video',
+          noVideo: 'Sin video asignado',
+          youtubeLabel: 'Enlace de YouTube',
+          youtubePlaceholder: 'https://youtube.com/watch?v=...',
+          youtubeHelper:
+            'Pega la URL completa del video. Se extraerá el ID automáticamente.',
+          contentStatus: 'Estado del contenido:',
+          active: 'Activo',
+          titleEnSection: 'Traducción al inglés',
+          titleEnHelper:
+            'Título de la lección en inglés (opcional). El contenido HTML no se traduce.',
+          errorTitle: 'Error: ',
+        },
+      },
+      adminToolbar: {
+        bold: 'Negrita',
+        italic: 'Cursiva',
+        h1: 'H1',
+        h2: 'H2',
+        list: 'Lista',
+        listNumbered: 'Lista #',
+        insertImage: 'Insertar Imagen',
+        insertYoutube: 'Insertar Video YouTube',
+        youtubePrompt: 'Ingresa la URL del video de YouTube:',
+        youtubeInvalid: 'Por favor ingresa una URL válida de YouTube',
       },
     },
   },
@@ -802,6 +1111,10 @@ export const dictionaries = {
       },
       adminCourses: {
         createModuleError: 'Failed to create module.',
+        createLessonError: 'Failed to create lesson.',
+        updateModuleTitleError: 'Failed to update module.',
+        updateLessonTitleError: 'Failed to update lesson.',
+        updateModuleCompetencyError: 'Failed to update competency.',
         reorderInvalidData: 'Invalid data to reorder lessons.',
         reorderDuplicate: 'There are duplicate lessons in the new order.',
         reorderMismatch: 'The received order does not match the selected module.',
@@ -824,10 +1137,337 @@ export const dictionaries = {
           'Great effort. Review symmetry and cleanliness details for your next submission.',
       },
     },
+
+    // ─── Dashboard (UI chrome) ──────────────────────────────────────────────
+    dashboard: {
+      hub: {
+        trainingProgram: {
+          title: 'Training Program',
+          description:
+            'Complete the theoretical and practical modules of the barbering program, step by step.',
+        },
+        tracking: {
+          title: 'Tracking & Evaluation',
+          description:
+            'Submit your practices and receive evaluation and feedback from your instructors.',
+        },
+        progress: {
+          title: 'Professional Progress',
+          description:
+            'Check your mastery of the four core competencies of the profession.',
+        },
+        academy: {
+          title: 'The Academy',
+          description:
+            'Discover Xclusive Barber Academy, its values and the community behind the project.',
+        },
+        adminPanel: 'Management Panel',
+      },
+      coursesList: {
+        heading: 'TRAINING PROGRAM',
+        subtitle: 'Advance through the modules of your professional training.',
+        module: 'MODULE {{n}}',
+        status: 'STATUS:',
+        inProgress: 'In progress',
+        locked: 'Locked',
+        empty: 'No modules available yet.',
+        descriptionFallback: 'Essential content for your training.',
+        cta: 'PUT MY TRAINING INTO PRACTICE',
+      },
+      lesson: {
+        lessons: 'LESSONS',
+        module: 'MODULE {{n}}',
+        microOptional: 'Optional Microtext',
+        audiovisualUnit: 'Audiovisual Unit',
+        noDescription: 'No description available.',
+        visualReferences: 'Visual References',
+        nextLesson: 'NEXT LESSON',
+        previousLesson: 'PREVIOUS LESSON',
+        endOfModule: 'End of module',
+        back: 'Back',
+        sidebar: {
+          backToCourses: 'Back to Courses',
+          moduleContent: 'Module Content',
+          yourProgress: 'Your progress',
+          loading: 'Loading...',
+        },
+        video: {
+          invalidUrl: 'Invalid video URL',
+          unavailable: 'Video unavailable',
+          completed: '✓ Lesson Completed',
+        },
+      },
+      progress: {
+        statuses: {
+          completed: 'Completed',
+          competent: 'Competent',
+          inProgress: 'In Progress',
+          notStarted: 'Not Started',
+        },
+        nextLevel: 'NEXT LEVEL',
+        requires: 'REQUIRES',
+        remaining: 'MISSING',
+        nextLevelLabel: 'NEXT LEVEL:',
+        requiresModules: 'REQUIRES: {{required}} OF {{total}} COMPLETED MODULES',
+        missingModules: 'MISSING: {{remaining}} {{moduleWord}}',
+        moduleWordSingular: 'MODULE',
+        moduleWordPlural: 'MODULES',
+        student: 'Student',
+        email: 'Email',
+        startDate: 'Start Date',
+        currentStatus: 'Current Status',
+        studentActive: 'Active',
+        backToDashboard: 'Back to Dashboard',
+        heroTitle: 'PROFESSIONAL\nPROGRESS',
+        photoAlt: 'Student photo',
+        avanceAlt: 'Professional Progress',
+        heroSubtitle: 'Track your development within the training program.',
+        competencyDevelopment: 'COMPETENCY\nDEVELOPMENT',
+        metricGeneral: 'General\nProgress',
+        metricModules: 'Modules\nCompleted',
+        metricPractices: 'Practices\nSubmitted',
+        of: 'OF',
+        ctaTitle: 'KEEP IT UP WITH CONSISTENCY!',
+        ctaBodyLine1: 'Keep the pace to reach',
+        ctaBodyLine2: 'your full potential.',
+        ctaButton: 'KEEP LEARNING!',
+      },
+      competencyLabels: {
+        desarrollo_tecnico: 'Technical Development',
+        aplicacion_estandares: 'Application of Standards',
+        atencion_cliente: 'Customer Service',
+        mentalidad_profesional: 'Professional Mindset',
+      },
+      professionalLevels: {
+        talento: { label: 'Talent in Training', subtitle: 'Starting the journey' },
+        tecnico: { label: 'Technician in Development', subtitle: 'Building skills' },
+        avanzado: { label: 'Advanced Barber', subtitle: 'Mastering the craft' },
+        profesional: { label: 'Xclusive Professional', subtitle: 'Excellence achieved' },
+      },
+      header: {
+        tagline: 'Your training journey starts here',
+        title: 'Academic Area',
+        description:
+          'Official space for training and professional tracking within the academy.',
+      },
+      footer: {
+        defaultTagline: 'Official platform for academic development.',
+        instagramAria: 'Open Xclusive Barber Academy Instagram',
+        whatsappAria: 'Open WhatsApp chat with the Xclusive team',
+        whatsappMessage:
+          'Hi Xclusive Barber Academy team, I am reaching out from the platform and I would like some help.',
+      },
+      coursesIndex: {
+        headerTitle: 'Modules',
+        bannerSubtitle: 'PROFESSIONAL BARBER TRAINING',
+      },
+      adminMenu: {
+        panel: 'Management Panel',
+        roleBadgeAdmin: 'Admin',
+        roleBadgeInstructor: 'Instructor',
+        gradeStudents: {
+          title: 'Grade Students',
+          description:
+            'Review submissions, grade cuts, and provide technical feedback.',
+        },
+        manageCourses: {
+          title: 'Course Management',
+          description:
+            'Manage the catalog, edit lessons, and configure learning modules.',
+        },
+        manageUsers: {
+          title: 'User Management',
+          description:
+            'Create single-use access codes and manage user roles.',
+        },
+        manageLeads: {
+          title: 'Leads Management',
+          description:
+            'Review auto scoring, manage CRM stages, and follow up on leads.',
+        },
+      },
+      tracker: {
+        headerTitle: 'Professional Evolution',
+        backAria: 'Back',
+        backAlt: 'Back',
+        bannerSubtitle: 'Professional Barber Training',
+        title: 'TRACKING & EVALUATION',
+        description:
+          'Review observations, evaluations, and professional feedback about your performance and progress in the program.',
+        subtitle:
+          'SUBMIT YOUR PRACTICE, RECEIVE PROFESSIONAL EVALUATION AND RAISE YOUR TECHNICAL STANDARD',
+        sectionTitle: 'SUBMITTED PRACTICES',
+        sectionSubtitle: 'Submission tracking and review status.',
+        empty: 'No practices recorded',
+        form: {
+          title: 'EVIDENCE SUBMISSION',
+          subtitle: 'VISUAL RECORD',
+          uploadAlt: 'Upload cut',
+          newCut: 'NEW CUT',
+          uploadButton: 'Upload file',
+          selectCut: 'Select Cut Type',
+          techniqueHeader: 'TECHNIQUE IMPLEMENTED',
+          notesHeader: 'TECHNICAL NOTES',
+          notesPlaceholder:
+            'Briefly describe the process performed, tools used, and professional considerations applied...',
+          submitting: 'SUBMITTING...',
+          submit: 'SUBMIT FOR EVALUATION',
+          errorEmptyFile: 'The file is empty',
+          errorTooLarge: 'The file exceeds the {{sizeMb}} MB limit',
+          errorMime: 'File type not allowed ({{mimeType}}). Images only.',
+          errorExtension: 'Extension not allowed (.{{ext}}). Images only.',
+          errorUpload: 'Error uploading the practice',
+          cutTypes: {
+            lowFade: 'Low Fade',
+            midFade: 'Mid Fade',
+            highFade: 'High Fade',
+            taperFade: 'Taper Fade',
+            buzzCut: 'Buzz Cut',
+            scissorCut: 'Scissor Cut',
+          },
+        },
+        card: {
+          practice: 'PRACTICE {{n}}',
+          techniqueImplemented: 'TECHNIQUE IMPLEMENTED',
+          noPhoto: 'No photo',
+          feedback: 'FEEDBACK',
+          inReview: 'IN REVIEW PROCESS',
+          deleteAria: 'Delete practice',
+          photoAlt: 'Practice {{n}} – {{cutType}}',
+        },
+        feedbackModal: {
+          heading: 'PROF. JULIAN',
+          noFeedback: 'No feedback available.',
+          scores: 'SCORES',
+          fade: 'Fade',
+          cleanliness: 'Cleanliness',
+          technique: 'Technique',
+          symmetry: 'Symmetry',
+        },
+      },
+      grading: {
+        headerTitle: 'Evaluation',
+        restrictedTitle: 'Restricted Access',
+        restrictedBody:
+          'This area is reserved exclusively for instructors and administrative staff.',
+        backToDashboard: 'Back to Dashboard',
+        instructorPanel: 'Instructor Panel',
+        pageTitle: 'Practice Evaluation',
+        pageDescription:
+          'Review, grade, and guide students toward technical excellence.',
+        pendingLabel: 'Pending:',
+        emptyTitle: 'All caught up!',
+        emptyBody:
+          'No pending submissions to review right now. Good work, instructor.',
+        footerTagline: 'Evaluation panel — Xclusive Barber Academy.',
+        photoAlt: 'Student cut',
+        studentBadge: 'Student',
+        noDescription: 'No description provided.',
+        technicalEvaluation: 'Technical Evaluation',
+        scale: 'Scale 1-10',
+        criteria: {
+          fade: 'Fade',
+          cleanliness: 'Cleanliness',
+          technique: 'Technique',
+          symmetry: 'Symmetry',
+        },
+        saving: 'SAVING...',
+        save: 'GRADE SUBMISSION',
+        errorSaving: 'Error while grading',
+      },
+      admin: {
+        headerTitle: 'Administration',
+        panelLabel: 'Administration Panel',
+        courseManagement: 'Course Management',
+        courseManagementDescription:
+          'Structure the academy content. Create modules, organize lessons, and keep the curriculum up to date.',
+        createModule: 'CREATE MODULE',
+        moduleNumber: 'Module 0{{n}}',
+        lessonsCount: '{{n}} lessons',
+        noCompetency: 'No competency',
+        lessonNumber: 'Lesson 0{{n}}',
+        edit: 'Edit',
+        deleteModuleTitle: 'Delete Module',
+        deleteLessonTitle: 'Delete Lesson',
+        addLesson: 'Add lesson',
+        emptyModule: 'This module is empty.',
+        emptyCourse: 'Empty course',
+        emptyCourseBody:
+          'You have not created any modules yet. Start your curriculum now.',
+        renameTitle: 'Rename',
+        titleEnPlaceholder: 'EN title',
+        loadError: 'Error loading course. Check the server console.',
+        prompts: {
+          newModule: 'New Module name (e.g.: Classic Cut):',
+          deleteModuleConfirm:
+            'Are you sure you want to delete this module and all its lessons?',
+          newLesson: 'Lesson Title:',
+          deleteLessonConfirm: 'Delete this lesson permanently?',
+          newModuleEn: 'Module English title (optional):',
+          newLessonEn: 'Lesson English title (optional):',
+        },
+        editLesson: {
+          editorMode: 'Editor Mode',
+          saving: 'SAVING...',
+          save: 'SAVE',
+          saved: 'Saved successfully!',
+          writtenContent: 'Written Content',
+          videoConfig: 'Video Settings',
+          noVideo: 'No video assigned',
+          youtubeLabel: 'YouTube Link',
+          youtubePlaceholder: 'https://youtube.com/watch?v=...',
+          youtubeHelper:
+            'Paste the full video URL. The ID will be extracted automatically.',
+          contentStatus: 'Content status:',
+          active: 'Active',
+          titleEnSection: 'English translation',
+          titleEnHelper:
+            'Lesson English title (optional). Rich HTML content is not translated.',
+          errorTitle: 'Error: ',
+        },
+      },
+      adminToolbar: {
+        bold: 'Bold',
+        italic: 'Italic',
+        h1: 'H1',
+        h2: 'H2',
+        list: 'List',
+        listNumbered: 'List #',
+        insertImage: 'Insert Image',
+        insertYoutube: 'Insert YouTube Video',
+        youtubePrompt: 'Enter the YouTube video URL:',
+        youtubeInvalid: 'Please enter a valid YouTube URL',
+      },
+    },
   },
 } as const
 
-export type Dictionary = (typeof dictionaries)[Language]
+/**
+ * REQ-INT-001 — Contrato del Diccionario tipado.
+ *
+ * Convierte recursivamente las hojas del literal `es` a `string`, preservando
+ * la estructura exacta con claves `readonly`. `DictionaryShape` es la ÚNICA
+ * forma del diccionario: ambas ramas deben satisfacerla, por lo que TypeScript
+ * obliga a que `es` y `en` tengan exactamente las mismas claves (sin drift).
+ *
+ * Quitar una clave de una sola rama produce un error de compilación bajo
+ * `_dictionaryParity` (REQ-INT-001) — verificación en verificación 'Analysis'
+ * de la SRS.
+ */
+type ToString<T> = T extends readonly (infer U)[]
+  ? readonly ToString<U>[]
+  : T extends Record<string, unknown>
+    ? { readonly [K in keyof T]: ToString<T[K]> }
+    : string
+
+export type DictionaryShape = ToString<typeof dictionaries.es>
+
+export type Dictionary = DictionaryShape
+
+// Paridad es/en: fuerza que la rama `en` (y la `es`) compartan la MISMA forma.
+// Si `en` gana o pierde una clave respecto a `es`, el literal deja de satisfacer
+// `DictionaryShape` y el compilador falla.
+const _dictionaryParity: Record<Language, DictionaryShape> = dictionaries
 
 export function getDictionary(language: Language): Dictionary {
   return dictionaries[language]

@@ -1,6 +1,9 @@
+'use client';
+
 import React from 'react';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
+import { useLanguage } from '@/components/i18n/LanguageProvider';
 
 interface DashboardCardProps {
     title: string;
@@ -28,6 +31,11 @@ export function DashboardCard({
     className,
 }: DashboardCardProps) {
 
+    // REQ-FUNC-006: badge de rol localizado vía contexto (este componente corre
+    // tanto dentro de la page RSC como del menú admin cliente).
+    const { dictionary } = useLanguage()
+    const adminMenu = dictionary.dashboard.adminMenu
+
     const inner = (
         <div
             className={cn(
@@ -53,7 +61,7 @@ export function DashboardCard({
             {/* Role badge */}
             {(isAdmin || isInstructor) && (
                 <span className="absolute top-2 right-2 px-2 py-0.5 bg-[#1E3A27] text-[#d3cbba] text-[8px] md:text-[9px] font-bold uppercase tracking-widest rounded">
-                    {isAdmin ? 'Admin' : 'Instructor'}
+                    {isAdmin ? adminMenu.roleBadgeAdmin : adminMenu.roleBadgeInstructor}
                 </span>
             )}
 

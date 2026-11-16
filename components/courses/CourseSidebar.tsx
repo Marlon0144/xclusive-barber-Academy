@@ -2,6 +2,8 @@ import React from 'react'
 import Link from 'next/link'
 import { createClient } from '@/utils/supabase/server'
 import { CheckCircle2, PlayCircle, ChevronLeft } from 'lucide-react'
+import { getServerDictionary, getServerLanguage } from '@/lib/i18n/server'
+import { pick } from '@/lib/i18n/localize'
 
 interface LessonProgress {
   is_completed: boolean
@@ -10,6 +12,7 @@ interface LessonProgress {
 interface Lesson {
   id: string
   title: string
+  title_en: string | null
   position: number
   module_id: string
   lesson_progress: LessonProgress[] | null
@@ -28,6 +31,7 @@ const fetchLessonsWithProgress = React.cache(async (moduleId: string) => {
     .select(`
       id, 
       title, 
+      title_en,
       position, 
       module_id,
       lesson_progress ( is_completed )
@@ -40,9 +44,20 @@ const fetchLessonsWithProgress = React.cache(async (moduleId: string) => {
 
 export default async function CourseSidebar({ moduleId }: CourseSidebarProps) {
   // start the promise early (async-defer-await) and use cache
-  const lessons = await fetchLessonsWithProgress(moduleId)
+  const lessonsPromise = fetchLessonsWithProgress(moduleId)
+  // REQ-FUNC-003: diccionario + idioma para localizar la lista de lecciones.
+  const dictionaryPromise = getServerDictionary()
+  const languagePromise = getServerLanguage()
 
-  if (!lessons) return <div className="p-4">Cargando...</div>
+  const [lessons, dictionary, language] = await Promise.all([
+    lessonsPromise,
+    dictionaryPromise,
+    languagePromise,
+  ])
+
+  const sidebarDict = dictionary.dashboard.lesson.sidebar
+
+  if (!lessons) return <div className="p-4">{sidebarDict.loading}</div>
 
   // Cálculos para la barra de progreso
   const totalLessons = lessons.length
@@ -59,17 +74,17 @@ export default async function CourseSidebar({ moduleId }: CourseSidebarProps) {
           className="inline-flex items-center gap-1 text-xs font-bold text-gray-500 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400 mb-4 transition-colors uppercase tracking-wide"
         >
           <ChevronLeft size={14} />
-          Volver a Cursos
+          {sidebarDict.backToCourses}
         </Link>
 
         <h3 className="font-bold text-lg text-gray-900 dark:text-white leading-tight mb-4">
-          Contenido del Módulo
+          {sidebarDict.moduleContent}
         </h3>
 
         {/* Barra de Progreso */}
         <div className="space-y-2">
           <div className="flex justify-between text-xs font-medium text-gray-500 dark:text-gray-400">
-            <span>Tu progreso</span>
+            <span>{sidebarDict.yourProgress}</span>
             <span>{Math.round(progressPercentage)}%</span>
           </div>
           <div className="h-2 w-full bg-gray-200 dark:bg-gray-800 rounded-full overflow-hidden">
@@ -107,7 +122,10 @@ export default async function CourseSidebar({ moduleId }: CourseSidebarProps) {
                   ? 'text-gray-600 dark:text-gray-400'
                   : 'text-gray-700 dark:text-gray-200 group-hover:text-gray-900 dark:group-hover:text-white'
                   }`}>
-                  {lesson.title}
+                  {pick(language, {
+                    es: lesson.title,
+                    en: lesson.title_en ?? null,
+                  })}
                 </span>
               </div>
             </Link>

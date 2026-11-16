@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { ChevronDown } from "lucide-react";
 import { DashboardCard } from "./DashboardCard";
+import { useLanguage } from "@/components/i18n/LanguageProvider";
 
 interface AdminToolsMenuProps {
     isInstructor: boolean;
@@ -11,6 +12,10 @@ interface AdminToolsMenuProps {
 
 export function AdminToolsMenu({ isInstructor, isAdmin }: AdminToolsMenuProps) {
     const [open, setOpen] = useState(false);
+
+    // REQ-FUNC-006: textos del menú admin desde el diccionario tipado.
+    const { dictionary } = useLanguage()
+    const adminMenu = dictionary.dashboard.adminMenu
 
     // Only render for privileged roles
     if (!isInstructor && !isAdmin) return null;
@@ -32,7 +37,7 @@ export function AdminToolsMenu({ isInstructor, isAdmin }: AdminToolsMenuProps) {
                 "
             >
                 <span className="font-sans font-extrabold text-[11px] md:text-xs lg:text-sm uppercase tracking-[0.18em] text-[#d3cbba]">
-                    Panel de Gestión
+                    {adminMenu.panel}
                 </span>
                 <ChevronDown
                     size={14}
@@ -51,26 +56,26 @@ export function AdminToolsMenu({ isInstructor, isAdmin }: AdminToolsMenuProps) {
                 <div className="flex flex-col md:flex-row gap-3 md:gap-5">
                     {isInstructor && (
                         <DashboardCard
-                            title="Evaluar Estudiantes"
-                            description="Revisar entregas, calificar cortes y proporcionar retroalimentación técnica."
+                            title={adminMenu.gradeStudents.title}
+                            description={adminMenu.gradeStudents.description}
                             href="/dashboard/grading"
                         />
                     )}
                     {isAdmin && (
                         <>
                             <DashboardCard
-                                title="Gestión de Cursos"
-                                description="Administrar catálogo, editar lecciones y configurar módulos de aprendizaje."
+                                title={adminMenu.manageCourses.title}
+                                description={adminMenu.manageCourses.description}
                                 href="/dashboard/admin/courses"
                             />
                             <DashboardCard
-                                title="Gestión de Usuarios"
-                                description="Crear codigos de acceso de un solo uso y administrar roles de usuarios."
+                                title={adminMenu.manageUsers.title}
+                                description={adminMenu.manageUsers.description}
                                 href="/dashboard/admin/gestion_users"
                             />
                             <DashboardCard
-                                title="Gestión de Leads"
-                                description="Revisar score automatico, gestionar etapas CRM y dar seguimiento comercial."
+                                title={adminMenu.manageLeads.title}
+                                description={adminMenu.manageLeads.description}
                                 href="/dashboard/admin/leads"
                             />
                         </>

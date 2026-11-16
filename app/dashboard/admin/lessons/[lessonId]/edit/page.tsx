@@ -21,7 +21,7 @@ export default async function EditLessonPage({ params }: PageProps) {
   // ⚠️ AQUÍ ESTABA EL ERROR: Faltaba pedir 'video_url'
   const { data: lesson, error } = await supabase
     .from('lessons')
-    .select('id, title, content, video_url') // <--- AGREGADO AQUI
+    .select('id, title, title_en, content, video_url') // <--- AGREGADO AQUI
     .eq('id', lessonId)
     .single()
 

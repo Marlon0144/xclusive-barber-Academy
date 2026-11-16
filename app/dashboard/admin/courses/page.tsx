@@ -3,25 +3,32 @@ import { redirect } from 'next/navigation'
 import AdminCourseList from './AdminCourseList'
 import { Settings, Star } from 'lucide-react'
 import DashboardPageHeader from '@/components/headers/DashboardPageHeader'
+import { getServerDictionary } from '@/lib/i18n/server'
 
 export default async function AdminCoursesPage() {
   const supabase = await createClient()
+  const dictionary = await getServerDictionary()
+  const adminDict = dictionary.dashboard.admin
 
   // 1. Verificación de Auth
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
-  // 2. Traer Módulos y sus Lecciones (Query Anidada Potente)
+  // 2. Traer Módulos y sus Lecciones (Query Anidada Potente) — incluye `_en`.
   const { data: modules, error } = await supabase
     .from('modules')
     .select(`
       id, 
       title, 
+      title_en,
+      description,
+      description_en,
       order_index,
       competency,
       lessons (
         id, 
         title, 
+        title_en,
         order_index
       )
     `)
@@ -29,7 +36,7 @@ export default async function AdminCoursesPage() {
 
   if (error) {
     console.error('Error cargando estructura:', error)
-    return <div className="text-red-500 p-8 text-center font-bold">Error cargando el curso. Revisa la consola del servidor.</div>
+    return <div className="text-red-500 p-8 text-center font-bold">{adminDict.loadError}</div>
   }
 
   // 3. Ordenamiento en JS (Seguridad extra para los hijos)
@@ -43,7 +50,7 @@ export default async function AdminCoursesPage() {
 
   return (
     <>
-      <DashboardPageHeader title="Administración" />
+      <DashboardPageHeader title={adminDict.headerTitle} />
       <div className="min-h-screen px-4 py-6 md:p-8 max-w-5xl mx-auto space-y-8 md:space-y-12">
 
       {/* HEADER DE LA PÁGINA */}
@@ -54,13 +61,13 @@ export default async function AdminCoursesPage() {
         <div className="relative z-10">
           <div className="flex items-center gap-2 md:gap-3 mb-2">
             <Star className="w-4 h-4 md:w-5 md:h-5 text-red-500 fill-red-500" />
-            <h2 className="text-red-500 text-[10px] md:text-xs tracking-[0.3em] uppercase font-bold">Panel de Administración</h2>
+            <h2 className="text-red-500 text-[10px] md:text-xs tracking-[0.3em] uppercase font-bold">{adminDict.panelLabel}</h2>
           </div>
           <h1 className="text-3xl md:text-5xl font-serif text-white mb-3 md:mb-4">
-            Gestión del Curso
+            {adminDict.courseManagement}
           </h1>
           <p className="text-zinc-400 max-w-xl text-sm md:text-lg font-light">
-            Estructura el contenido de la academia. Crea módulos, organiza lecciones y mantén el plan de estudios actualizado.
+            {adminDict.courseManagementDescription}
           </p>
         </div>
       </header>

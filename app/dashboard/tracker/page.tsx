@@ -9,7 +9,11 @@ import { SubmissionForm } from './SubmissionForm'
 import DashboardPageHeader from '@/components/headers/DashboardPageHeader'
 import { DashboardFooter } from '@/components/dashboard/DashboardFooter'
 
+import { useLanguage } from '@/components/i18n/LanguageProvider'
+
 export default function TrackerPage() {
+  const { dictionary } = useLanguage()
+  const trackerDict = dictionary.dashboard.tracker
   // ── Estado del orquestador (solo el historial de prácticas) ──────────────
   const [submissions, setSubmissions] = useState<Submission[]>([])
   const [refreshTrigger, setRefreshTrigger] = useState(0)
@@ -61,7 +65,7 @@ export default function TrackerPage() {
 
       {/* ── NAV HEADER ───────────────────────────────────────────────────── */}
       {/* h-[61px] in component, flows in document */}
-      <DashboardPageHeader title="Evolución Profesional" />
+      <DashboardPageHeader title={trackerDict.headerTitle} />
 
       {/* ── MAIN CONTENT (below header) ──────────────────────────────────── */}
       <div className="relative z-10 flex flex-col items-center w-full md:max-w-[680px] lg:max-w-[800px] xl:max-w-[960px] md:mx-auto md:px-6">
@@ -71,11 +75,11 @@ export default function TrackerPage() {
           <button
             onClick={() => window.history.back()}
             className="flex flex-col items-start gap-[3px] opacity-80 hover:opacity-100 transition-opacity"
-            aria-label="Volver"
+            aria-label={trackerDict.backAria}
           >
             <Image
               src="/assets/dashboard/tracker/back.row.png"
-              alt="Volver"
+              alt={trackerDict.backAlt}
               width={33}
               height={10}
               className="object-contain"
@@ -104,7 +108,7 @@ export default function TrackerPage() {
           <p
             className="font-sans font-extralight text-[#d3cbba] text-[11px] md:text-sm text-center uppercase tracking-[0.99px] mt-[8px] md:mt-3"
           >
-            Formación Profesional en Barbería
+            {trackerDict.bannerSubtitle}
           </p>
         </div>
 
@@ -114,7 +118,7 @@ export default function TrackerPage() {
         <h1
           className="font-sans font-extrabold text-[#d3cbba] text-[24px] md:text-[32px] lg:text-[36px] text-center uppercase leading-normal mt-[37px] md:mt-10"
         >
-          SEGUIMIENTO Y EVALUACIÓN
+          {trackerDict.title}
         </h1>
 
         {/* ── GOLD DIVIDER LINE ──
@@ -133,7 +137,7 @@ export default function TrackerPage() {
         <p
           className="font-sans font-normal text-[#d3cbba] text-[9px] md:text-sm text-center leading-[1.3] md:leading-relaxed mt-[14px] md:mt-5 w-[336px] md:w-full max-w-[90vw] md:max-w-full"
         >
-          Revisa observaciones, evaluaciones y retroalimentación profesional sobre tu desempeño y evolución dentro del programa.
+          {trackerDict.description}
         </p>
 
         {/* ── SUBTITLE "ENVÍA TU PRÁCTICA..." ──
@@ -142,7 +146,7 @@ export default function TrackerPage() {
         <p
           className="font-sans font-extralight text-[#d3cbba] text-[11px] md:text-base text-center uppercase leading-normal tracking-[0.99px] mt-[34px] md:mt-10 w-[295px] md:w-full max-w-[85vw] md:max-w-full"
         >
-          ENVÍA TU PRÁCTICA, RECIBE EVALUACIÓN PROFESIONAL Y ELEVA TU ESTÁNDAR TÉCNICO
+          {trackerDict.subtitle}
         </p>
 
         {/* ── SUBMISSION FORM ──
@@ -170,7 +174,7 @@ export default function TrackerPage() {
           <h2
             className="font-sans font-extrabold text-[#d3cbba] text-[24px] md:text-[32px] lg:text-[36px] text-center uppercase leading-normal mt-[9px] md:mt-4 mb-[9px] md:mb-4"
           >
-            PRÁCTICAS ENVIADAS
+            {trackerDict.sectionTitle}
           </h2>
 
           {/* Bottom divider line — w-269px (Figma: 209:429) */}
@@ -186,7 +190,7 @@ export default function TrackerPage() {
           <p
             className="font-sans font-normal text-[#d3cbba] text-[9px] md:text-sm text-center leading-[1.3] md:leading-relaxed mt-[12px] md:mt-4 w-[269px] md:w-[400px] lg:w-[500px] max-w-[80vw] md:max-w-full"
           >
-            Seguimiento de envíos y estado de revisión.
+            {trackerDict.sectionSubtitle}
           </p>
 
           {/* ── CARDS LIST ──────────────────────────────────────────────── */}
@@ -194,7 +198,7 @@ export default function TrackerPage() {
             {submissions.length === 0 ? (
               <div className="py-12 md:py-16 text-center border border-dashed border-[#d3cbba]/10 mx-4 md:rounded-lg">
                 <p className="text-[#d3cbba]/40 text-[10px] md:text-sm uppercase tracking-widest">
-                  No hay prácticas registradas
+                  {trackerDict.empty}
                 </p>
               </div>
             ) : (

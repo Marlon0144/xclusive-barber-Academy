@@ -1,11 +1,15 @@
 import React from 'react';
 import Image from 'next/image';
+import { getServerDictionary } from '@/lib/i18n/server';
 
 // Hero section — pixel-faithful to Figma node 136:377
 // h-[278px] fixed, background blurred at opacity-66, all text centered
-export function DashboardHeader() {
+export async function DashboardHeader() {
     const  mobileBg = '/assets/dashboard/header-bg-mobile.png';
     const desktopBg = '/assets/dashboard/header-bg.png';
+    // REQ-FUNC-001: texto fijo del hero proveniente del diccionario.
+    const dict = await getServerDictionary()
+    const header = dict.dashboard.header
     return (
         <>
             {/* ============================================================
@@ -19,14 +23,14 @@ export function DashboardHeader() {
                 <div className="absolute inset-0 bg-[#161616]/20" />
                 <div className="relative z-10 flex flex-col items-center text-center px-6 pt-[59px]">
                     <p className="font-sans font-extralight text-[11px] text-[#d3cbba] uppercase tracking-[0.09em] leading-normal">
-                        Tu proceso de formación comienza aquí
+                        {header.tagline}
                     </p>
                     <h1 className="font-sans font-extrabold text-[24px] text-[#d3cbba] uppercase leading-normal mt-[8px]">
-                        Área Académica
+                        {header.title}
                     </h1>
                     <div className="w-[223px] h-px bg-gradient-to-r from-transparent via-[#468F5D] to-transparent mt-[14px] mb-[12px] opacity-90" />
                     <p className="font-sans font-normal text-[9px] text-[#d3cbba] text-center leading-[1.3] max-w-[223px]">
-                        Espacio oficial de formación y seguimiento profesional dentro de la academia.
+                        {header.description}
                     </p>
                 </div>
             </div>
@@ -53,7 +57,7 @@ export function DashboardHeader() {
                         className="font-sans font-extralight text-[#d3cbba] uppercase leading-normal
                                    text-sm lg:text-base xl:text-lg tracking-[2.16px]"
                     >
-                        Tu proceso de formación comienza aquí
+                        {header.tagline}
                     </p>
 
                     {/* Title */}
@@ -61,7 +65,7 @@ export function DashboardHeader() {
                         className="font-sans font-extrabold text-[#d3cbba] uppercase leading-normal mt-[8px]
                                    text-4xl lg:text-5xl xl:text-6xl"
                     >
-                        Área Académica
+                        {header.title}
                     </h1>
 
                     {/* Divider */}
@@ -77,7 +81,7 @@ export function DashboardHeader() {
                                    text-sm lg:text-base xl:text-lg
                                    max-w-[400px] lg:max-w-[500px] xl:max-w-[600px]"
                     >
-                        Espacio oficial de formación y seguimiento profesional dentro de la academia.
+                        {header.description}
                     </p>
                 </div>
             </div>

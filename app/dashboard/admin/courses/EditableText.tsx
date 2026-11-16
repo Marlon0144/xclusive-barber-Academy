@@ -8,9 +8,10 @@ interface EditableTextProps {
   initialText: string
   onSave: (newText: string) => Promise<void>
   className?: string
+  placeholder?: string
 }
 
-export default function EditableText({ initialText, onSave, className = '' }: EditableTextProps) {
+export default function EditableText({ initialText, onSave, className = '', placeholder = '' }: EditableTextProps) {
   const [isEditing, setIsEditing] = useState(false)
   const [text, setText] = useState(initialText)
   const [isSaving, setIsSaving] = useState(false)
@@ -56,6 +57,7 @@ export default function EditableText({ initialText, onSave, className = '' }: Ed
           onKeyDown={handleKeyDown}
           disabled={isSaving}
           className="bg-black/50 text-white px-3 py-1.5 rounded-sm border border-gold-500 focus:outline-none focus:ring-1 focus:ring-gold-500/50 w-full max-w-xs text-sm font-serif placeholder:text-zinc-600"
+          placeholder={placeholder}
         />
         <button
           onClick={handleSave}

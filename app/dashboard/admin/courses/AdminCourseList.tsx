@@ -5,27 +5,35 @@ import { Plus, Trash2, Edit, ChevronRight, BookOpen, Video, GripVertical, Folder
 import { useRouter } from 'next/navigation'
 // Importamos las actions (asegúrate de que updateModuleTitle y updateLessonTitle estén en actions.ts)
 import { createModule, deleteModule, createLesson, deleteLesson, updateModuleTitle, updateLessonTitle, updateModuleCompetency, reorderLessonsInModule } from './actions'
-import { COMPETENCY_LABELS, type CompetencyKey } from '@/types/progress'
+import { COMPETENCY_KEYS } from '@/types/progress'
 import EditableText from './EditableText'
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
+import { useLanguage } from '@/components/i18n/LanguageProvider'
+import { interpolate } from '@/lib/i18n/dictionaries'
 
-// Tipos locales para la UI
+// Tipos locales para la UI (incluye columnas `_en` para edición admin)
 type Lesson = {
   id: string
   title: string
+  title_en: string | null
   order_index: number
 }
 
 type Module = {
   id: string
   title: string
+  title_en: string | null
+  description_en: string | null
   order_index: number
   competency: string | null
   lessons: Lesson[]
 }
 
 export default function AdminCourseList({ initialModules }: { initialModules: Module[] }) {
+  const { dictionary } = useLanguage()
+  const adminDict = dictionary.dashboard.admin
+  const competencyLabels = dictionary.dashboard.competencyLabels
   // Estado local para saber qué módulos están abiertos (expandidos)
   const [expandedModules, setExpandedModules] = useState<Record<string, boolean>>({})
   const [modules, setModules] = useState<Module[]>(initialModules)
@@ -52,29 +60,34 @@ export default function AdminCourseList({ initialModules }: { initialModules: Mo
   // --- MANEJADORES DE EVENTOS ---
 
   const handleCreateModule = async () => {
-    const title = window.prompt('Nombre del nuevo Módulo (Ej: Corte Clásico):')
-    if (!title) return
-    await createModule(title)
+    const title = window.prompt(adminDict.prompts.newModule)
+    if (!title || !title.trim()) return
+    const titleEn = window.prompt(adminDict.prompts.newModuleEn)
+    await createModule(title, {
+      title_en: titleEn || null,
+      description_en: null,
+    })
     router.refresh()
   }
 
   const handleDeleteModule = async (id: string) => {
-    if (!confirm('¿Estás seguro de borrar este módulo y todas sus lecciones?')) return
+    if (!confirm(adminDict.prompts.deleteModuleConfirm)) return
     await deleteModule(id)
     router.refresh()
   }
 
   const handleCreateLesson = async (moduleId: string) => {
-    const title = window.prompt('Título de la Lección:')
-    if (!title) return
-    await createLesson(moduleId, title)
+    const title = window.prompt(adminDict.prompts.newLesson)
+    if (!title || !title.trim()) return
+    const titleEn = window.prompt(adminDict.prompts.newLessonEn)
+    await createLesson(moduleId, title, { title_en: titleEn || null })
     // Forzamos abrir el módulo para ver la nueva lección
     setExpandedModules(prev => ({ ...prev, [moduleId]: true }))
     router.refresh()
   }
 
   const handleDeleteLesson = async (id: string) => {
-    if (!confirm('¿Borrar esta lección permanentemente?')) return
+    if (!confirm(adminDict.prompts.deleteLessonConfirm)) return
     await deleteLesson(id)
     router.refresh()
   }
@@ -169,8 +182,20 @@ export default function AdminCourseList({ initialModules }: { initialModules: Mo
     router.refresh()
   }
 
+  const handleRenameModuleEn = async (module: Module, newTitleEn: string) => {
+    await updateModuleTitle(module.id, module.title, {
+      title_en: newTitleEn || null,
+    })
+    router.refresh()
+  }
+
   const handleRenameLesson = async (lessonId: string, newTitle: string) => {
     await updateLessonTitle(lessonId, newTitle)
+    router.refresh()
+  }
+
+  const handleRenameLessonEn = async (lesson: Lesson, newTitleEn: string) => {
+    await updateLessonTitle(lesson.id, lesson.title, { title_en: newTitleEn || null })
     router.refresh()
   }
 
@@ -190,7 +215,7 @@ export default function AdminCourseList({ initialModules }: { initialModules: Mo
           className="bg-gold-500 hover:bg-gold-600 text-black font-bold tracking-widest text-xs md:text-sm"
         >
           <Plus size={18} className="mr-1.5 md:mr-2" />
-          CREAR MÓDULO
+          {adminDict.createModule}
         </Button>
       </div>
 
@@ -222,10 +247,10 @@ export default function AdminCourseList({ initialModules }: { initialModules: Mo
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 md:gap-3 flex-wrap">
                     <span className="text-[9px] md:text-[10px] text-zinc-500 font-bold uppercase tracking-widest border border-white/10 px-1.5 md:px-2 rounded-sm bg-black/20">
-                      Módulo 0{index + 1}
+                      {interpolate(adminDict.moduleNumber, { n: index + 1 })}
                     </span>
                     <span className="text-[10px] md:text-xs bg-black/50 text-zinc-500 px-1.5 md:px-2 py-0.5 rounded-full border border-white/5">
-                      {module.lessons?.length || 0} lecciones
+                      {interpolate(adminDict.lessonsCount, { n: module.lessons?.length || 0 })}
                     </span>
                   </div>
 
@@ -236,6 +261,19 @@ export default function AdminCourseList({ initialModules }: { initialModules: Mo
                     className="font-serif text-base md:text-xl text-white mt-1 hover:text-gold-500 transition-colors"
                   />
 
+                  {/* TÍTULO EN EDITABLE */}
+                  <div className="mt-1">
+                    <span className="text-[8px] uppercase tracking-widest text-gold-500/70 font-bold mr-1">
+                      EN
+                    </span>
+                    <EditableText
+                      initialText={module.title_en ?? ''}
+                      placeholder={adminDict.titleEnPlaceholder}
+                      onSave={(newTitleEn) => handleRenameModuleEn(module, newTitleEn)}
+                      className="text-xs text-zinc-400 hover:text-gold-500 transition-colors"
+                    />
+                  </div>
+
                   {/* SELECTOR DE COMPETENCIA */}
                   <select
                     value={module.competency ?? ''}
@@ -243,10 +281,10 @@ export default function AdminCourseList({ initialModules }: { initialModules: Mo
                     onClick={(e) => e.stopPropagation()}
                     className="mt-1.5 text-[10px] uppercase tracking-widest font-bold bg-black/60 border border-white/10 text-zinc-400 rounded-sm px-2 py-1.5 md:py-1 hover:border-gold-500/40 focus:border-gold-500 focus:outline-none cursor-pointer transition-colors min-h-[32px] md:min-h-0"
                   >
-                    <option value="">Sin competencia</option>
-                    {(Object.keys(COMPETENCY_LABELS) as CompetencyKey[]).map((key) => (
+                    <option value="">{adminDict.noCompetency}</option>
+                    {COMPETENCY_KEYS.map((key) => (
                       <option key={key} value={key}>
-                        {COMPETENCY_LABELS[key]}
+                        {competencyLabels[key]}
                       </option>
                     ))}
                   </select>
@@ -261,7 +299,7 @@ export default function AdminCourseList({ initialModules }: { initialModules: Mo
                   handleDeleteModule(module.id)
                 }}
                 className="text-zinc-600 hover:text-red-500 hover:bg-red-500/10 md:opacity-0 md:group-hover:opacity-100 transition-all shrink-0"
-                title="Eliminar Módulo"
+                title={adminDict.deleteModuleTitle}
               >
                 <Trash2 size={16} className="md:w-[18px] md:h-[18px]" />
               </Button>
@@ -299,13 +337,23 @@ export default function AdminCourseList({ initialModules }: { initialModules: Mo
                           </div>
 
                           <div className="flex flex-col min-w-0">
-                            <span className="text-[9px] text-zinc-600 uppercase tracking-widest font-bold">Lección 0{lIndex + 1}</span>
+                            <span className="text-[9px] text-zinc-600 uppercase tracking-widest font-bold">{interpolate(adminDict.lessonNumber, { n: lIndex + 1 })}</span>
                             {/* TÍTULO EDITABLE */}
                             <EditableText
                               initialText={lesson.title}
                               onSave={(newTitle) => handleRenameLesson(lesson.id, newTitle)}
                               className="text-zinc-300 font-medium text-xs md:text-sm hover:text-white transition-colors"
                             />
+                            {/* TÍTULO EN EDITABLE */}
+                            <div className="mt-0.5">
+                              <span className="text-[8px] uppercase tracking-widest text-gold-500/70 font-bold mr-1">EN</span>
+                              <EditableText
+                                initialText={lesson.title_en ?? ''}
+                                placeholder={adminDict.titleEnPlaceholder}
+                                onSave={(newTitleEn) => handleRenameLessonEn(lesson, newTitleEn)}
+                                className="text-[11px] text-zinc-500 hover:text-white transition-colors"
+                              />
+                            </div>
                           </div>
                         </div>
 
@@ -318,7 +366,7 @@ export default function AdminCourseList({ initialModules }: { initialModules: Mo
                             className="h-7 text-[10px] uppercase font-bold tracking-wider bg-blue-900/30 text-blue-400 border border-blue-500/30 hover:bg-blue-600 hover:text-white hover:border-blue-600 px-2 md:px-3"
                           >
                             <Edit size={12} className="md:mr-1" />
-                            <span className="hidden md:inline">Editar</span>
+                            <span className="hidden md:inline">{adminDict.edit}</span>
                           </Button>
 
                           <Button
@@ -326,7 +374,7 @@ export default function AdminCourseList({ initialModules }: { initialModules: Mo
                             size="icon"
                             onClick={() => handleDeleteLesson(lesson.id)}
                             className="h-7 w-7 text-zinc-600 hover:text-red-400 hover:bg-red-400/10"
-                            title="Borrar Lección"
+                            title={adminDict.deleteLessonTitle}
                           >
                             <Trash2 size={14} />
                           </Button>
@@ -336,7 +384,7 @@ export default function AdminCourseList({ initialModules }: { initialModules: Mo
                   </div>
                 ) : (
                   <div className="py-8 text-center flex flex-col items-center">
-                    <p className="text-zinc-600 text-sm italic mb-4">Este módulo está vacío.</p>
+                    <p className="text-zinc-600 text-sm italic mb-4">{adminDict.emptyModule}</p>
                   </div>
                 )}
 
@@ -347,7 +395,7 @@ export default function AdminCourseList({ initialModules }: { initialModules: Mo
                   className="w-full mt-2 py-4 md:py-6 text-[10px] md:text-xs uppercase tracking-widest font-bold text-zinc-500 hover:text-blue-400 hover:bg-blue-500/5 transition-colors border border-dashed border-zinc-800 hover:border-blue-500/30"
                 >
                   <Plus size={14} className="mr-1.5 md:mr-2" />
-                  Agregar lección
+                  {adminDict.addLesson}
                 </Button>
               </div>
             )}
@@ -359,9 +407,9 @@ export default function AdminCourseList({ initialModules }: { initialModules: Mo
             <div className="bg-black/50 w-20 h-20 rounded-full flex items-center justify-center mb-6 text-zinc-700 border border-white/5">
               <BookOpen size={32} />
             </div>
-            <h3 className="text-xl font-serif text-white mb-2">Curso vacío</h3>
+            <h3 className="text-xl font-serif text-white mb-2">{adminDict.emptyCourse}</h3>
             <p className="text-zinc-500 text-sm max-w-xs">
-              Aún no has creado ningún módulo. Comienza tu plan de estudios ahora.
+              {adminDict.emptyCourseBody}
             </p>
           </div>
         )}
