@@ -1,7 +1,6 @@
 'use server'
 
 import { cookies } from 'next/headers'
-import { redirect } from 'next/navigation'
 import { z } from 'zod'
 import { computeLeadScore } from '@/utils/crm-scoring'
 import { createAdminClient } from '@/utils/supabase/server'
@@ -12,6 +11,15 @@ import { checkActionRateLimit } from '@/lib/rate-limit'
 
 export type QualifyState = {
   error?: string | null
+  /**
+   * Set only on success: the WhatsApp deep link the client must navigate to.
+   * The action used to call redirect() itself, but that unloads the page
+   * before any client code can report the conversion — so the client now
+   * fires `academy_apply_submit` first and then navigates (QualifyForm).
+   */
+  redirectUrl?: string
+  /** Plan chosen on the pricing CTA, validated server-side (undefined when none was selected). */
+  programa?: PlanKey
 }
 
 const WHATSAPP_DEAL_NUMBER = '61413891977'
@@ -46,7 +54,11 @@ const qualifySchema = z.object({
   careerStartWindow: z.enum(['immediately', 'within_3_months', 'within_6_months', 'just_researching']),
   longTermAmbition: z.enum(['senior_barber', 'open_shop', 'personal_brand', 'educator', 'not_sure']),
   callWillingness: z.enum(['yes', 'maybe', 'no']),
-  selectedPlan: z.enum(['starter', 'profesional', 'elite', 'business']).optional(),
+  // The plan is optional context, never a reason to reject the lead. The wizard is also
+  // reachable without ?plan= (header "get started" link → /qualify), in which case the
+  // hidden input posts '' — which a bare enum rejects, blocking the whole submission.
+  // An empty or unknown value is therefore treated as "no plan selected".
+  selectedPlan: z.enum(['starter', 'profesional', 'elite', 'business']).optional().catch(undefined),
 })
 
 export async function submitPublicLeadQualification(
@@ -191,5 +203,5 @@ export async function submitPublicLeadQualification(
 
   const whatsappMessage = buildWhatsAppDealMessage(messages, parsed.data.selectedPlan)
   const whatsappUrl = `https://wa.me/${WHATSAPP_DEAL_NUMBER}?text=${encodeURIComponent(whatsappMessage)}`
-  redirect(whatsappUrl)
+  return { error: null, redirectUrl: whatsappUrl, programa: parsed.data.selectedPlan }
 }

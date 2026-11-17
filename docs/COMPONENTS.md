@@ -429,6 +429,30 @@ a single route.
 |-----------|------|-------|
 | `ApplyForm` | Client | None (uses action directly) |
 
+### Public qualification route (`app/qualify/`)
+
+| Component | Type | Props |
+|-----------|------|-------|
+| `QualifyForm` | Client | None (uses `submitPublicLeadQualification` via `useActionState`; on success reports `academy_apply_submit` and navigates to the returned WhatsApp URL) |
+
+### Analytics components (`components/analytics/`)
+
+Rendered from `app/layout.tsx` unless noted. Behaviour, IDs and the full event
+list live in `docs/ANALYTICS_TRACKING_PLAN.md`.
+
+| Component | Type | Notes |
+|-----------|------|-------|
+| `GoogleAnalyticsScript` | RSC | Loads gtag.js once and configures GA4 (`G-…`) and Google Ads (`AW-…`) |
+| `GoogleTagManagerScript` / `GoogleTagManagerNoScript` | RSC | GTM container loader + `<noscript>` fallback |
+| `MetaPixelScript` / `MetaPixelNoScript` | RSC | Meta Pixel loader + `<noscript>` fallback |
+| `OutboundContactTracker` | Client (renders `null`) | One delegated click listener reporting `academy_whatsapp_click` (`wa.me`) and `academy_phone_click` (`tel:`) for every link on the site |
+| `TrackedLink` | Client | Link wrapper firing a GTM-routed `track()` event on click |
+| `ApplicationSuccessTracker` | Client (renders `null`) | Mounted in `app/dashboard/layout.tsx`; fires `application_submit` + `academy_apply_submit` once after a successful `/apply` signup (reads the `xba_application_submitted` cookie) |
+
+Helpers: `lib/analytics/gtag.ts` (`gtagEvent`, `gtagEventThen`),
+`lib/analytics/contact-links.ts` (`classifyContactLink`),
+`lib/analytics/track.ts` (`track`, GTM/Meta only), `lib/analytics/config.ts`.
+
 ### Qualification route (`app/dashboard/qualify/`)
 
 | Component | Type | Props |

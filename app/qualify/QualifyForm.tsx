@@ -1,11 +1,13 @@
 'use client'
 
-import { useActionState, useMemo, useState } from 'react'
+import { useActionState, useEffect, useMemo, useRef, useState } from 'react'
 import { useFormStatus } from 'react-dom'
 import { AlertCircle, ArrowLeft, ArrowRight } from 'lucide-react'
 import { useSearchParams } from 'next/navigation'
 import { submitPublicLeadQualification, type QualifyState } from './actions'
 import { useLanguage } from '@/components/i18n/LanguageProvider'
+import { classifyContactLink } from '@/lib/analytics/contact-links'
+import { gtagEventThen } from '@/lib/analytics/gtag'
 import type { Dictionary } from '@/lib/i18n/dictionaries'
 
 const initialState: QualifyState = {
@@ -149,7 +151,7 @@ function buildSteps(text: Dictionary['qualifyForm']): Step[] {
   ]
 }
 
-function SubmitButton({ disabled }: { disabled: boolean }) {
+function SubmitButton({ disabled, busy }: { disabled: boolean; busy: boolean }) {
   const { pending } = useFormStatus()
   const { dictionary } = useLanguage()
   const text = dictionary.qualifyForm
@@ -160,7 +162,7 @@ function SubmitButton({ disabled }: { disabled: boolean }) {
       disabled={pending || disabled}
       className="w-full h-12 rounded-sm bg-[#d3cbba] text-[#1e3a27] font-bold uppercase tracking-[0.18em] text-xs hover:bg-[#c2b9a5] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
     >
-      {pending ? text.sending : text.finish}
+      {pending || busy ? text.sending : text.finish}
     </button>
   )
 }
@@ -204,6 +206,36 @@ export default function QualifyForm() {
   const text = dictionary.qualifyForm
   const steps = useMemo(() => buildSteps(text), [text])
   const selectedPlan = searchParams.get('plan') ?? ''
+
+  // The action succeeded: it hands back the WhatsApp URL instead of redirecting server-side so
+  // the conversion can be reported before the page is unloaded (see QualifyState).
+  const redirectUrl = state.redirectUrl
+  const redirecting = Boolean(redirectUrl)
+  const redirectHandledRef = useRef(false)
+
+  useEffect(() => {
+    if (!redirectUrl || redirectHandledRef.current) return
+    // Defense in depth: the URL is built server-side, but never send the browser anywhere except WhatsApp.
+    if (classifyContactLink(redirectUrl)?.kind !== 'whatsapp') return
+
+    redirectHandledRef.current = true
+    gtagEventThen(
+      'academy_apply_submit',
+      { form: 'qualify', programa: state.programa },
+      () => window.location.assign(redirectUrl),
+    )
+  }, [redirectUrl, state.programa])
+
+  useEffect(() => {
+    // Coming back from WhatsApp with the browser's Back button can restore this page from the
+    // back/forward cache with the success state (and a disabled button) intact — start fresh.
+    function handlePageShow(event: PageTransitionEvent) {
+      if (event.persisted && redirectHandledRef.current) window.location.reload()
+    }
+
+    window.addEventListener('pageshow', handlePageShow)
+    return () => window.removeEventListener('pageshow', handlePageShow)
+  }, [])
 
   const currentStep = steps[stepIndex]
   const currentValue = answers[currentStep.key]
@@ -359,7 +391,10 @@ export default function QualifyForm() {
           </button>
 
           {isLastStep ? (
-            <SubmitButton disabled={Boolean(validateStep(currentStep, currentValue, text))} />
+            <SubmitButton
+              disabled={Boolean(validateStep(currentStep, currentValue, text)) || redirecting}
+              busy={redirecting}
+            />
           ) : (
             <button
               type="button"

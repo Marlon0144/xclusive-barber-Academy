@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react'
 import { track } from '@/lib/analytics/track'
+import { gtagEvent } from '@/lib/analytics/gtag'
 
 const COOKIE_NAME = 'xba_application_submitted'
 
@@ -17,8 +18,11 @@ function clearCookie(name: string) {
 }
 
 /**
- * Fires `application_submit` exactly once, right after a new student lands
- * on /dashboard following a successful /apply signup.
+ * Fires `application_submit` (GTM/Meta, via track()) and `academy_apply_submit`
+ * (Google tag, via gtag()) exactly once, right after a new student lands on
+ * /dashboard following a successful /apply signup. The `programa` parameter
+ * is omitted here on purpose: the plan is chosen earlier, on /qualify, and
+ * isn't known to /apply.
  *
  * Why this exists: applyAccess() (app/apply/actions.ts) calls redirect()
  * on success, so the client never receives a `success: true` state to react
@@ -32,6 +36,7 @@ export function ApplicationSuccessTracker() {
     if (readCookie(COOKIE_NAME) !== '1') return
     clearCookie(COOKIE_NAME)
     track('application_submit')
+    gtagEvent('academy_apply_submit', { form: 'apply' })
   }, [])
 
   return null

@@ -20,10 +20,16 @@
 export const analyticsConfig = {
   gtmId: process.env.NEXT_PUBLIC_GTM_ID ?? 'GTM-TD78R9X9',
   ga4Id: process.env.NEXT_PUBLIC_GA4_ID ?? 'G-TX8M33DNRH',
+  // Google Ads tag (conversion tracking / remarketing). Shares the single
+  // gtag.js loader with GA4 — see components/analytics/GoogleAnalytics.tsx.
+  googleAdsId: process.env.NEXT_PUBLIC_GOOGLE_ADS_ID ?? 'AW-16998011333',
   metaPixelId: process.env.NEXT_PUBLIC_META_PIXEL_ID ?? '1169356005611386',
 } as const
 
 export const isGtmEnabled = analyticsConfig.gtmId.length > 0
 export const isGa4Enabled = analyticsConfig.ga4Id.length > 0
+export const isGoogleAdsEnabled = analyticsConfig.googleAdsId.length > 0
+/** True when at least one Google tag (GA4 and/or Google Ads) must be configured through gtag.js. */
+export const isGtagEnabled = isGa4Enabled || isGoogleAdsEnabled
 export const isMetaPixelEnabled = analyticsConfig.metaPixelId.length > 0
-export const isAnalyticsEnabled = isGtmEnabled || isGa4Enabled || isMetaPixelEnabled
+export const isAnalyticsEnabled = isGtmEnabled || isGtagEnabled || isMetaPixelEnabled

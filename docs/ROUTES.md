@@ -143,8 +143,14 @@ ApplyForm (client)
 - Upserts `crm_leads` by `phone_number` with `auto_score`,
   `status = contacted`, and completion timestamp
 - Upserts `crm_lead_answers` by `lead_id + question_key`
-- Redirects to WhatsApp deal chat (`https://wa.me/61413891977`) with prefilled
-  message personalized by selected plan (fallback to generic message)
+- Treats an empty or unknown `selectedPlan` as "no plan" instead of rejecting the
+  submission (the header link reaches this route without `?plan=`)
+- Returns `{ error: null, redirectUrl, programa }` on success, where
+  `redirectUrl` is the WhatsApp deal chat (`https://wa.me/61413891977`) with a
+  prefilled message personalized by selected plan (fallback to generic message).
+  It no longer calls `redirect()` itself: `QualifyForm` fires the
+  `academy_apply_submit` conversion first and then navigates (see
+  `docs/ANALYTICS_TRACKING_PLAN.md`)
 
 **Business behavior:**
 - Landing CTA buttons (`Header` + `PricingSection`) point to this route.

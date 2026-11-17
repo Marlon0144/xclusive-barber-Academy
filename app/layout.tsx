@@ -10,6 +10,7 @@ import { getOrganizationSchema } from "@/lib/seo/organization-schema";
 import { GoogleTagManagerScript, GoogleTagManagerNoScript } from "@/components/analytics/GoogleTagManager";
 import { MetaPixelScript, MetaPixelNoScript } from "@/components/analytics/MetaPixel";
 import { GoogleAnalyticsScript } from "@/components/analytics/GoogleAnalytics";
+import { OutboundContactTracker } from "@/components/analytics/OutboundContactTracker";
 
 // Figma source of truth: Poppins (ExtraBold for headings, Regular for body)
 const poppins = Poppins({
@@ -65,6 +66,7 @@ export default async function RootLayout({
       <body className={`${poppins.variable} antialiased bg-background text-foreground-strong`}>
         <GoogleTagManagerNoScript />
         <MetaPixelNoScript />
+        <OutboundContactTracker />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
