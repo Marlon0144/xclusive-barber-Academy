@@ -2,7 +2,7 @@
 
 This document covers setup, conventions, and patterns you need to
 follow when working on Xclusive Barber Academy. Read it before
-making your first contribution.
+making your first contribution
 
 ## Prerequisites
 
