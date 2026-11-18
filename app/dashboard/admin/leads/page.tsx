@@ -111,6 +111,25 @@ const QUESTION_LABELS: Record<string, string> = {
   career_start_window: 'Cuando quiere empezar',
   long_term_ambition: 'Ambicion a largo plazo',
   call_willingness: 'Disposicion a llamada',
+  // Short application form (/aplicar)
+  selected_plan: 'Programa de interes',
+  course_interest: 'Curso de interes',
+  experience_level: 'Experiencia',
+  how_heard: 'Como nos conocio',
+  privacy_consent: 'Consentimiento de contacto',
+  application_submitted_at: 'Solicitud enviada',
+  // Where the lead came from (captured from the ad click / visit)
+  attr_gclid: 'Origen: gclid (Google Ads)',
+  attr_gbraid: 'Origen: gbraid (Google Ads)',
+  attr_wbraid: 'Origen: wbraid (Google Ads)',
+  attr_fbclid: 'Origen: fbclid (Meta)',
+  attr_utm_source: 'Origen: utm_source',
+  attr_utm_medium: 'Origen: utm_medium',
+  attr_utm_campaign: 'Origen: campana (utm_campaign)',
+  attr_utm_term: 'Origen: palabra clave (utm_term)',
+  attr_utm_content: 'Origen: anuncio (utm_content)',
+  attr_landing_page: 'Origen: pagina de entrada',
+  attr_referrer: 'Origen: referido por',
 }
 
 const QUESTION_ORDER = [
@@ -125,6 +144,23 @@ const QUESTION_ORDER = [
   'career_start_window',
   'long_term_ambition',
   'call_willingness',
+  'selected_plan',
+  'course_interest',
+  'experience_level',
+  'how_heard',
+  'privacy_consent',
+  'application_submitted_at',
+  'attr_utm_source',
+  'attr_utm_medium',
+  'attr_utm_campaign',
+  'attr_utm_term',
+  'attr_utm_content',
+  'attr_gclid',
+  'attr_gbraid',
+  'attr_wbraid',
+  'attr_fbclid',
+  'attr_landing_page',
+  'attr_referrer',
 ]
 
 function formatAnswerValue(answer: LeadAnswer) {

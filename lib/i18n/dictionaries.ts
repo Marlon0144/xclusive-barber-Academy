@@ -142,6 +142,8 @@ export const dictionaries = {
         headingBottom: 'MERCADO AUSTRALIANO',
         paragraph:
           'Sistema de aprendizaje practico y estructurado para construir una carrera real, con estandares profesionales y mentalidad de negocio.',
+        seoHeading:
+          'Academia de barbería en Melbourne: formación práctica en una barbería real en Coburg',
         armAlt: 'Barber profesional',
       },
       targetAudience: {
@@ -198,6 +200,8 @@ export const dictionaries = {
         subtitle: 'Una academia creada desde la experiencia real',
         description:
           'Xclusive Barber Academy nace desde la experiencia directa de su fundador como migrante, barbero profesional y emprendedor en Australia.',
+        backgroundAlt:
+          'Interior de Xclusive Barber Coburg, una barbería real: techo hexagonal de luces LED, pared de ladrillo verde y sillones de barbero',
         imageAlt: 'Julian Giraldo - Fundador de Xclusive Barber Academy',
       },
       finalCta: {
@@ -241,7 +245,7 @@ export const dictionaries = {
               'Higiene de la barbería, fades, tijera, barba y estilos modernos',
               'Practica con clientes reales',
               'Kit profesional + uniforme',
-              'Certificado privado',
+              'Certificado de finalización de Xclusive Academy',
             ],
             ctaLabel: 'Aplicar ahora',
           },
@@ -864,6 +868,8 @@ export const dictionaries = {
         headingBottom: 'AUSTRALIAN MARKET',
         paragraph:
           'A practical and structured learning system to build a real career, with professional standards and business mindset.',
+        seoHeading:
+          'Barber academy in Melbourne: hands-on training inside a real barbershop in Coburg',
         armAlt: 'Professional barber',
       },
       targetAudience: {
@@ -920,6 +926,8 @@ export const dictionaries = {
         subtitle: 'An academy built from real experience',
         description:
           'Xclusive Barber Academy was born from the direct experience of its founder as a migrant, professional barber, and entrepreneur in Australia.',
+        backgroundAlt:
+          'Inside Xclusive Barber Coburg, a real barbershop: hexagonal LED ceiling, green brick wall and barber chairs',
         imageAlt: 'Julian Giraldo - Founder of Xclusive Barber Academy',
       },
       finalCta: {
@@ -963,7 +971,7 @@ export const dictionaries = {
               'Barbershop hygiene, fades, scissor work, beards, and modern styles',
               'Practice with real clients',
               'Professional kit + uniform',
-              'Private certificate',
+              'Xclusive Academy certificate of completion',
             ],
             ctaLabel: 'Apply now',
           },

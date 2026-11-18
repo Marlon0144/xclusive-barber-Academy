@@ -80,13 +80,16 @@ Notes:
 - **`/qualify` no longer redirects server-side.** `submitPublicLeadQualification`
   used to end with `redirect(whatsappUrl)`, which unloads the page before any
   client code can report the conversion. It now returns
-  `{ error: null, redirectUrl, programa }`; `QualifyForm` calls
-  `gtagEventThen('academy_apply_submit', …, () => window.location.assign(url))`,
-  which navigates as soon as Google confirms dispatch (≈10 ms in testing) or
-  after a 1 s cap, or immediately if gtag.js is blocked — a visitor is never
-  stuck waiting on analytics. The client only navigates to a `wa.me` URL.
-- **`/apply`** still uses the cookie bridge described below; the same tracker
-  now fires both `application_submit` (GTM/Meta) and `academy_apply_submit`.
+  `{ error: null, redirectUrl, programa, leadId, userData }`; `QualifyForm` calls
+  `reportLeadSubmission(…, { then: () => window.location.assign(url) })`, which
+  reports the conversion (see "Lead conversion" below) and navigates as soon as
+  Google confirms dispatch (≈5 ms in testing) or after the wait cap, or
+  immediately if gtag.js is blocked — a visitor is never stuck waiting on
+  analytics. The client only navigates to a `wa.me` URL.
+- **`/apply`** (invite-code registration) still uses the cookie bridge described below; the same
+  tracker fires both `application_submit` (GTM/Meta) and `academy_apply_submit`
+  (`form: 'apply'`). It does **not** report the Google Ads conversion: that person was already
+  counted as a lead at `/qualify` or `/aplicar`, and counting the enrolment too would double-count.
 - **Click tracking is a single delegated listener** (capture phase) in the root
   layout, so every current and future `wa.me` / `tel:` link is covered without
   touching call sites. It is additive to `TrackedLink`'s GTM-routed
@@ -110,10 +113,52 @@ Notes:
    gtag event sent this page-view.
 4. GA4 → Admin → DebugView (use Tag Assistant's debug connection) shows the
    events live; they appear in Reports → Events within ~24 h.
-5. `/qualify`: complete the wizard (with and without `?plan=elite`) — expect one
-   `academy_apply_submit` with `form=qualify` (and `programa=elite`) just before
-   the WhatsApp page opens. `/apply`: finish a signup with a valid invite code —
+5. `/qualify`: complete the wizard (with and without `?plan=elite`) — expect, just before the WhatsApp
+   page opens, `academy_apply_submit` (`form=qualify`, `programa=elite`) and a request to
+   `googleadservices.com/pagead/conversion/16998011333/?label=s44pCMiZnLodEMWjpKk_`.
+   `/aplicar`: submit the form — same requests on `/aplicar/gracias`; reload that page: nothing is repeated.
+   Enter with `?gclid=TEST123&utm_source=google` and check the form's hidden `attr_*` fields. `/apply`: finish a signup with a valid invite code —
    expect `academy_apply_submit` with `form=apply` on the next page.
+
+## Lead conversion (`lib/analytics/conversion.ts`)
+
+One function, `reportLeadSubmission`, is called by every successful *lead* path:
+`/qualify` (before navigating to WhatsApp) and `/aplicar/gracias`. In order it sends:
+
+1. **Enhanced conversions** — `gtag('set', 'user_data', { email, phone_number })` (email lower-cased,
+   phone in E.164; the Google tag hashes them in the browser).
+2. `academy_apply_submit` (`form: 'qualify' | 'aplicar'`, `programa`, `transaction_id`).
+3. **Google Ads conversion** — `gtag('event', 'conversion', { send_to: 'AW-16998011333/s44pCMiZnLodEMWjpKk_', value: 1.0, currency: 'AUD', transaction_id })`.
+4. **Meta Pixel `Lead`** with `eventID` = the same `transaction_id` (so a future Conversions API
+   event can be de-duplicated).
+
+**Exactly once per application:** `transaction_id` is the CRM lead id (stable, Google de-duplicates on
+it too) and a `sessionStorage` flag (`xba_conv_done:<id>`) blocks repeats. On `/aplicar/gracias` the
+payload is handed over through `sessionStorage` (`xba_pending_conversion`) and **consumed on first
+read**, so reloading or opening the thank-you page directly reports nothing. Honeypot hits carry no
+`leadId`, so bots never convert. If gtag.js is blocked the visitor still moves on.
+
+## Attribution: gclid / UTM → CRM (`lib/analytics/attribution.ts`)
+
+- `AttributionCapture` (root layout) writes the first-party cookie `xba_attr` (90 days) on every page load
+  with `gclid, gbraid, wbraid, fbclid, utm_source, utm_medium, utm_campaign, utm_term, utm_content`
+  plus `landing_page` and the external `referrer`.
+- A later visit **without** parameters never erases them; a later visit **with** parameters replaces them.
+- Only known keys are ever stored; values are trimmed, stripped of control chars and capped at 150 chars.
+- `AttributionFields` adds them as hidden inputs (`attr_gclid`, …) to the landing capture form,
+  `/qualify` and `/aplicar`; the server actions read the fields (cookie as fallback) and store one
+  `crm_lead_answers` row per key (`question_key = attr_<name>`, no schema change). They appear in
+  `/dashboard/admin/leads` with readable labels.
+
+## Meta Pixel standard events
+
+| Event | When | Where |
+|---|---|---|
+| `Lead` | Successful application (same `eventID` as the conversion's `transaction_id`) | `reportLeadSubmission` |
+| `ViewContent` (`content_name`: Barber Starter / Programa Profesional / Mentoría Elite 1 a 1 / Barber Business) | A program page loads | `components/analytics/ViewContentTracker.tsx` |
+| `Contact` | Click on any `wa.me` or `tel:` link | `OutboundContactTracker` |
+
+These are standard events (`fbq('track', …)`), separate from the legacy custom events sent by `track()`.
 
 ## Turning a provider off / changing an ID
 

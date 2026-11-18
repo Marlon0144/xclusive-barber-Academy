@@ -1,10 +1,14 @@
 import Image from "next/image";
 import ScrollReveal from "./ScrollReveal";
-import { getServerDictionary } from "@/lib/i18n/server";
+import { getServerDictionary, getServerLanguage } from "@/lib/i18n/server";
+import { localizedPath } from "@/lib/i18n/routes";
 import { TrackedLink } from "@/components/analytics/TrackedLink";
 
 export default async function FinalCtaSection() {
   const finalCta = (await getServerDictionary()).landing.finalCta;
+  // "Apply" goes to the short application form (/aplicar), in the visitor's language.
+  // /apply is the invite-code registration for students who were already accepted.
+  const applyHref = localizedPath("/aplicar", await getServerLanguage());
 
   return (
     <section className="relative w-full bg-[#161616] overflow-hidden -mt-10 z-50">
@@ -40,7 +44,7 @@ export default async function FinalCtaSection() {
 
         {/* Botón CTA — antes era un <div> decorativo sin href, no llevaba a ningún lado */}
         <TrackedLink
-          href="/apply"
+          href={applyHref}
           event="apply_click"
           className="absolute z-10 hover:brightness-110 transition-all duration-300 select-none block"
           style={{ top: "192px", left: "81px", width: "250px", height: "38px" }}
@@ -98,7 +102,7 @@ export default async function FinalCtaSection() {
 
         {/* Botón CTA — Figma: w=932px, h=135px, text-[64px] ExtraBold */}
         <TrackedLink
-          href="/apply"
+          href={applyHref}
           event="apply_click"
           className="relative hover:brightness-110 transition-all duration-300 mb-6 lg:mb-10 select-none block"
         >

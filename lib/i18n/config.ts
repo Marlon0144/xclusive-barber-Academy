@@ -6,6 +6,12 @@ export const DEFAULT_LANGUAGE: Language = 'es'
 export const LANGUAGE_COOKIE_NAME = 'preferred_language'
 export const LANGUAGE_COOKIE_MAX_AGE = 60 * 60 * 24 * 365
 
+/**
+ * Request header the middleware sets (overwriting any client value) so server
+ * components can read the URL path — see lib/i18n/server.ts.
+ */
+export const PATHNAME_HEADER = 'x-xba-pathname'
+
 export function isSupportedLanguage(value: unknown): value is Language {
   return typeof value === 'string' && SUPPORTED_LANGUAGES.includes(value as Language)
 }

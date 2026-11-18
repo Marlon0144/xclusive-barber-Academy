@@ -1,24 +1,17 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { getServerDictionary } from "@/lib/i18n/server";
+import { getServerDictionary, getServerLanguage } from "@/lib/i18n/server";
+import { localizedPath } from "@/lib/i18n/routes";
+import { buildPageMetadata } from "@/lib/seo/page-meta";
 
-export const metadata: Metadata = {
-  title: "Barber Training Programs in Coburg, Melbourne",
-  description:
-    "Explore every Xclusive Barber Academy training program in Coburg, Melbourne: Barber Starter Experience, Professional Xclusive Program, Elite Mentoring, and Barber Business Experience.",
-  alternates: {
-    canonical: "/courses",
-  },
-  openGraph: {
-    title: "Xclusive Barber Academy | Barber Training Programs in Coburg, Melbourne",
-    description:
-      "Explore every Xclusive Barber Academy training program in Coburg, Melbourne: Barber Starter Experience, Professional Xclusive Program, Elite Mentoring, and Barber Business Experience.",
-    url: "/courses",
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const language = await getServerLanguage();
+  return buildPageMetadata(localizedPath("/courses", language));
+}
 
 export default async function CoursesIndexPage() {
   const dictionary = await getServerDictionary();
+  const language = await getServerLanguage();
   const { pricing } = dictionary.landing;
   const { heading, subtitle } = dictionary.coursesPage;
 
@@ -39,7 +32,7 @@ export default async function CoursesIndexPage() {
               className="border-b border-[rgba(211,203,186,0.15)] pb-8 last:border-b-0"
             >
               <Link
-                href={`/courses/${plan.id}`}
+                href={localizedPath(`/courses/${plan.id}`, language)}
                 className="font-sans text-xl font-extrabold uppercase text-[#f0ece3] transition-colors hover:text-[#D4AF37] md:text-2xl"
               >
                 {plan.name}

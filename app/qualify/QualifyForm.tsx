@@ -7,7 +7,8 @@ import { useSearchParams } from 'next/navigation'
 import { submitPublicLeadQualification, type QualifyState } from './actions'
 import { useLanguage } from '@/components/i18n/LanguageProvider'
 import { classifyContactLink } from '@/lib/analytics/contact-links'
-import { gtagEventThen } from '@/lib/analytics/gtag'
+import { reportLeadSubmission } from '@/lib/analytics/conversion'
+import { AttributionFields } from '@/components/analytics/AttributionFields'
 import type { Dictionary } from '@/lib/i18n/dictionaries'
 
 const initialState: QualifyState = {
@@ -219,12 +220,25 @@ export default function QualifyForm() {
     if (classifyContactLink(redirectUrl)?.kind !== 'whatsapp') return
 
     redirectHandledRef.current = true
-    gtagEventThen(
-      'academy_apply_submit',
-      { form: 'qualify', programa: state.programa },
-      () => window.location.assign(redirectUrl),
+    const goToWhatsApp = () => window.location.assign(redirectUrl)
+
+    if (!state.leadId) {
+      // No lead id → nothing to attribute a conversion to; the visitor still goes to WhatsApp.
+      goToWhatsApp()
+      return
+    }
+
+    // Conversion first (Google Ads + GA4 + Meta Lead), then navigate — the page unloads on navigation.
+    void reportLeadSubmission(
+      {
+        transactionId: state.leadId,
+        form: 'qualify',
+        programa: state.programa,
+        userData: state.userData,
+      },
+      { then: goToWhatsApp, waitMs: 1500 },
     )
-  }, [redirectUrl, state.programa])
+  }, [redirectUrl, state.leadId, state.programa, state.userData])
 
   useEffect(() => {
     // Coming back from WhatsApp with the browser's Back button can restore this page from the
@@ -347,6 +361,7 @@ export default function QualifyForm() {
       <input type="hidden" name="longTermAmbition" value={answers.longTermAmbition} />
       <input type="hidden" name="callWillingness" value={answers.callWillingness} />
       <input type="hidden" name="selectedPlan" value={selectedPlan} />
+      <AttributionFields />
 
       <div className="space-y-3">
         <div className="flex items-center justify-between text-[10px] md:text-xs uppercase tracking-[0.2em] text-zinc-400">

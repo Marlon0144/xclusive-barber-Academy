@@ -16,6 +16,8 @@ export type GtagEventName =
   | 'academy_apply_submit'
   | 'academy_whatsapp_click'
   | 'academy_phone_click'
+  /** Google Ads conversion (needs `send_to: 'AW-…/<label>'` — see lib/analytics/conversion.ts). */
+  | 'conversion'
 
 export type GtagEventParams = Record<string, string | number | boolean | undefined>
 
@@ -78,4 +80,43 @@ export function gtagEventThen(
   // gtag may invoke event_callback once per destination (GA4 + Ads); `done` makes that harmless.
   const sent = send(name, { ...params, event_callback: finish, event_timeout: timeoutMs })
   if (!sent) finish()
+}
+
+/**
+ * `gtag('set', key, value)` — used to hand enhanced-conversions user data to
+ * the Google tag just before a conversion event. Returns whether gtag was present.
+ */
+export function gtagSet(key: string, value: Record<string, unknown>): boolean {
+  if (typeof window === 'undefined' || typeof window.gtag !== 'function') return false
+
+  try {
+    window.gtag('set', key, value)
+    return true
+  } catch {
+    return false
+  }
+}
+
+/**
+ * Resolves true as soon as gtag.js is available, or false after `maxWaitMs`.
+ * Needed for events fired on page load (e.g. the thank-you page): the Google
+ * tag is loaded `afterInteractive`, so it may not exist yet when the page's
+ * first effect runs. Resolves immediately when it's already there.
+ */
+export function waitForGtag(maxWaitMs = 8000, intervalMs = 100): Promise<boolean> {
+  if (typeof window === 'undefined') return Promise.resolve(false)
+  if (typeof window.gtag === 'function') return Promise.resolve(true)
+
+  return new Promise((resolve) => {
+    const startedAt = Date.now()
+    const timer = setInterval(() => {
+      if (typeof window.gtag === 'function') {
+        clearInterval(timer)
+        resolve(true)
+      } else if (Date.now() - startedAt >= maxWaitMs) {
+        clearInterval(timer)
+        resolve(false)
+      }
+    }, intervalMs)
+  })
 }

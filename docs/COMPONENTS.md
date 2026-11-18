@@ -435,6 +435,18 @@ a single route.
 |-----------|------|-------|
 | `QualifyForm` | Client | None (uses `submitPublicLeadQualification` via `useActionState`; on success reports `academy_apply_submit` and navigates to the returned WhatsApp URL) |
 
+### Marketing site components
+
+| Component | Type | Notes |
+|-----------|------|-------|
+| `SiteFooter` (`components/SiteFooter.tsx`) | Client | Public footer: programs, pillar/guide/PT links, address, contact. Only on public marketing paths |
+| `MobileStickyCta` (`components/MobileStickyCta.tsx`) | Client | Fixed bottom "Apply now" + WhatsApp bar below `lg`; hidden on the form and thank-you pages |
+| `DifferentiatorsBar` (`components/landing/`) | RSC/presentational | The five differentiators, es/en, under the intro of home, program and pillar pages |
+| `ContentPage` (`components/content/`) | RSC | Renders pillar/guide pages from a `PageContent` object (H1, sections, program table, FAQ + JSON-LD, CTA) |
+| `JsonLd` (`components/seo/`) | RSC | Safe `<script type="application/ld+json">` |
+| `ApplicationForm` (`app/aplicar/`) | Client | Short application form (7 fields + consent, honeypot, refills after errors) |
+| `ThankYouConversion` (`app/aplicar/gracias/`) | Client (renders `null`) | Reports the conversion once per application |
+
 ### Analytics components (`components/analytics/`)
 
 Rendered from `app/layout.tsx` unless noted. Behaviour, IDs and the full event
@@ -445,7 +457,10 @@ list live in `docs/ANALYTICS_TRACKING_PLAN.md`.
 | `GoogleAnalyticsScript` | RSC | Loads gtag.js once and configures GA4 (`G-…`) and Google Ads (`AW-…`) |
 | `GoogleTagManagerScript` / `GoogleTagManagerNoScript` | RSC | GTM container loader + `<noscript>` fallback |
 | `MetaPixelScript` / `MetaPixelNoScript` | RSC | Meta Pixel loader + `<noscript>` fallback |
-| `OutboundContactTracker` | Client (renders `null`) | One delegated click listener reporting `academy_whatsapp_click` (`wa.me`) and `academy_phone_click` (`tel:`) for every link on the site |
+| `OutboundContactTracker` | Client (renders `null`) | One delegated click listener reporting `academy_whatsapp_click` (`wa.me`) and `academy_phone_click` (`tel:`) — plus a Meta `Contact` — for every link on the site |
+| `AttributionCapture` | Client (renders `null`) | Writes the `xba_attr` cookie (gclid / UTM / landing page / referrer, 90 days) on every page load |
+| `AttributionFields` | Client | Hidden `attr_*` inputs for any lead `<form>` (`useSyncExternalStore` over the cookie) |
+| `ViewContentTracker` | Client (renders `null`) | Meta `ViewContent` for a program page |
 | `TrackedLink` | Client | Link wrapper firing a GTM-routed `track()` event on click |
 | `ApplicationSuccessTracker` | Client (renders `null`) | Mounted in `app/dashboard/layout.tsx`; fires `application_submit` + `academy_apply_submit` once after a successful `/apply` signup (reads the `xba_application_submitted` cookie) |
 

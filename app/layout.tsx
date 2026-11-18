@@ -5,12 +5,15 @@ import Header from "@/components/Header";
 import HeaderWrapper from "@/components/HeaderWrapper";
 import { LanguageProvider } from "@/components/i18n/LanguageProvider";
 import FloatingLanguageSwitcher from "@/components/i18n/FloatingLanguageSwitcher";
-import { getServerLanguage } from "@/lib/i18n/server";
+import { getHtmlLang, getServerLanguage } from "@/lib/i18n/server";
 import { getOrganizationSchema } from "@/lib/seo/organization-schema";
 import { GoogleTagManagerScript, GoogleTagManagerNoScript } from "@/components/analytics/GoogleTagManager";
 import { MetaPixelScript, MetaPixelNoScript } from "@/components/analytics/MetaPixel";
 import { GoogleAnalyticsScript } from "@/components/analytics/GoogleAnalytics";
 import { OutboundContactTracker } from "@/components/analytics/OutboundContactTracker";
+import { AttributionCapture } from "@/components/analytics/AttributionCapture";
+import SiteFooter from "@/components/SiteFooter";
+import MobileStickyCta from "@/components/MobileStickyCta";
 
 // Figma source of truth: Poppins (ExtraBold for headings, Regular for body)
 const poppins = Poppins({
@@ -54,10 +57,11 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const language = await getServerLanguage();
+  const htmlLang = await getHtmlLang();
   const organizationSchema = getOrganizationSchema();
 
   return (
-    <html lang={language}>
+    <html lang={htmlLang}>
       <head>
         <GoogleTagManagerScript />
         <GoogleAnalyticsScript />
@@ -67,6 +71,7 @@ export default async function RootLayout({
         <GoogleTagManagerNoScript />
         <MetaPixelNoScript />
         <OutboundContactTracker />
+        <AttributionCapture />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
@@ -79,6 +84,8 @@ export default async function RootLayout({
           <main>
             {children}
           </main>
+          <SiteFooter />
+          <MobileStickyCta />
         </LanguageProvider>
       </body>
     </html>

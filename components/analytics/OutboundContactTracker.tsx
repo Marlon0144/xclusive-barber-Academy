@@ -3,10 +3,12 @@
 import { useEffect } from 'react'
 import { classifyContactLink } from '@/lib/analytics/contact-links'
 import { gtagEvent } from '@/lib/analytics/gtag'
+import { fbqTrack } from '@/lib/analytics/meta'
 
 /**
  * Reports `academy_whatsapp_click` (links to wa.me) and `academy_phone_click`
- * (tel: links) to the Google tag, wherever on the site they appear.
+ * (tel: links) to the Google tag — and a Meta Pixel `Contact` — wherever on the
+ * site they appear.
  *
  * One delegated listener on `document` instead of per-link handlers: it
  * covers every current link (pricing, dashboard footer, final CTA, header…)
@@ -38,6 +40,8 @@ export function OutboundContactTracker() {
         link_url: link.url,
         page_path: window.location.pathname,
       })
+      // Meta standard event for the same click, so Meta Ads can optimise on contact intent.
+      fbqTrack('Contact', { content_name: link.kind === 'whatsapp' ? 'WhatsApp' : 'Phone' })
     }
 
     document.addEventListener('click', handleClick, true)

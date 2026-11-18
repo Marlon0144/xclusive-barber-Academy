@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { cn } from '@/lib/utils'
 import { track } from '@/lib/analytics/track'
+import { AttributionFields } from '@/components/analytics/AttributionFields'
 
 const initialState: CapturePhoneLeadState = {
   error: null,
@@ -72,6 +73,7 @@ export default function PhoneLeadCaptureForm({
   return (
 <div className={cn('w-full max-w-md mx-auto', className)}>
   <form action={formAction} className="flex w-full flex-col gap-3">
+    <AttributionFields />
     
     {/* FILA 1: Selector de País + Input de Teléfono */}
     <div className="flex w-full gap-2">

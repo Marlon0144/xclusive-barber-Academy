@@ -8,6 +8,8 @@ import type { LeadAnswers } from '@/types/crm'
 import { getServerDictionary, getServerLanguage } from '@/lib/i18n/server'
 import { interpolate } from '@/lib/i18n/dictionaries'
 import { checkActionRateLimit } from '@/lib/rate-limit'
+import { ATTRIBUTION_COOKIE } from '@/lib/analytics/attribution'
+import { readAttribution, saveLeadAttribution } from '@/lib/leads/attribution'
 
 export type QualifyState = {
   error?: string | null
@@ -20,6 +22,10 @@ export type QualifyState = {
   redirectUrl?: string
   /** Plan chosen on the pricing CTA, validated server-side (undefined when none was selected). */
   programa?: PlanKey
+  /** CRM lead id — the conversion's transaction_id (stable, so a retry can't count twice). */
+  leadId?: string
+  /** The visitor's own contact data, handed back for Google Ads enhanced conversions. */
+  userData?: { email?: string; phone?: string }
 }
 
 const WHATSAPP_DEAL_NUMBER = '61413891977'
@@ -123,13 +129,14 @@ export async function submitPublicLeadQualification(
 
   const { data: existingLeadByPhone } = await supabaseAdmin
     .from('crm_leads')
-    .select('id, stage3_entered_at')
+    .select('id, email, stage3_entered_at')
     .eq('phone_number', trackedPhone)
     .order('created_at', { ascending: true })
     .limit(1)
     .maybeSingle()
 
   let leadId = existingLeadByPhone?.id ?? null
+  const leadEmail = existingLeadByPhone?.email ?? undefined
 
   if (!leadId) {
     const { data: insertedLead, error: insertLeadError } = await supabaseAdmin
@@ -201,7 +208,20 @@ export async function submitPublicLeadQualification(
     return { error: messages.answersPartialError }
   }
 
+  // Where did this lead come from? Best-effort: never blocks the submission.
+  await saveLeadAttribution(
+    supabaseAdmin,
+    leadId,
+    readAttribution(formData, cookieStore.get(ATTRIBUTION_COOKIE)?.value),
+  )
+
   const whatsappMessage = buildWhatsAppDealMessage(messages, parsed.data.selectedPlan)
   const whatsappUrl = `https://wa.me/${WHATSAPP_DEAL_NUMBER}?text=${encodeURIComponent(whatsappMessage)}`
-  return { error: null, redirectUrl: whatsappUrl, programa: parsed.data.selectedPlan }
+  return {
+    error: null,
+    redirectUrl: whatsappUrl,
+    programa: parsed.data.selectedPlan,
+    leadId,
+    userData: { email: leadEmail, phone: trackedPhone },
+  }
 }

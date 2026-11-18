@@ -267,6 +267,8 @@ student.
 
 **Pre-lead notes:**
 - A pre-lead can start with email and phone (`source = landing_phone_capture`).
+- The short application form (`/aplicar`) reuses a lead found by phone/email or inserts one with
+  `source = aplicar_form`, `status = new`.
 - Visiting `/apply` marks intent with `source = apply_page_visit`
   when tracked pre-lead context exists.
 - Full name is completed later when the user progresses through
@@ -292,8 +294,16 @@ Stores each questionnaire response keyed by lead and question.
 | `answer_choice` | `text` | nullable | Choice answer |
 | `created_at` | `timestamptz` | NOT NULL, DEFAULT `now()` | Creation timestamp |
 
+**Known `question_key` values** (free text, no enum): the wizard's eleven questions and `selected_plan`;
+from the short application form (`/aplicar`): `course_interest`, `experience_level`, `how_heard`,
+`privacy_consent`, `application_submitted_at`; and lead attribution captured from the visit:
+`attr_gclid`, `attr_gbraid`, `attr_wbraid`, `attr_fbclid`, `attr_utm_source`, `attr_utm_medium`,
+`attr_utm_campaign`, `attr_utm_term`, `attr_utm_content`, `attr_landing_page`, `attr_referrer`
+(see `lib/leads/attribution.ts`; saving them is best-effort and never fails a submission).
+
 **Access patterns:**
 - Upserted from qualification action to persist latest questionnaire
+- Upserted from `/aplicar` (`submitAcademyApplication`) and, for `attr_*`, from the landing capture
 - Read by admin workflows for deeper lead context
 
 ## Row-Level Security (RLS)

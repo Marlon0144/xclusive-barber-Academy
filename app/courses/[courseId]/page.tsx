@@ -1,9 +1,17 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getServerDictionary, getServerLanguage } from "@/lib/i18n/server";
+import { ViewContentTracker } from "@/components/analytics/ViewContentTracker";
+import DifferentiatorsBar from "@/components/landing/DifferentiatorsBar";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { getSiteCopy } from "@/lib/content/site";
 import { COURSE_SLUGS, isCourseSlug } from "@/lib/data/course-slugs";
+import { programContentName } from "@/lib/data/programs";
+import { localizedPath } from "@/lib/i18n/routes";
+import { getServerDictionary, getServerLanguage } from "@/lib/i18n/server";
 import { getCourseSchema } from "@/lib/seo/course-schema";
+import { getBreadcrumbSchema } from "@/lib/seo/organization-schema";
+import { buildPageMetadata } from "@/lib/seo/page-meta";
 
 type PageProps = {
   params: Promise<{ courseId: string }>;
@@ -11,8 +19,9 @@ type PageProps = {
 
 // Known slugs today: starter, profesional, elite, business (see
 // lib/data/course-slugs.ts). Pages still render dynamically per-request
-// (getServerDictionary reads the language cookie), this just hints the
-// known routes to Next.js.
+// (getServerDictionary reads the language from the URL), this just hints the
+// known routes to Next.js. The English routes (/en/courses/professional…)
+// reuse this page: see app/en/courses/[courseId]/page.tsx.
 export function generateStaticParams() {
   return COURSE_SLUGS.map((courseId) => ({ courseId }));
 }
@@ -22,39 +31,22 @@ async function getPlan(courseId: string) {
   return pricing.plans.find((plan) => plan.id === courseId) ?? null;
 }
 
-// Plan names are stored ALL CAPS for on-page display emphasis, but an
-// all-caps <title> tag reads as shouting in search results/browser tabs.
-// Title-case it just for metadata; the visible page heading is untouched.
+// Plan names are stored ALL CAPS for on-page display emphasis; structured data reads better in
+// natural case ("Professional Xclusive Program"), so title-case it for schema.org only.
 function toTitleCase(value: string): string {
   return value
     .toLowerCase()
-    .split(' ')
+    .split(" ")
     .map((word) => (word ? word[0].toUpperCase() + word.slice(1) : word))
-    .join(' ');
+    .join(" ");
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { courseId } = await params;
   if (!isCourseSlug(courseId)) return {};
 
-  const plan = await getPlan(courseId);
-  if (!plan) return {};
-
-  const displayName = toTitleCase(plan.name);
-  const title = `${displayName} in Coburg, Melbourne`;
-
-  return {
-    title,
-    description: plan.hook,
-    alternates: {
-      canonical: `/courses/${courseId}`,
-    },
-    openGraph: {
-      title: `${title} | Xclusive Barber Academy`,
-      description: plan.hook,
-      url: `/courses/${courseId}`,
-    },
-  };
+  const language = await getServerLanguage();
+  return buildPageMetadata(localizedPath(`/courses/${courseId}`, language));
 }
 
 export default async function CourseDetailPage({ params }: PageProps) {
@@ -66,23 +58,34 @@ export default async function CourseDetailPage({ params }: PageProps) {
 
   const dictionary = await getServerDictionary();
   const language = await getServerLanguage();
+  const site = getSiteCopy(language);
+
+  const pagePath = localizedPath(`/courses/${courseId}`, language);
+  const homePath = language === "en" ? "/en" : "/";
+  const coursesPath = localizedPath("/courses", language);
+
   const courseSchema = getCourseSchema({
-    slug: courseId,
-    name: plan.name,
+    path: pagePath,
+    name: toTitleCase(plan.name),
     description: plan.description,
-    inLanguage: language,
   });
+  const breadcrumbSchema = getBreadcrumbSchema([
+    { name: site.breadcrumbs.home, path: homePath },
+    { name: site.breadcrumbs.courses, path: coursesPath },
+    { name: toTitleCase(plan.name), path: pagePath },
+  ]);
+
+  const contentName = programContentName(courseId);
 
   return (
     <div className="min-h-screen bg-[#161616] text-[#d3cbba]">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(courseSchema) }}
-      />
+      <JsonLd data={courseSchema} />
+      <JsonLd data={breadcrumbSchema} />
+      {contentName ? <ViewContentTracker contentName={contentName} contentId={courseId} /> : null}
 
-      <div className="mx-auto max-w-3xl px-4 py-16 md:px-8 md:py-24">
+      <div className="mx-auto max-w-3xl px-4 pt-16 md:px-8 md:pt-24">
         <Link
-          href="/courses"
+          href={coursesPath}
           className="mb-8 inline-block font-sans text-xs uppercase tracking-[0.14em] text-[#9ea79f] transition-colors hover:text-[#D4AF37]"
         >
           {dictionary.courseDetailPage.backLink}
@@ -94,7 +97,11 @@ export default async function CourseDetailPage({ params }: PageProps) {
         <p className="mb-6 font-sans text-sm font-semibold tracking-wide text-[#D4AF37] md:text-base">
           {plan.formatLabel}
         </p>
+      </div>
 
+      <DifferentiatorsBar language={language} />
+
+      <div className="mx-auto max-w-3xl px-4 py-10 md:px-8 md:pb-24">
         <p className="mb-8 font-sans text-base leading-relaxed text-[#c8c0ad] md:text-lg">
           {plan.description}
         </p>
@@ -130,6 +137,16 @@ export default async function CourseDetailPage({ params }: PageProps) {
         >
           {plan.ctaLabel}
         </Link>
+
+        <p className="mt-10 font-sans text-sm text-[#9ea79f]">
+          {site.courseExtras.learnMore}{" "}
+          <Link
+            href={language === "en" ? "/en/barber-course-melbourne" : "/curso-barberia-melbourne"}
+            className="text-[#D4AF37] underline-offset-4 hover:underline"
+          >
+            {site.courseExtras.pillarCta}
+          </Link>
+        </p>
       </div>
     </div>
   );

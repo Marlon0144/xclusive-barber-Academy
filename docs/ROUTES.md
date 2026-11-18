@@ -10,6 +10,7 @@ routes or modifying existing ones.
 | Route | Auth | Role | Rendering | First Load JS |
 |-------|------|------|-----------|---------------|
 | `/` | No | Any | RSC | Standard |
+| `/en` | No | Any | RSC (same page as `/`, English by URL) | Standard |
 | `/apply` | No | Any | RSC + Client | Standard |
 | `/login` | No | Any | RSC | Standard |
 | `/signup` | No | Any | Client | Standard |
@@ -25,12 +26,20 @@ routes or modifying existing ones.
 | `/dashboard/admin/lessons/[lessonId]/edit` | Yes | admin | RSC + Client | Standard |
 | `/dashboard/progreso_profesional` | Yes | Any | RSC | 139 B |
 | `/qualify` | No | Any | Dynamic RSC + Client | Standard |
+| `/aplicar`, `/en/apply-now` | No | Any | Dynamic RSC + Client (short application form, ad landing) | Standard |
+| `/aplicar/gracias`, `/en/apply-now/thank-you` | No | Any | RSC + Client (reports the conversion once; `noindex`) | Standard |
+| `/courses`, `/en/courses` | No | Any | RSC | Standard |
+| `/courses/[courseId]`, `/en/courses/[courseId]` | No | Any | RSC (`professional` ↔ `profesional` mapped in the `/en` wrapper) | Standard |
+| `/curso-barberia-melbourne`, `/en/barber-course-melbourne`, `/pt/curso-de-barbeiro-melbourne` | No | Any | RSC (pillar pages + FAQ) | Standard |
+| `/como-ser-barbero-en-australia` | No | Any | RSC (Spanish guide) | Standard |
 
 ## Internationalization coverage
 
 The language switcher (`FloatingLanguageSwitcher`) is rendered on all
 routes via the root layout; it persists `preferred_language` via the
-`setLanguagePreference` server action (`app/i18n/actions.ts`).
+`setLanguagePreference` server action (`app/i18n/actions.ts`). On public
+marketing pages every language has its own URL and the switcher navigates to the
+equivalent one (`lib/i18n/routes.ts`); see `docs/SEO_AND_ADS_PLAYBOOK.md`.
 
 | Surface | Status |
 |---------|--------|
@@ -145,7 +154,8 @@ ApplyForm (client)
 - Upserts `crm_lead_answers` by `lead_id + question_key`
 - Treats an empty or unknown `selectedPlan` as "no plan" instead of rejecting the
   submission (the header link reaches this route without `?plan=`)
-- Returns `{ error: null, redirectUrl, programa }` on success, where
+- Saves gclid/UTM/landing page/referrer as `attr_*` answers (best-effort)
+- Returns `{ error: null, redirectUrl, programa, leadId, userData }` on success, where
   `redirectUrl` is the WhatsApp deal chat (`https://wa.me/61413891977`) with a
   prefilled message personalized by selected plan (fallback to generic message).
   It no longer calls `redirect()` itself: `QualifyForm` fires the
@@ -157,6 +167,33 @@ ApplyForm (client)
 - Pricing plan cards append `?plan=<plan_key>` so the qualification submit carries
   plan context into CRM answers and WhatsApp message.
 - This route is the first conversion step before purchase and invite code.
+
+### `/aplicar` (ES) · `/en/apply-now` (EN) — Short application form
+
+**Files:** `app/aplicar/page.tsx`, `ApplicationForm.tsx`, `actions.ts` (the `/en` route re-exports the page)
+**Rendering:** Dynamic RSC + Client form · **Auth:** None (public) · This is the landing page for ads.
+`/apply` is a *different* page: the invite-code registration for accepted students.
+
+**Server Action:** `submitAcademyApplication(prevState, formData)`
+- Order: honeypot (`website` field → silent success, no write, no `leadId`) → rate limit (5 / 10 min) →
+  Zod validation → save → answers → attribution
+- Fields: full name, email, WhatsApp (Australian mobile, normalised to E.164), course of interest,
+  experience, suburb, how you heard about us + a consent checkbox
+- Reuses the lead found by phone/email (the landing capture creates one) or inserts a new
+  `crm_leads` row (`source = aplicar_form`, `status = new`)
+- Upserts `crm_lead_answers`: `course_interest`, `experience_level`, `how_heard`, `privacy_consent`,
+  `application_submitted_at`, and `selected_plan` when one of the four programs was chosen
+- Saves gclid/UTM/landing page/referrer as `attr_*` answers (best-effort)
+- On any error returns the typed values (`values`) and a `retryId`: React 19 resets uncontrolled forms
+  after every action, and `<select>`s ignore a changed `defaultValue`, so the form refills itself and
+  remounts the selects with `key={retryId}`
+- On success returns `{ ok, leadId, programa, userData }`; the form parks it in `sessionStorage`
+  (`xba_pending_conversion`) and navigates to the thank-you page
+
+### `/aplicar/gracias` · `/en/apply-now/thank-you`
+
+`noindex`. `ThankYouConversion` consumes the sessionStorage payload **once** and calls
+`reportLeadSubmission` (Google Ads conversion + GA4 + Meta Lead). Reload or direct visit reports nothing.
 
 ### `/login` — Login page
 

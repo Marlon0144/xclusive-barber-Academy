@@ -7,22 +7,12 @@ import InstructorSection from "@/components/landing/InstructorSection";
 import FinalCtaSection from "@/components/landing/FinalCtaSection";
 import PricingSection from "@/components/landing/PricingSection";
 import LandingFlowGate from "@/components/landing/LandingFlowGate";
+import DifferentiatorsBar from "@/components/landing/DifferentiatorsBar";
+import { getServerLanguage } from "@/lib/i18n/server";
+import { buildPageMetadata } from "@/lib/seo/page-meta";
 import { createClient } from "@/utils/supabase/server";
 
-export const metadata: Metadata = {
-  title: "Barber Training in Coburg, Melbourne",
-  description:
-    "Learn barbering in Coburg, Melbourne, inside a real operating barbershop. Practical, hands-on training programs at Xclusive Barber Academy — Barber Starter, Professional Xclusive Program, Elite Mentoring, and Barber Business Experience.",
-  alternates: {
-    canonical: "/",
-  },
-  openGraph: {
-    title: "Xclusive Barber Academy | Barber Training in Coburg, Melbourne",
-    description:
-      "Learn barbering in Coburg, Melbourne, inside a real operating barbershop. Practical, hands-on training programs at Xclusive Barber Academy.",
-    url: "/",
-  },
-};
+export const metadata: Metadata = buildPageMetadata("/");
 
 export default async function Home() {
   const supabase = await createClient();
@@ -31,6 +21,7 @@ export default async function Home() {
   } = await supabase.auth.getUser();
 
   const isAuthenticated = Boolean(user);
+  const language = await getServerLanguage();
 
   return (
     <div className="flex flex-col min-h-screen text-[#d3cbba] bg-[#161616] overflow-x-hidden">
@@ -40,6 +31,11 @@ export default async function Home() {
 
       {/* 2. TARGET AUDIENCE (Para quién es) */}
       <TargetAudienceSection />
+
+      {/* Differentiators: right after the intro blocks, in every language. (Placed after
+          TargetAudienceSection on purpose: that section overlaps the hero with negative margins
+          from the Figma layout, so anything inserted between them covers its title.) */}
+      <DifferentiatorsBar language={language} />
 
       <LandingFlowGate forceUnlocked={isAuthenticated}>
         <div id="landing-features-start">

@@ -4,7 +4,8 @@ import { createClient } from "@/utils/supabase/server"
 import { signout } from "@/app/auth/actions"
 import { Button } from "@/components/ui/button"
 import React from "react"
-import { getServerDictionary } from "@/lib/i18n/server"
+import { getServerDictionary, getServerLanguage } from "@/lib/i18n/server"
+import { localizedPath } from "@/lib/i18n/routes"
 
 // cache the current user so multiple components can read it without
 // re-running the request during the same render/flight.
@@ -19,7 +20,14 @@ const getCurrentUser = React.cache(async () => {
 export default async function Header() {
   const user = await getCurrentUser()
   const dictionary = await getServerDictionary()
+  const language = await getServerLanguage()
   const text = dictionary.header
+  // Links to public pages stay inside the visitor's language (/courses → /en/courses).
+  const homeHref = localizedPath("/", language)
+  const coursesHref = localizedPath("/courses", language)
+  // "Apply" is the short application form (/aplicar). /apply is the invite-code registration for
+  // students who were already accepted, so it is NOT where prospects should land.
+  const applyHref = localizedPath("/aplicar", language)
 
   return (
     /**
@@ -49,7 +57,7 @@ export default async function Header() {
         <div className="mx-auto flex h-[69px] w-full max-w-[1500px] items-center justify-between px-4 md:px-8">
 
           {/* Brand / Logo */}
-          <Link href="/" className="group flex items-center gap-3">
+          <Link href={homeHref} className="group flex items-center gap-3">
             {/* Mark icon */}
             <div className="relative h-[55px] w-[55px] shrink-0 md:h-[67px] md:w-[67px]">
               <Image
@@ -79,7 +87,7 @@ export default async function Header() {
             /* ── Authenticated state ── */
             <div className="flex items-center gap-2 md:gap-3">
               <Link
-                href="/courses"
+                href={coursesHref}
                 className="text-xs font-semibold uppercase tracking-wider text-[#d3cbba] transition-colors hover:text-white md:text-sm"
               >
                 {text.courses}
@@ -105,7 +113,7 @@ export default async function Header() {
             <nav className="flex items-center gap-2 sm:gap-4 md:gap-6 lg:gap-8">
               {/* PROGRAMAS — persistent link to the /courses index (Task #16 fix) */}
               <Link
-                href="/courses"
+                href={coursesHref}
                 className="text-[0.5rem] font-light uppercase tracking-widest text-[#d3cbba] transition-colors hover:text-white sm:text-[0.6rem] md:text-[0.7rem] lg:text-xs"
               >
                 {text.courses}
@@ -130,10 +138,9 @@ export default async function Header() {
               </Link>
 
               {/* APLICAR — Poppins Bold + golden divider accent (Figma: Rectangle 29).
-                  Points at /apply, so its anchor text should say "Apply", not
-                  "Create account". */}
+                  Points at the /aplicar application form (see applyHref above). */}
               <Link
-                href="/apply"
+                href={applyHref}
                 className="group relative flex flex-col items-center gap-0.5"
               >
                 <span className="text-[0.55rem] font-extrabold uppercase tracking-widest text-[#d3cbba] transition-colors group-hover:text-white sm:text-[0.65rem] md:text-[0.75rem] lg:text-sm">

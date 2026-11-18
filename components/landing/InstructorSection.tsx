@@ -11,10 +11,10 @@ export default async function InstructorSection() {
       {/* ── Background image — opacity applied directly so content above is unaffected ── */}
       <Image
         src="/assets/landing/barbershop-hero.jpg"
-        alt=""
+        alt={instructor.backgroundAlt}
         fill
+        sizes="100vw"
         className="object-cover object-center z-0 opacity-50"
-        aria-hidden="true"
       />
       {/* ── Bottom fade to dark ── */}
       <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-[#161616] to-transparent z-[2] pointer-events-none" />

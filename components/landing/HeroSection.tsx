@@ -37,6 +37,12 @@ export default async function HeroSection() {
 
   return (
     <section className="relative w-full bg-[#161616]">
+      {/*
+        The ONE h1 of the home page. The mobile and desktop layouts below both render the visual
+        headline, so their copies are <div>s (a page must have a single <h1>) and this heading
+        carries the keyword-rich title for crawlers and screen readers.
+      */}
+      <h1 className="sr-only">{hero.seoHeading}</h1>
 
       {/* ══════════════════════════════════════════════════════════════════════
           MOBILE LAYOUT  (< md)
@@ -102,9 +108,9 @@ export default async function HeroSection() {
         <div
           className="absolute top-[103px] left-1/2 -translate-x-1/2 z-20 w-[359px] text-center"
         >
-          <h1 className="font-sans font-extrabold uppercase text-[#d3cbba] text-[20px] leading-[1.25] tracking-tight">
+          <div className="font-sans font-extrabold uppercase text-[#d3cbba] text-[20px] leading-[1.25] tracking-tight">
             {hero.headingTop}
-          </h1>
+          </div>
           {/* Figma blank line between heading rows ≈ 17px */}
           <div className="h-[17px]" aria-hidden />
           <h2 className="font-sans font-extrabold uppercase text-[#d3cbba] text-[24px] leading-none tracking-tight">
@@ -194,7 +200,7 @@ export default async function HeroSection() {
               style={{ '--reveal-delay': '0.25s' } as React.CSSProperties}
             >
               {/* Lines 1-2 */}
-              <h1
+              <div
                 className="
                   font-sans font-extrabold uppercase text-[#d3cbba]
                   leading-[1.1] tracking-tight
@@ -202,7 +208,7 @@ export default async function HeroSection() {
                 "
               >
                 {hero.headingTop}
-              </h1>
+              </div>
 
               {/* Line 3 */}
               <h2

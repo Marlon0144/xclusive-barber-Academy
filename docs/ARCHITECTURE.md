@@ -83,18 +83,33 @@ are required.
 ## Internationalization (i18n)
 
 The project uses a **custom, typed dictionary** (no external i18n library such
-as next-intl/react-i18next). Language resolves from the
-`preferred_language` cookie with fallback to the `accept-language` header;
-default is Spanish (`es`). Switching is **cookie-based** — there is no URL
-locale prefix (`/en/...`).
+as next-intl/react-i18next). Default language is Spanish (`es`).
+
+**Language by URL (public marketing pages).** Each language has its own
+indexable URL — `/` (es) vs `/en` (en), `/courses/profesional` vs
+`/en/courses/professional`, etc. (`lib/i18n/routes.ts` is the source of truth).
+The middleware forwards the path to server components in the `x-xba-pathname`
+request header (always overwritten, so it can't be spoofed) and
+`getServerLanguage()` derives the language from it. A visitor's cookie or
+`accept-language` never changes what a public URL renders. Hreflang, canonical,
+`<html lang>` (`es-AU`/`en-AU`/`pt-AU`) and `sitemap.xml` come from the same module.
+
+**Language as a preference (everything else).** Pages without a language-specific
+URL (`/qualify`, `/apply`, `/login`, `/dashboard/*`) still use the
+`preferred_language` cookie with fallback to `accept-language`. On public pages the
+cookie *follows* the URL (so `/en` → `/qualify` stays English), and the middleware
+never writes it for `<Link>` prefetch requests. On the client,
+`LanguageProvider` also derives the language from the pathname on public pages,
+because the root layout is not re-rendered by soft navigation.
 
 | File | Responsibility |
 |------|----------------|
-| `lib/i18n/config.ts` | `Language` type, `SUPPORTED_LANGUAGES` (`es`, `en`), cookie name/age, `accept-language` parser |
-| `lib/i18n/server.ts` | `getServerLanguage()` / `getServerDictionary()` (RSC, `React.cache`) |
+| `lib/i18n/config.ts` | `Language` type, `SUPPORTED_LANGUAGES` (`es`, `en`), cookie name/age, `PATHNAME_HEADER`, `accept-language` parser |
+| `lib/i18n/routes.ts` | Language ↔ URL pairs, `languageForPath`, `counterpartPath`, `localizedPath`, `alternatesFor` (hreflang), `htmlLangForPath` |
+| `lib/i18n/server.ts` | `getServerLanguage()` / `getServerDictionary()` / `getHtmlLang()` (RSC, `React.cache`) |
 | `lib/i18n/dictionaries.ts` | Typed dictionary `{ es, en }` — single source of UI strings |
 | `components/i18n/LanguageProvider.tsx` | React context `useLanguage()` for client components |
-| `components/i18n/LanguageSwitcher.tsx` + `FloatingLanguageSwitcher.tsx` | Switcher UI (floating, rendered on all routes) |
+| `components/i18n/LanguageSwitcher.tsx` + `FloatingLanguageSwitcher.tsx` | Switcher UI (floating, rendered on all routes). On public pages it navigates to the equivalent URL |
 | `app/i18n/actions.ts` | `setLanguagePreference()` server action — persists cookie + `revalidatePath('/', 'layout')` |
 
 **Resolution pattern (RSC → client):** server components read
@@ -106,6 +121,11 @@ root layout).
 apply, qualify, `/courses`) is translated. The dashboard interior
 (`/dashboard`, course viewer, lesson player, tracker, grading, progress, admin)
 still contains hardcoded Spanish and is the pending scope of the i18n spec.
+
+**Extra content modules.** Long-form/marketing copy that is not part of the dictionary lives in
+`lib/content/*` as `Record<Language, …>` (site chrome, application form, pillar pages, FAQ,
+Portuguese page) so a missing translation is a compile error; the dictionary parity test
+only covers `lib/i18n/dictionaries.ts`.
 
 **Content localization:** module/lesson *titles* are stored in Spanish in
 Supabase. The completion spec adds nullable `*_en` columns with a Spanish

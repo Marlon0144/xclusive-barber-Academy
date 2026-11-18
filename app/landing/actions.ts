@@ -1,10 +1,13 @@
 'use server'
 
+import { cookies } from 'next/headers'
 import { z } from 'zod'
 import { createAdminClient } from '@/utils/supabase/server'
 import { normalizePhoneNumber } from '@/utils/phone'
 import { getServerDictionary } from '@/lib/i18n/server'
 import { checkActionRateLimit } from '@/lib/rate-limit'
+import { ATTRIBUTION_COOKIE } from '@/lib/analytics/attribution'
+import { readAttribution, saveLeadAttribution } from '@/lib/leads/attribution'
 
 export type CapturePhoneLeadState = {
   error?: string | null
@@ -80,6 +83,11 @@ export async function capturePhoneLead(
   const supabaseAdmin = createAdminClient()
   const now = new Date().toISOString()
 
+  // Where did this lead come from? (gclid / UTM / landing page / referrer) — best-effort, never fails the capture.
+  const cookieStore = await cookies()
+  const attribution = readAttribution(formData, cookieStore.get(ATTRIBUTION_COOKIE)?.value)
+  const persistAttribution = (leadId: string) => saveLeadAttribution(supabaseAdmin, leadId, attribution)
+
   const { data: phoneLead, error: phoneLeadError } = await supabaseAdmin
     .from('crm_leads')
     .select('id, email, stage1_entered_at')
@@ -122,6 +130,7 @@ export async function capturePhoneLead(
       return { error: messages.registerFailed, success: false }
     }
 
+    await persistAttribution(phoneLead.id)
     return { success: true, error: null, phone: normalized.value }
   }
 
@@ -155,10 +164,11 @@ export async function capturePhoneLead(
       return { error: messages.registerFailed, success: false }
     }
 
+    await persistAttribution(emailLead.id)
     return { success: true, error: null, phone: normalized.value }
   }
 
-  const { error: insertError } = await supabaseAdmin.from('crm_leads').insert({
+  const { data: insertedLead, error: insertError } = await supabaseAdmin.from('crm_leads').insert({
     full_name: null,
     email: normalizedEmail,
     phone_number: normalized.value,
@@ -167,7 +177,7 @@ export async function capturePhoneLead(
     stage1_entered_at: now,
     auto_score: 0,
     updated_at: now,
-  })
+  }).select('id').single()
 
   if (insertError) {
     console.error('capturePhoneLead insertError:', insertError)
@@ -201,5 +211,6 @@ export async function capturePhoneLead(
     return { error: messages.registerFailed, success: false }
   }
 
+  if (insertedLead?.id) await persistAttribution(insertedLead.id)
   return { success: true, error: null, phone: normalized.value }
 }
