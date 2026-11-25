@@ -4,7 +4,7 @@ import { ACCREDITATION_FAQ_QUESTIONS, faqEn, faqEs, faqPt } from '@/lib/content/
 import { guideEs, pillarEn, pillarEs, pillarPt, type PageContent } from '@/lib/content/pillar'
 import { siteCopy } from '@/lib/content/site'
 import { dictionaries } from '@/lib/i18n/dictionaries'
-import { PAGE_META } from '@/lib/seo/page-meta'
+import { APPLY_META, PAGE_META } from '@/lib/seo/page-meta'
 
 /**
  * LEGAL RULE: the Academy is private, NON-accredited training. Copy must never claim
@@ -18,6 +18,7 @@ const FORBIDDEN = [
   /accredit/i,
   /credenciad/i,
   /certificado oficial/i,
+  /\bcertificates?\b/i, // English only — "Certificado de finalización de Xclusive Academy" (ES) stays allowed
   /official certificate/i,
   /nationally recogni[sz]ed/i,
   /reconocid[oa] (a nivel )?nacional/i,
@@ -57,6 +58,7 @@ function withoutFaq(content: PageContent) {
 describe('legal words — no accreditation / visa / guarantee / ranking claims', () => {
   it('page titles and descriptions', () => {
     expect(violations(strings(PAGE_META))).toEqual([])
+    expect(violations(strings(APPLY_META))).toEqual([])
   })
 
   it('site chrome copy (footer, sticky CTA, differentiators)', () => {
@@ -105,5 +107,7 @@ describe('legal words — no accreditation / visa / guarantee / ranking claims',
     expect(violations(['La mejor academia'])).toHaveLength(1)
     expect(violations(['Revisa las opciones'])).toEqual([]) // "Revisa" must not match \bvisa
     expect(violations(['Certificado de finalización de Xclusive Academy'])).toEqual([])
+    expect(violations(['Private certificate'])).toHaveLength(1)
+    expect(violations(['Get your certificate'])).toHaveLength(1)
   })
 })

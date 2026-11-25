@@ -71,7 +71,7 @@ describe('reportLeadSubmission', () => {
     expect(calls[1]).toEqual([
       'event',
       'academy_apply_submit',
-      { form: 'aplicar', programa: 'elite', transaction_id: 'lead-123' },
+      { form: 'aplicar', program: 'elite', transaction_id: 'lead-123' },
     ])
 
     const [, name, params] = calls[2]

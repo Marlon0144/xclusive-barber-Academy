@@ -118,7 +118,7 @@ export async function reportLeadSubmission(
     })
   }
 
-  gtagEvent('academy_apply_submit', { form, programa, transaction_id: transactionId })
+  gtagEvent('academy_apply_submit', { form, program: programa, transaction_id: transactionId })
 
   gtagEventThen(
     'conversion',

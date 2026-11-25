@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { PAGE_META, buildPageMetadata, OG_IMAGE_PATH } from '@/lib/seo/page-meta'
+import { APPLY_META, PAGE_META, buildApplyMetadata, buildPageMetadata, OG_IMAGE_PATH } from '@/lib/seo/page-meta'
 
 describe('PAGE_META limits', () => {
   it.each(Object.entries(PAGE_META))('%s — title ≤ 60 and description ≤ 155 chars', (_path, meta) => {
@@ -12,6 +12,25 @@ describe('PAGE_META limits', () => {
   it('titles are unique (no two pages compete with the same title)', () => {
     const titles = Object.values(PAGE_META).map((meta) => meta.title)
     expect(new Set(titles).size).toBe(titles.length)
+  })
+})
+
+describe('/apply metadata (invite-code registration, language by preference)', () => {
+  it.each(Object.entries(APPLY_META))('%s — within title/description limits', (_language, meta) => {
+    expect(meta.title.length).toBeLessThanOrEqual(60)
+    expect(meta.description.length).toBeLessThanOrEqual(155)
+  })
+
+  it('serves Spanish by default and English on request, with a self canonical', () => {
+    const es = buildApplyMetadata('es')
+    const en = buildApplyMetadata('en')
+
+    expect(es.title).toEqual({ absolute: APPLY_META.es.title })
+    expect(en.title).toEqual({ absolute: APPLY_META.en.title })
+    expect(es.title).not.toEqual(en.title)
+    expect(es.alternates?.canonical).toBe('/apply')
+    expect((es.openGraph as { locale: string }).locale).toBe('es_AU')
+    expect((en.openGraph as { locale: string }).locale).toBe('en_AU')
   })
 })
 

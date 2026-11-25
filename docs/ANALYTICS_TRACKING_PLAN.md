@@ -68,10 +68,10 @@ they can't collide.
 
 | Event | Fired when | Params | Source |
 |---|---|---|---|
-| `academy_apply_submit` | `/qualify` wizard submitted **successfully** (server saved the lead) | `form: 'qualify'`, `programa` (`starter` \| `profesional` \| `elite` \| `business`, omitted when no plan was chosen) | `app/qualify/QualifyForm.tsx` |
+| `academy_apply_submit` | `/qualify` wizard submitted **successfully** (server saved the lead) | `form: 'qualify'`, `program` (`starter` \| `profesional` \| `elite` \| `business`, omitted when no plan was chosen), `transaction_id` | `app/qualify/QualifyForm.tsx` via `reportLeadSubmission` |
 | `academy_apply_submit` | `/apply` signup completed **successfully** (account created, invite code redeemed) | `form: 'apply'` (`programa` isn't known here) | `components/analytics/ApplicationSuccessTracker.tsx` |
-| `academy_whatsapp_click` | Any link to `wa.me` is clicked, anywhere on the site | `link_url` (origin + path, **without** the `?text=` message), `page_path` | `components/analytics/OutboundContactTracker.tsx` |
-| `academy_phone_click` | Any `tel:` link is clicked, anywhere on the site | `link_url` (`tel:…`), `page_path` | `components/analytics/OutboundContactTracker.tsx` |
+| `academy_whatsapp_click` | Any link to `wa.me` **or `api.whatsapp.com`** is clicked, anywhere on the site | `link_url` (endpoint only, **without** the number/`?text=` query), `page` (route of the click) | `components/analytics/OutboundContactTracker.tsx` |
+| `academy_phone_click` | Any `tel:` link is clicked, anywhere on the site | `link_url` (`tel:…`), `page` (route of the click) | `components/analytics/OutboundContactTracker.tsx` |
 
 Notes:
 
@@ -94,7 +94,7 @@ Notes:
   layout, so every current and future `wa.me` / `tel:` link is covered without
   touching call sites. It is additive to `TrackedLink`'s GTM-routed
   `whatsapp_click`. Dashboard footer clicks (existing students) also fire it;
-  filter on `page_path` when building audiences/conversions.
+  filter on `page` when building audiences/conversions.
 - **These events are not Google Ads conversions by themselves.** The tag
   records them in GA4, and Ads receives the signal, but to *optimise bidding*
   on them either import the GA4 key events into Google Ads, or create Ads
@@ -127,7 +127,7 @@ One function, `reportLeadSubmission`, is called by every successful *lead* path:
 
 1. **Enhanced conversions** — `gtag('set', 'user_data', { email, phone_number })` (email lower-cased,
    phone in E.164; the Google tag hashes them in the browser).
-2. `academy_apply_submit` (`form: 'qualify' | 'aplicar'`, `programa`, `transaction_id`).
+2. `academy_apply_submit` (`form: 'qualify' | 'aplicar'`, `program`, `transaction_id`).
 3. **Google Ads conversion** — `gtag('event', 'conversion', { send_to: 'AW-16998011333/s44pCMiZnLodEMWjpKk_', value: 1.0, currency: 'AUD', transaction_id })`.
 4. **Meta Pixel `Lead`** with `eventID` = the same `transaction_id` (so a future Conversions API
    event can be de-duplicated).

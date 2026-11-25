@@ -971,7 +971,7 @@ export const dictionaries = {
               'Barbershop hygiene, fades, scissor work, beards, and modern styles',
               'Practice with real clients',
               'Professional kit + uniform',
-              'Xclusive Academy certificate of completion',
+              'Xclusive Academy completion confirmation',
             ],
             ctaLabel: 'Apply now',
           },

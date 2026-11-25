@@ -7,11 +7,12 @@ Code that implements it: `lib/i18n/routes.ts`, `lib/seo/*`, `lib/content/*`,
 ## 1. Legal rule (mandatory, enforced by tests)
 
 The Academy is **private, NON-accredited** training. In no text, title, meta,
-schema or image may the site say: *acreditado / accredited / certificado oficial /
+schema or image may the site say: *acreditado / accredited / certificado oficial / certificate (English) /
 nationally recognised / Cert III / SHB… / RTO / visa / garantizado / #1 / el mejor*.
 
-- Allowed: "certificado de finalización de Xclusive Academy" — **only if one is really
-  delivered** (the pricing card has said so since before this work; confirm it).
+- Allowed (Spanish only): "certificado de finalización de Xclusive Academy" — **only if one is really
+  delivered** (the pricing card has said so since before this work; confirm it). English copy avoids the word
+  "certificate" altogether ("completion confirmation").
 - The single, deliberate exception is the FAQ entry **"¿El curso es acreditado?"**
   (and its EN/PT twins in `lib/content/faq.ts`), whose honest answer must name Cert III / RTO to
   say the course is *not* one.

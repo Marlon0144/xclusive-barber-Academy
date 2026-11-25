@@ -18,7 +18,7 @@ import { fbqTrack } from '@/lib/analytics/meta'
  *
  * This is additive to the GTM-routed `whatsapp_click` fired by TrackedLink —
  * different event name, different pipeline (direct gtag), so nothing is
- * double-counted. `page_path` is included so dashboard clicks (existing
+ * double-counted. `page` (the route of the click) is included so dashboard clicks (existing
  * students asking for support) can be told apart from landing-page clicks
  * (prospects) when building audiences/conversions.
  *
@@ -38,7 +38,7 @@ export function OutboundContactTracker() {
 
       gtagEvent(link.kind === 'whatsapp' ? 'academy_whatsapp_click' : 'academy_phone_click', {
         link_url: link.url,
-        page_path: window.location.pathname,
+        page: window.location.pathname,
       })
       // Meta standard event for the same click, so Meta Ads can optimise on contact intent.
       fbqTrack('Contact', { content_name: link.kind === 'whatsapp' ? 'WhatsApp' : 'Phone' })

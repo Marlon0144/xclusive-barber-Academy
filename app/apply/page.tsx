@@ -5,23 +5,13 @@ import { cookies } from 'next/headers'
 import ApplyForm from './ApplyForm'
 import { AuthCard, AuthCardContent } from '@/components/ui/auth-card'
 import { DashboardFooter } from '@/components/dashboard/DashboardFooter'
+import { getServerLanguage } from '@/lib/i18n/server'
+import { buildApplyMetadata } from '@/lib/seo/page-meta'
 import { createAdminClient } from '@/utils/supabase/server'
 
-export const metadata: Metadata = {
-  title: {
-    absolute: 'Apply to Xclusive Barber Academy',
-  },
-  description:
-    'Start your application to Xclusive Barber Academy in Coburg, Melbourne. Practical, hands-on barber training inside a real operating barbershop.',
-  alternates: {
-    canonical: '/apply',
-  },
-  openGraph: {
-    title: 'Apply to Xclusive Barber Academy',
-    description:
-      'Start your application to Xclusive Barber Academy in Coburg, Melbourne. Practical, hands-on barber training inside a real operating barbershop.',
-    url: '/apply',
-  },
+// Title/description in the visitor's language (ES default, EN available) — see lib/seo/page-meta.ts.
+export async function generateMetadata(): Promise<Metadata> {
+  return buildApplyMetadata(await getServerLanguage())
 }
 
 export default async function ApplyPage() {

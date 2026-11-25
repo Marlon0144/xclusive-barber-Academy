@@ -16,6 +16,7 @@
  */
 
 import type { Metadata } from 'next'
+import type { Language } from '@/lib/i18n/config'
 import { alternatesFor, normalizePathname } from '@/lib/i18n/routes'
 
 export type PageMeta = { title: string; description: string }
@@ -132,6 +133,51 @@ export const PAGE_META: Record<string, PageMeta> = {
     description:
       'Curso de barbeiro em Melbourne: 80% prática com clientes reais, dentro de uma barbearia em Coburg. Aulas em espanhol e inglês.',
   },
+}
+
+/**
+ * /apply is the invite-code registration for already-accepted students. It has no
+ * language-specific URL (the language is the visitor's preference), so its metadata
+ * is chosen by language instead of by path.
+ */
+export const APPLY_META: Record<Language, PageMeta> = {
+  es: {
+    title: 'Registro con código de invitación · Xclusive Academy',
+    description:
+      'Crea tu cuenta de alumno con tu código de invitación. ¿Aún no aplicaste? Envía tu solicitud en 2 minutos y te escribimos por WhatsApp.',
+  },
+  en: {
+    title: 'Join with Your Invitation Code · Xclusive Academy',
+    description:
+      "Create your student account with your invitation code. Haven't applied yet? Send your application in 2 minutes and we'll message you on WhatsApp.",
+  },
+}
+
+export function buildApplyMetadata(language: Language): Metadata {
+  const meta = APPLY_META[language]
+  const { og, imageAlt } = localeFor(language === 'en' ? '/en' : '/')
+  const image = { url: OG_IMAGE_PATH, width: 1200, height: 630, alt: imageAlt }
+
+  return {
+    title: { absolute: meta.title },
+    description: meta.description,
+    alternates: { canonical: '/apply' },
+    openGraph: {
+      type: 'website',
+      siteName: 'Xclusive Barber Academy',
+      locale: og,
+      title: meta.title,
+      description: meta.description,
+      url: '/apply',
+      images: [image],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: meta.title,
+      description: meta.description,
+      images: [{ url: OG_IMAGE_PATH, alt: imageAlt }],
+    },
+  }
 }
 
 const NOINDEX_PATHS = new Set<string>(['/aplicar/gracias', '/en/apply-now/thank-you'])

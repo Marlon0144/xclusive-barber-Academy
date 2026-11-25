@@ -168,6 +168,11 @@ ApplyForm (client)
   plan context into CRM answers and WhatsApp message.
 - This route is the first conversion step before purchase and invite code.
 
+### `/apply` — metadata
+
+Title/description come from `buildApplyMetadata(language)` (`lib/seo/page-meta.ts`): Spanish by default, English
+when the visitor's language preference is English (this page has no language-specific URL).
+
 ### `/aplicar` (ES) · `/en/apply-now` (EN) — Short application form
 
 **Files:** `app/aplicar/page.tsx`, `ApplicationForm.tsx`, `actions.ts` (the `/en` route re-exports the page)

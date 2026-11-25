@@ -15,6 +15,14 @@ describe('classifyContactLink', () => {
     })
   })
 
+  it('classifies api.whatsapp.com links as whatsapp and drops the number/message query', () => {
+    expect(classifyContactLink('https://api.whatsapp.com/send?phone=61413891977&text=Hola')).toEqual({
+      kind: 'whatsapp',
+      url: 'https://api.whatsapp.com/send',
+    })
+    expect(classifyContactLink('https://api.whatsapp.com/send/?phone=61413891977')?.kind).toBe('whatsapp')
+  })
+
   it('normalises an http wa.me link to https in the reported url', () => {
     expect(classifyContactLink('http://wa.me/61413891977')?.url).toBe('https://wa.me/61413891977')
   })
@@ -30,6 +38,8 @@ describe('classifyContactLink', () => {
     expect(classifyContactLink('https://wa.me.evil.example/61413891977')).toBeNull()
     expect(classifyContactLink('https://notwa.me/61413891977')).toBeNull()
     expect(classifyContactLink('https://example.com/wa.me/61413891977')).toBeNull()
+    expect(classifyContactLink('https://api.whatsapp.com.evil.example/send?phone=1')).toBeNull()
+    expect(classifyContactLink('https://www.whatsapp.com/')).toBeNull()
   })
 
   it('ignores other protocols and ordinary links', () => {

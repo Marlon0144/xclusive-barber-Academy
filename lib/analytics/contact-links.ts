@@ -1,6 +1,6 @@
 /**
  * Classifies an absolute link URL as an outbound *contact* touchpoint
- * (WhatsApp or phone) so a single global click listener can report it —
+ * (WhatsApp — wa.me or api.whatsapp.com — or phone) so a single global click listener can report it —
  * see components/analytics/OutboundContactTracker.tsx.
  *
  * Pure on purpose (no DOM, no window): that keeps the matching rules unit-
@@ -35,8 +35,15 @@ export function classifyContactLink(href: string | null | undefined): ContactLin
   }
 
   // Exact hostname match: `wa.me.evil.example` or `notwa.me` must NOT count.
-  if ((parsed.protocol === 'https:' || parsed.protocol === 'http:') && parsed.hostname === 'wa.me') {
-    return { kind: 'whatsapp', url: `https://wa.me${parsed.pathname}` }
+  // Both official WhatsApp link formats are recognised: wa.me/<number> and api.whatsapp.com/send?phone=<number>.
+  if (parsed.protocol === 'https:' || parsed.protocol === 'http:') {
+    if (parsed.hostname === 'wa.me') {
+      return { kind: 'whatsapp', url: `https://wa.me${parsed.pathname}` }
+    }
+    if (parsed.hostname === 'api.whatsapp.com') {
+      // The query holds the number and the pre-filled text; only the endpoint is worth reporting.
+      return { kind: 'whatsapp', url: `https://api.whatsapp.com${parsed.pathname}` }
+    }
   }
 
   return null
