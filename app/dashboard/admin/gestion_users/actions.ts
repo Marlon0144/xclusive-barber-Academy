@@ -6,32 +6,17 @@ import { redirect } from 'next/navigation'
 import { createAdminClient, createClient } from '@/utils/supabase/server'
 import { normalizePhoneNumber } from '@/utils/phone'
 import { getServerDictionary } from '@/lib/i18n/server'
-
-type UserRole = 'admin' | 'instructor' | 'student'
-const MIN_INVITE_USES = 1
-const MAX_INVITE_USES = 50
-
-const VALID_ROLES = new Set<UserRole>(['admin', 'instructor', 'student'])
+import {
+  createInvitationSchema,
+  deleteInvitationSchema,
+  toggleInvitationStatusSchema,
+  updateUserRoleSchema,
+  uuidSchema,
+} from '@/lib/validation/gestion-users'
 
 async function getAdminUserMessages() {
   const dictionary = await getServerDictionary()
   return dictionary.actions.adminUsers
-}
-
-function parseRole(raw: FormDataEntryValue | null): UserRole | null {
-  if (typeof raw !== 'string') return null
-  if (!VALID_ROLES.has(raw as UserRole)) return null
-  return raw as UserRole
-}
-
-function parseMaxUses(raw: FormDataEntryValue | null): number | null {
-  if (typeof raw !== 'string') return null
-
-  const value = Number(raw)
-  if (!Number.isInteger(value)) return null
-  if (value < MIN_INVITE_USES || value > MAX_INVITE_USES) return null
-
-  return value
 }
 
 async function assertAdmin(): Promise<{ ok: true; userId: string } | { ok: false; error: string }> {
@@ -76,15 +61,16 @@ export async function createInviteCodeAction(formData: FormData): Promise<void> 
   if (!adminCheck.ok) return
   const messages = await getAdminUserMessages()
 
-  const role = parseRole(formData.get('role_to_assign'))
-  if (!role) {
+  // REQ-FUNC-003 — validación Zod en lugar de parseo manual de FormData
+  const parsed = createInvitationSchema.safeParse({
+    role: formData.get('role_to_assign'),
+    maxUses: formData.get('max_uses'),
+  })
+  if (!parsed.success) {
     return
   }
 
-  const maxUses = parseMaxUses(formData.get('max_uses'))
-  if (maxUses === null) {
-    return
-  }
+  const { role, maxUses } = parsed.data
 
   const rawLeadPhone = formData.get('lead_phone')
   const leadPhoneInput = typeof rawLeadPhone === 'string' ? rawLeadPhone.trim() : ''
@@ -152,22 +138,21 @@ export async function toggleInviteStatusAction(formData: FormData): Promise<void
   const adminCheck = await assertAdmin()
   if (!adminCheck.ok) return
 
-  const inviteId = formData.get('invite_id')
-  const nextActive = formData.get('next_active')
-
-  if (typeof inviteId !== 'string' || !inviteId) {
+  const parsed = toggleInvitationStatusSchema.safeParse({
+    invitationId: formData.get('invite_id'),
+    nextActive: formData.get('next_active'),
+  })
+  if (!parsed.success) {
     return
   }
 
-  if (nextActive !== 'true' && nextActive !== 'false') {
-    return
-  }
+  const { invitationId, nextActive } = parsed.data
 
   const supabaseAdmin = createAdminClient()
   const { error } = await supabaseAdmin
     .from('invitations')
     .update({ is_active: nextActive === 'true' })
-    .eq('id', inviteId)
+    .eq('id', invitationId)
 
   if (error) return
 
@@ -178,16 +163,15 @@ export async function updateUserRoleAction(formData: FormData): Promise<void> {
   const adminCheck = await assertAdmin()
   if (!adminCheck.ok) return
 
-  const userId = formData.get('user_id')
-  const role = parseRole(formData.get('role'))
-
-  if (typeof userId !== 'string' || !userId) {
+  const parsed = updateUserRoleSchema.safeParse({
+    userId: formData.get('user_id'),
+    role: formData.get('role'),
+  })
+  if (!parsed.success) {
     return
   }
 
-  if (!role) {
-    return
-  }
+  const { userId, role } = parsed.data
 
   const supabaseAdmin = createAdminClient()
 
@@ -230,14 +214,18 @@ export async function deleteInvitationAction(formData: FormData): Promise<void> 
   const adminCheck = await assertAdmin()
   if (!adminCheck.ok) return
 
-  const inviteId = formData.get('invite_id')
-  if (typeof inviteId !== 'string' || !inviteId) return
+  const parsed = deleteInvitationSchema.safeParse({
+    invitationId: formData.get('invite_id'),
+  })
+  if (!parsed.success) return
+
+  const { invitationId } = parsed.data
 
   const supabaseAdmin = createAdminClient()
   const { error } = await supabaseAdmin
     .from('invitations')
     .delete()
-    .eq('id', inviteId)
+    .eq('id', invitationId)
 
   if (error) return
 
@@ -248,8 +236,10 @@ export async function deleteUserAction(formData: FormData): Promise<void> {
   const adminCheck = await assertAdmin()
   if (!adminCheck.ok) return
 
-  const targetUserId = formData.get('user_id')
-  if (typeof targetUserId !== 'string' || !targetUserId) return
+  const parsed = uuidSchema.safeParse(formData.get('user_id'))
+  if (!parsed.success) return
+
+  const targetUserId = parsed.data
 
   // Prevent deleting your own active admin account from this panel.
   if (targetUserId === adminCheck.userId) return

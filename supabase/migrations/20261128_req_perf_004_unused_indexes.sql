@@ -1,0 +1,26 @@
+-- ============================================================================
+-- REQ-PERF-004 — Índices no utilizados en `crm_leads` (análisis)
+-- ============================================================================
+-- RESULTADO DEL ANÁLISIS: SE MANTIENEN los índices
+--   `crm_leads_status_idx` y `crm_leads_created_at_idx`.
+--
+-- Motivo (criterio 3 de la SRS): aunque pg_stat_statements no registra uso,
+-- el código fuente SÍ filtra y ordena por estas columnas:
+--
+--   app/dashboard/admin/leads/page.tsx
+--     .order('created_at', { ascending: false })   → necesita created_at_idx
+--     query.eq('status', selectedStatus)           → necesita status_idx
+--
+-- Se documenta la razón y se conservan los índices. Si en el futuro el
+-- filtro por status deja de usarse, revisar con:
+--
+--   SELECT indexrelname FROM pg_stat_user_indexes
+--   WHERE relname = 'crm_leads' AND idx_scan = 0;
+--
+-- y entonces sí aplicar:
+--   DROP INDEX IF EXISTS public.crm_leads_status_idx;
+--   DROP INDEX IF EXISTS public.crm_leads_created_at_idx;
+-- (comentado intencionalmente — NO ejecutar hoy)
+
+-- Verificación: código fuente revisado + advisor `unused_index` con
+-- documentación de excepción aprobada.

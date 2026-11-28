@@ -10,9 +10,20 @@ WORKDIR /app
 # Se instala en un paquete minimo (sin el package.json del monorepo app) para
 # evitar conflictos de peer deps con Next (@types/node). --legacy-peer-deps
 # evita el ERESOLVE al no instalar la App completa.
-RUN npm init -y && npm install vitest@5.1.0 vite@^7 typescript@^5
+# zod se instala porque lib/validation/*.ts (REQ-FUNC-002/003/004) lo importa.
+RUN npm config set fund false --location=global && npm config set audit false --location=global
 
-COPY vitest.config.mjs ./
+# Package.json mínimo (solo toolchain de pruebas). --legacy-peer-deps reduce
+# conflictos ERESOLVE al no instalar la App completa.
+RUN npm init -y
+RUN npm install --no-audit --no-fund --legacy-peer-deps \
+    vitest@5.1.0 \
+    vite@7.2.4 \
+    typescript@5.9.3 \
+    zod@4.3.6 \
+    @types/node@^20
+
+COPY vitest.config.ts ./
 COPY tsconfig.test.json ./
 COPY lib ./lib
 COPY types ./types

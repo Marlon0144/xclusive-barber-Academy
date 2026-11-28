@@ -325,6 +325,9 @@ export const dictionaries = {
       },
       login: {
         invalidCredentials: 'Credenciales incorrectas',
+        invalidEmail: 'Correo electrónico inválido.',
+        invalidPassword: 'La contraseña debe tener al menos 6 caracteres.',
+        invalidForm: 'Datos del formulario inválidos.',
       },
       landing: {
         invalidEmail: 'Correo electronico invalido.',
@@ -389,6 +392,7 @@ export const dictionaries = {
         unauthenticated: 'No estás autenticado.',
         instructorOnly: 'No tienes permisos de instructor para realizar esta acción.',
         submissionMissing: 'No se encontró el envío o no tienes permiso para verlo.',
+        invalidGrades: 'Los criterios de calificación son inválidos (valores entre 0 y 10).',
         manualPending: 'Feedback manual pendiente.',
         aiError: 'No se pudo generar feedback automático.',
         unexpectedError: 'Ocurrió un error inesperado en el servidor.',
@@ -1051,6 +1055,9 @@ export const dictionaries = {
       },
       login: {
         invalidCredentials: 'Invalid credentials',
+        invalidEmail: 'Invalid email address.',
+        invalidPassword: 'Password must be at least 6 characters.',
+        invalidForm: 'Invalid form data.',
       },
       landing: {
         invalidEmail: 'Invalid email address.',
@@ -1112,6 +1119,7 @@ export const dictionaries = {
         unauthenticated: 'You are not authenticated.',
         instructorOnly: 'You do not have instructor permissions for this action.',
         submissionMissing: 'Submission not found or you do not have permission to view it.',
+        invalidGrades: 'Grade criteria are invalid (values between 0 and 10).',
         manualPending: 'Manual feedback pending.',
         aiError: 'Automatic feedback could not be generated.',
         unexpectedError: 'An unexpected server error occurred.',
@@ -1475,7 +1483,7 @@ export type Dictionary = DictionaryShape
 // Paridad es/en: fuerza que la rama `en` (y la `es`) compartan la MISMA forma.
 // Si `en` gana o pierde una clave respecto a `es`, el literal deja de satisfacer
 // `DictionaryShape` y el compilador falla.
-const _dictionaryParity: Record<Language, DictionaryShape> = dictionaries
+export const dictionaryParity: Record<Language, DictionaryShape> = dictionaries
 
 export function getDictionary(language: Language): Dictionary {
   return dictionaries[language]

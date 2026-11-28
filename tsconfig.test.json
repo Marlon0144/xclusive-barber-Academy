@@ -19,6 +19,9 @@
     "lib/i18n/dictionaries.ts",
     "lib/i18n/localize.ts",
     "lib/i18n/progress-localization.ts",
+    "lib/validation/login.ts",
+    "lib/validation/gestion-users.ts",
+    "lib/validation/grading.ts",
     "types/progress.ts",
     "tests/**/*.test.ts"
   ]

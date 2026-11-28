@@ -3,4 +3,4 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.test
-    command: ["npx", "vitest", "run"]
+    command: ["sh", "-c", "npx tsc --noEmit -p tsconfig.test.json && npx vitest run"]

@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest'
 import { dictionaries, getDictionary } from '@/lib/i18n/dictionaries'
-import type { Language } from '@/lib/i18n/config'
 
 type UnknownRecord = Record<string, unknown>
 

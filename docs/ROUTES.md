@@ -13,7 +13,7 @@ routes or modifying existing ones.
 | `/en` | No | Any | RSC (same page as `/`, English by URL) | Standard |
 | `/apply` | No | Any | RSC + Client | Standard |
 | `/login` | No | Any | RSC | Standard |
-| `/signup` | No | Any | Client | Standard |
+| `/signup` | No | Any | RSC (308 → `/apply`) | Standard |
 | `/dashboard` | Yes | Any | RSC | Standard |
 | `/dashboard/courses` | Yes | Any | RSC | Standard |
 | `/dashboard/courses/[courseId]/[lessonId]` | Yes | Any | RSC + Client | Standard |
@@ -43,7 +43,7 @@ equivalent one (`lib/i18n/routes.ts`); see `docs/SEO_AND_ADS_PLAYBOOK.md`.
 
 | Surface | Status |
 |---------|--------|
-| Landing, header, login, apply, signup, qualify, public courses | ✅ Localized via dictionary |
+| Landing, header, login, apply, qualify, public courses | ✅ Localized via dictionary |
 | `/dashboard` hub | ⏳ Hardcoded Spanish (pending `req003.md`) |
 | `/dashboard/courses` list | ⏳ Hardcoded Spanish + DB titles (pending `req004.md`) |
 | `/dashboard/courses/[courseId]/[lessonId]` | ⏳ Hardcoded Spanish (pending `req005.md`) |
@@ -217,16 +217,16 @@ displayed as red banner.
 
 ---
 
-### `/signup` — Signup page (legacy)
+### `/signup` — Signup page (deprecated → `/apply`)
 
 **File:** `app/signup/page.tsx`
-**Rendering:** Client Component
-**Auth:** None
+**Rendering:** RSC — solo emite `permanentRedirect('/apply')` (308)
 
-**Server Action:** `signup(prevState, formData)`
+**Server Action:** Ninguno (se eliminó `app/signup/actions.ts` — REQ-FUNC-001/005).
 
-> **Note:** This is a legacy route. The `/apply` page is the current
-> registration flow with a more polished UI.
+> **Note:** La única ruta de registro es `/apply`. `/signup` es legacy y
+> redirige permanentemente (308) para no romper enlaces guardados. El
+> middleware ya no referencia `/signup`.
 
 ---
 
@@ -586,6 +586,6 @@ videoUrl)`
 1. Refresh Supabase auth session (token rotation)
 2. If unauthenticated and path starts with `/dashboard` → redirect
    to `/login`
-3. If authenticated and path is `/login` or `/signup` → redirect
-   to `/dashboard`
+3. If authenticated and path is `/login` or `/apply` (= `/signup`
+   redirects 308 to `/apply` first) → redirect to `/dashboard`
 4. Otherwise, allow the request through

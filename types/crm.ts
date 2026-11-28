@@ -10,6 +10,13 @@ export type LongTermAmbition =
 export type DiscoverySource = 'yes' | 'no'
 export type CallWillingness = 'yes' | 'maybe' | 'no'
 
+/**
+ * Estado de un lead (REQ-DATA-002 — refleja el ENUM nativo `lead_status_type`
+ * creado en la migración 20261128_req_data_002_enums.sql).
+ * Valores usados por app/dashboard/admin/leads (page + actions).
+ */
+export type LeadStatus = 'new' | 'contacted' | 'qualified' | 'lost' | 'converted'
+
 export type LeadAnswers = {
   citySuburb: string
   hasCutHairBefore: DiscoverySource

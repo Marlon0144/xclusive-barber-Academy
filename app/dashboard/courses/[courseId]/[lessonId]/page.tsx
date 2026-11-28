@@ -22,7 +22,7 @@ interface LessonPageProps {
 interface LessonNavItem {
   id: string
   title: string
-  position: number
+  order_index: number
 }
 
 export default async function LessonPage({ params }: LessonPageProps) {
@@ -59,12 +59,12 @@ export default async function LessonPage({ params }: LessonPageProps) {
   const [{ data: allLessons }, { data: moduleData }] = await Promise.all([
     supabase
       .from('lessons')
-      .select('id, title, title_en, position')
+      .select('id, title, title_en, order_index')
       .eq('module_id', lesson.module_id)
-      .order('position', { ascending: true }),
+      .order('order_index', { ascending: true }),
     supabase
       .from('modules')
-      .select('title, title_en, description, description_en, position')
+      .select('title, title_en, description, description_en, order_index')
       .eq('id', lesson.module_id)
       .single(),
   ])
@@ -81,7 +81,7 @@ export default async function LessonPage({ params }: LessonPageProps) {
     es: moduleData?.description ?? '',
     en: moduleData?.description_en ?? null,
   })
-  const moduleNumber = moduleData?.position ?? 1
+  const moduleNumber = moduleData?.order_index ?? 1
 
   // ── Asset paths (all from /assets/dashboard/courses/lessons/) ────────────────
   const A = {

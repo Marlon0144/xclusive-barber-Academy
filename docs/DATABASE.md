@@ -66,8 +66,10 @@ registration via Admin client (bypasses RLS).
 | Column | Type | Constraints | Description |
 |--------|------|-------------|-------------|
 | `id` | `uuid` | PK, FK → `auth.users.id` | Supabase Auth user ID |
-| `role` | `user_role` | NOT NULL | `admin`, `student`, or `instructor` |
+| `role` | `user_role` | NULLABLE, DEFAULT `'student'` | `admin`, `student`, or `instructor` (nullable en el schema real; el código asume default estudiante) |
 | `full_name` | `text` | NOT NULL | Display name |
+| `email` | `text` | NULLABLE | User email |
+| `avatar_url` | `text` | NULLABLE | Profile avatar |
 | `created_at` | `timestamptz` | DEFAULT `now()` | Registration timestamp |
 
 **Access patterns:**
@@ -86,16 +88,14 @@ assigned a competency for professional progress tracking.
 | `id` | `uuid` | PK, DEFAULT `gen_random_uuid()` | Module ID |
 | `title` | `text` | NOT NULL | Module display name (Spanish) |
 | `description` | `text` | NULLABLE | Module description (Spanish); read in `CourseListView` |
-| `order_index` | `integer` | NOT NULL | Sort order |
-| `competency` | `text` | CHECK constraint | Competency category (nullable) |
+| `order_index` | `integer` | NULLABLE, DEFAULT `0` | Sort order (nullable en el schema real) |
+| `competency` | `text` | CHECK constraint | Competency category (nullable; pendiente migrar a ENUM nativo `competency_type` — REQ-DATA-002) |
 | `created_at` | `timestamptz` | DEFAULT `now()` | Creation timestamp |
-| `title_en` | `text` | **PENDING** (nullable) | English title — not yet migrated |
-| `description_en` | `text` | **PENDING** (nullable) | English description — not yet migrated |
 
-> **⚠️ Pending migration:** `title_en` and `description_en` do **not**
-> yet exist in production. They are part of the i18n spec
-> (`scripts/2026-11-16-i18n-content-titles.sql`, `docs/specs/req009.md`).
-> Do not reference them in code until the migration is applied.
+> **⚠️ Pending migration (i18n):** `title_en` / `description_en` no
+> existen aún en producción (`scripts/2026-11-16-i18n-content-titles.sql`,
+> `docs/specs/req009.md` / SRS001). Se movieron fuera de la tabla de
+> columnas reales; no referenciarlas en código hasta aplicar la migración.
 
 **Competency CHECK constraint:**
 ```sql
@@ -126,21 +126,19 @@ rich text editor.
 | `description` | `text` | NULLABLE | Lesson description (Spanish); rendered in lesson page |
 | `content` | `text` | DEFAULT `''` | HTML content (Tiptap) — NOT translated |
 | `video_url` | `text` | DEFAULT `''` | YouTube URL |
-| `order_index` | `integer` | NOT NULL | Sort order within module |
-| `title_en` | `text` | **PENDING** (nullable) | English title — not yet migrated |
+| `order_index` | `integer` | NULLABLE, DEFAULT `0` | **Única** columna de ordenamiento (REQ-DATA-001) — la columna duplicada `position` fue eliminada |
 
-> **⚠️ Pending migration:** `title_en` does **not** yet exist in
-> production (`scripts/2026-11-16-i18n-content-titles.sql`). `content`
-> (HTML) is intentionally left out of translation scope (see
+> **⚠️ Pending migration (i18n):** `title_en` no existe aún en
+> producción (`scripts/2026-11-16-i18n-content-titles.sql`). `content`
+> (HTML) está intencionalmente fuera del alcance de traducción (ver
 > `docs/specs/srs001.md` §REQ-ML-001).
 
-**⚠️ Ordering column inconsistency:** the admin panel
-(`admin/courses/actions.ts`) and courses list page order/write
-`order_index`, but the lesson player page
-(`app/dashboard/courses/[courseId]/[lessonId]/page.tsx`) and
-`components/courses/CourseSidebar.tsx` `select(... 'position')` and
-`.order('position')`. One of these is a stale column reference — verify
-the real column in Supabase and unify to `order_index`.
+**Ordenamiento (REQ-DATA-001 resuelto):** la columna `position`
+(smallint) era un artefacto sin uso — `grep` sobre `app/ lib/ utils/`
+no devuelve referencias. Se eliminó vía migración
+`supabase/migrations/20261128_req_data_001_lessons_position.sql`;
+`order_index` es la única fuente de verdad (la escribe
+`reorderLessonsInModule()` en `admin/courses/actions.ts`).
 
 **Access patterns:**
 - `getLessonById(id)` — Cached helper
@@ -581,10 +579,10 @@ status instead of segment columns.
 
 | # | Area | Description | Priority |
 |---|------|-------------|----------|
-| 1 | RLS | Admin policies inconsistently check JWT metadata vs. `profiles.role` | High |
+| 1 | RLS | ~Resuelto (REQ-SEC-001): políticas admin de `modules`/`lessons` unificadas a `profiles.role`. Verificar con advisor que no quede `auth.jwt()` en `public` | High |
 | 2 | Types | Some inline types could be extracted to `types/` for reuse | Low |
-| 3 | Validation | Not all Server Actions use Zod schemas (some use manual checks) | Medium |
-| 4 | Schema | `lessons`/`modules` ordering mixes `order_index` (admin, list) with `position` (lesson page, `CourseSidebar`) — stale column reference to be unified | High |
+| 3 | Validation | ~Resuelto (REQ-FUNC-002/003/004): login, gestión de usuarios y grading ahora usan Zod (`lib/validation/`) | Medium |
+| 4 | Schema | ~Resuelto (REQ-DATA-001): `position` eliminada; `order_index` es la única columna de ordenamiento | High |
 | 5 | i18n | `title_en`/`description_en` columns are specified but not yet migrated (`scripts/2026-11-16-i18n-content-titles.sql` pending) | Medium |
 | 6 | i18n | Dashboard interior (`/dashboard`, course viewer, lesson player, tracker, grading, progress, admin) still hardcodes Spanish strings | Medium |
 

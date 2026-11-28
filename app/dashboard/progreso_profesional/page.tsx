@@ -199,7 +199,6 @@ export default async function ProgressPage() {
     ...comp,
     label: competencyLabels[comp.key],
   }))
-  const localizedCurrent = levelsByKey[currentLevel.key]
   const localizedNext = nextLevel ? levelsByKey[nextLevel.key] : null
 
   const levelKeys = PROFESSIONAL_LEVEL_KEYS

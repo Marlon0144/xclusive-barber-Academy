@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Skills del agente: código de tooling externo, no parte del proyecto.
+    ".agents/**",
   ]),
 ]);
 

@@ -5,13 +5,7 @@ import { revalidatePath } from 'next/cache'
 // Asegúrate de que esta ruta sea correcta, si no la tienes, comenta la línea de IA temporalmente para probar
 import { generateAIFeedback } from '@/utils/openai'
 import { getServerDictionary, getServerLanguage } from '@/lib/i18n/server'
-
-interface Grades {
-  fade: number
-  cleanliness: number
-  technique: number
-  symmetry: number
-}
+import { submitGradeSchema, type Grades } from '@/lib/validation/grading'
 
 // Definimos un tipo de retorno para que el frontend sepa qué esperar
 export type GradeState = {
@@ -24,6 +18,13 @@ export async function submitGrade(submissionId: string, grades: Grades): Promise
     const language = await getServerLanguage()
     const dictionary = await getServerDictionary()
     const messages = dictionary.actions.grading
+
+    // 0. VALIDAR (REQ-FUNC-004) — Zod antes de tocar BD o IA
+    const parsed = submitGradeSchema.safeParse({ submissionId, grades })
+    if (!parsed.success) {
+      return { error: messages.invalidGrades }
+    }
+
     const supabase = await createClient()
 
     // 1. Verificar Usuario
@@ -45,7 +46,7 @@ export async function submitGrade(submissionId: string, grades: Grades): Promise
     const { data: submission, error: fetchError } = await supabase
       .from('submissions')
       .select('cut_type')
-      .eq('id', submissionId)
+      .eq('id', parsed.data.submissionId)
       .single()
 
     if (fetchError || !submission) return { error: messages.submissionMissing }
@@ -54,7 +55,7 @@ export async function submitGrade(submissionId: string, grades: Grades): Promise
     let feedback: string = messages.manualPending
     try {
       if (submission.cut_type) {
-        feedback = await generateAIFeedback(submission.cut_type, grades, language)
+        feedback = await generateAIFeedback(submission.cut_type, parsed.data.grades, language)
       }
     } catch (aiError) {
       console.error("Error generando IA:", aiError)
@@ -66,13 +67,13 @@ export async function submitGrade(submissionId: string, grades: Grades): Promise
     const { error: updateError } = await supabase
       .from('submissions')
       .update({
-        scores: grades, // Asegúrate que tu columna en Supabase sea tipo JSONB
+        scores: parsed.data.grades, // Asegúrate que tu columna en Supabase sea tipo JSONB
         status: 'reviewed',
         feedback_ai: feedback,
         graded_at: new Date().toISOString(), // Opcional: útil para saber cuándo se calificó
         grader_id: user.id // Opcional: saber quién calificó
       })
-      .eq('id', submissionId)
+      .eq('id', parsed.data.submissionId)
 
     if (updateError) {
       console.error("Error DB Update:", updateError)

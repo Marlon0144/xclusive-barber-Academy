@@ -13,7 +13,7 @@ interface Lesson {
   id: string
   title: string
   title_en: string | null
-  position: number
+  order_index: number
   module_id: string
   lesson_progress: LessonProgress[] | null
 }
@@ -32,12 +32,12 @@ const fetchLessonsWithProgress = React.cache(async (moduleId: string) => {
       id, 
       title, 
       title_en,
-      position, 
+      order_index, 
       module_id,
       lesson_progress ( is_completed )
     `)
     .eq('module_id', moduleId)
-    .order('position', { ascending: true })
+    .order('order_index', { ascending: true })
 
   return lessons as Lesson[] | null
 })

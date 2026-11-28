@@ -120,7 +120,6 @@ export async function updateSession(request: NextRequest) {
     user &&
     (
       request.nextUrl.pathname === '/login' ||
-      request.nextUrl.pathname === '/signup' ||
       request.nextUrl.pathname === '/apply' ||
       request.nextUrl.pathname === '/qualify'
     )

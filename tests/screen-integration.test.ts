@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Pruebas de integración de pantalla (estáticas) — REQ-FUNC-001..010, REQ-INT-00x.
  *
@@ -8,8 +7,7 @@
  * cableados al diccionario i18n y a las columnas `_en` (REQ-INT-003/004) según
  * la SRS. Esto da cobertura de "screen integration" sin arrancar el framework.
  *
- * Nota: @ts-nocheck desactiva el chequeo de tipos en este archivo ya que
- * usa `node:fs` sin @types/node instalado en el contenedor.
+ * Nota: `node:fs`/`node:path` están tipados vía `@types/node` (devDependency).
  */
 import { describe, expect, it } from 'vitest'
 import { readFileSync } from 'node:fs'
